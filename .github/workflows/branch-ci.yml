@@ -1,12 +1,10 @@
 name: Theeb Stream branch CI
 
 on:
-  push:
-    branches:
-      - bootstrap/theeb-stream-foundation
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
