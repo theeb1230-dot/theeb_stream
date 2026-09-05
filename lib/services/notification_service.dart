@@ -43,9 +43,9 @@ class NotificationService {
   }) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'maxstream_channel',
-          'MaxStream Notifications',
-          channelDescription: 'Notifications for content availability',
+          'theeb_stream_channel',
+          'إشعارات ذيب ستريم',
+          channelDescription: 'إشعارات توفر المحتوى',
           importance: Importance.max,
           priority: Priority.high,
           showWhen: true,
@@ -75,9 +75,9 @@ class NotificationService {
     String? size,
   }) async {
     final androidDetails = AndroidNotificationDetails(
-      'maxstream_downloads',
-      'Media downloads',
-      channelDescription: 'Progress for offline movie and episode downloads',
+      'theeb_stream_downloads',
+      'تنزيلات الوسائط',
+      channelDescription: 'تقدم تنزيل الأفلام والحلقات للمشاهدة دون اتصال',
       importance: Importance.low,
       priority: Priority.low,
       category: AndroidNotificationCategory.progress,
@@ -105,9 +105,9 @@ class NotificationService {
     String? error,
   }) async {
     const androidDetails = AndroidNotificationDetails(
-      'maxstream_downloads',
-      'Media downloads',
-      channelDescription: 'Progress for offline movie and episode downloads',
+      'theeb_stream_downloads',
+      'تنزيلات الوسائط',
+      channelDescription: 'تقدم تنزيل الأفلام والحلقات للمشاهدة دون اتصال',
       importance: Importance.defaultImportance,
       priority: Priority.defaultPriority,
       autoCancel: true,
@@ -117,7 +117,7 @@ class NotificationService {
     );
     await _notificationsPlugin.show(
       id,
-      error == null ? 'Download complete' : 'Download failed',
+      error == null ? 'اكتمل التنزيل' : 'فشل التنزيل',
       error == null ? label : '$label · $error',
       const NotificationDetails(android: androidDetails),
       payload: 'downloads',
@@ -131,8 +131,8 @@ class NotificationService {
   }) async {
     await showNotification(
       id: DateTime.now().millisecond,
-      title: 'New on $providerName!',
-      body: '$contentTitle is now available on $providerName ($mediaType)',
+      title: 'جديد على $providerName',
+      body: '$contentTitle متاح الآن على $providerName ($mediaType)',
       payload: 'new_content:$contentTitle:$providerName',
     );
   }
@@ -145,8 +145,8 @@ class NotificationService {
     final providers = providerNames.join(', ');
     await showNotification(
       id: DateTime.now().millisecond,
-      title: '$contentTitle is now on multiple platforms!',
-      body: 'Available on: $providers',
+      title: '$contentTitle متاح الآن على عدة مصادر',
+      body: 'متاح على: $providers',
       payload: 'content_expanded:$contentTitle',
     );
   }
@@ -157,8 +157,8 @@ class NotificationService {
   }) async {
     await showNotification(
       id: DateTime.now().millisecond,
-      title: 'Your Favorite Provider Has It!',
-      body: '$contentTitle just became available on $providerName',
+      title: 'المحتوى متاح على مصدرك المفضل',
+      body: '$contentTitle أصبح متاحًا الآن على $providerName',
       payload: 'preferred:$contentTitle:$providerName',
     );
   }
