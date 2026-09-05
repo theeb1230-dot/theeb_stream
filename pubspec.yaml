@@ -1,0 +1,80 @@
+name: theeb_stream
+description: ذيب ستريم - تطبيق Flutter وAndroid TV للمشاهدة والاستكشاف
+publish_to: 'none'
+version: 1.6.0+8
+
+environment:
+  sdk: '>=3.8.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  video_player: ^2.8.2
+  video_player_android: ^2.12.2
+  video_player_platform_interface: ^6.6.0
+  fvp: ^0.38.1
+  cupertino_icons: ^1.0.8
+  flutter_inappwebview: ^6.2.0-beta.3
+  http: ^1.4.0
+  cached_network_image: ^3.2.3
+  provider: ^6.0.5
+  logger: ^2.0.2
+  youtube_player_flutter: ^9.1.1 
+  sqflite: ^2.3.2
+  path: ^1.8.3
+  url_launcher: ^6.2.6
+  firebase_core: ^3.15.2
+  firebase_auth: ^5.1.0
+  cloud_firestore: ^5.0.1
+  firebase_database: ^11.3.2
+  google_sign_in: ^6.3.0
+  glassmorphism: ^3.0.0
+  shimmer: ^3.0.0
+  shared_preferences: ^2.2.2
+  dio: ^5.4.0
+  encrypt: ^5.0.3
+  lottie: ^3.1.0
+  path_provider: ^2.1.1
+  flutter_local_notifications: ^19.4.2
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.4
+  installed_apps: ^2.0.0
+  html: ^0.15.4
+  package_info_plus: ^9.0.0
+  permission_handler: ^12.0.1
+  image_picker: ^1.0.8
+  image: ^4.1.0
+  local_auth: ^2.3.0
+  flutter_secure_storage: ^9.0.0
+  google_fonts: ^6.1.0
+  wakelock_plus: ^1.2.1
+  web: ^1.1.1
+  firebase_crashlytics: ^4.3.10
+  speech_to_text: ^7.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/movies.json
+    - assets/images/background.jpg
+    - assets/images/theeb_stream_logo.png
+    - assets/images/app_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/app_icon.png
+  adaptive_icon_background: "#0F172A"
+
+flutter_native_splash:
+  color: "#0F172A"
+  image: assets/images/theeb_stream_logo.png
+  android: true
+  ios: true
+  fullscreen: true

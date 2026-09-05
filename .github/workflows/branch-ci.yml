@@ -1,0 +1,42 @@
+name: Theeb Stream branch CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: theeb-stream-branch-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flutter-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Audit legacy identity and auth references
+        shell: bash
+        run: |
+          echo "=== package:maxstream imports ==="
+          grep -RIn --exclude-dir=.git --exclude='*.lock' 'package:maxstream' lib test || true
+          echo "=== visible/auth references ==="
+          grep -RIn --exclude-dir=.git -E 'MaxStream|Sign[ -]?In|Sign[ -]?Out|Login|FirebaseAuth|AuthRepository|SessionManager' lib android/tvapp/src/main || true
+
+      - name: Flutter analyze
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+
+      - name: Flutter tests
+        run: flutter test

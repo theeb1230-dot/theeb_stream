@@ -1,0 +1,50 @@
+name: Generate Theeb Stream brand assets
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - bootstrap/theeb-stream-foundation
+    paths:
+      - "tools/generate_brand_assets.py"
+      - ".github/workflows/generate-brand-assets.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: theeb-stream-brand-assets
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate deterministic brand assets
+        run: python3 tools/generate_brand_assets.py
+
+      - name: Remove obsolete MaxStream brand files
+        shell: bash
+        run: |
+          rm -f assets/images/maxstream_logo.png
+          rm -f android/app/src/main/res/drawable/maxstream_logo.xml
+          rm -f android/tvapp/src/main/res/drawable/maxstream_logo.xml
+
+      - name: Commit generated assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Brand assets already up to date."
+            exit 0
+          fi
+          git commit -m "feat: generate Theeb Stream brand assets"
+          git push origin HEAD:bootstrap/theeb-stream-foundation

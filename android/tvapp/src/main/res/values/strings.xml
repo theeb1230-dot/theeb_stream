@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ذيب ستريم</string>
+    <string name="home">الرئيسية</string>
+    <string name="search">البحث</string>
+    <string name="genre">التصنيفات</string>
+    <string name="series">المسلسلات</string>
+    <string name="watchlist">قائمتي</string>
+    <string name="more">المزيد</string>
+    <string name="play">تشغيل</string>
+    <string name="resume">متابعة</string>
+    <string name="details">التفاصيل</string>
+    <string name="continue_watching">متابعة المشاهدة</string>
+    <string name="trending_movies">أفلام رائجة</string>
+    <string name="trending_series">مسلسلات رائجة</string>
+    <string name="popular_movies">أفلام شائعة</string>
+    <string name="top_rated">الأعلى تقييمًا</string>
+</resources>

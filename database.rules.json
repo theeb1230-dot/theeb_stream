@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "$uid === auth.uid",
+        ".write": "$uid === auth.uid",
+        "watch_history": {
+          "$key": {
+            ".read": "$uid === auth.uid",
+            ".write": "$uid === auth.uid"
+          }
+        },
+        "watchlist": {
+          "$key": {
+            ".read": "$uid === auth.uid",
+            ".write": "$uid === auth.uid"
+          }
+        },
+        "profile": {
+          ".read": "$uid === auth.uid",
+          ".write": "$uid === auth.uid"
+        }
+      }
+    },
+    "device_codes": {
+      "$code": {
+        ".read": true,
+        ".write": "auth != null"
+      }
+    },
+    "tv_authenticated_sessions": {
+      "$session": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "biometric_sessions": {
+      "$session": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "login_audits": {
+      "$audit": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+  }
+}

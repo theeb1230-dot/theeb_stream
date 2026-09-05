@@ -1,0 +1,76 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# Generated platform plugin registrants (recreated by flutter pub get)
+linux/flutter/ephemeral/
+macos/Flutter/ephemeral/
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# The .vscode folder contains launch configuration and tasks you configure in
+# VS Code which you may wish to be included in version control, so this line
+# is commented out by default.
+#.vscode/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Keystore files
+*.jks
+key.jks
+
+# Firebase/Google Services configuration (contains sensitive credentials)
+google-services.json
+**/android/**/google-services.json
+**/ios/**/GoogleService-Info.plist
+
+# Signing credentials (contains sensitive keystore passwords)
+keystore.properties
+**/android/**/keystore.properties
+local.properties
+
+.mimocode
+
+# Firebase / Firestore rules
+dart_tv_reference
+.agents
+.firebaserc
+skills-lock.json
+.jsonfirebaserc
