@@ -1,3 +1,4 @@
+# Bootstrap extraction workflow. A second push ensures GitHub registers the newly added workflow before execution.
 name: Bootstrap Theeb Stream source
 
 on:
@@ -46,7 +47,9 @@ jobs:
             src="$tmpdir/"
           fi
 
-          rsync -a "$src" ./             --exclude '.git/'             --exclude '.github/workflows/bootstrap-source.yml'
+          rsync -a "$src" ./ \
+            --exclude '.git/' \
+            --exclude '.github/workflows/bootstrap-source.yml'
 
           rm maxstream-main.zip
 
