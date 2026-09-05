@@ -19,7 +19,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.maxstream.tv"
+        applicationId = "com.theebstream.tv"
         minSdk = 23
         targetSdk = 34
         versionCode = 8
