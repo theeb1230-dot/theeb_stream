@@ -11,9 +11,9 @@ import 'notification_service.dart';
 
 /// APK variant names matching GitHub release assets.
 const Map<String, String> kApkVariants = {
-  'arm64-v8a': 'maxstream-arm64-v8a.apk',
-  'armeabi-v7a': 'maxstream-armeabi-v7a.apk',
-  'x86_64': 'maxstream-x86_64.apk',
+  'arm64-v8a': 'theeb-stream-arm64-v8a.apk',
+  'armeabi-v7a': 'theeb-stream-armeabi-v7a.apk',
+  'x86_64': 'theeb-stream-x86_64.apk',
 };
 
 /// Get the device's primary ABI (arm64-v8a, armeabi-v7a, x86_64).
@@ -78,7 +78,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(isDone ? 'Download complete' : 'Downloading update...'),
+          Text(isDone ? 'اكتمل التنزيل' : 'جارٍ تنزيل التحديث...'),
           const SizedBox(height: 16),
           LinearProgressIndicator(value: _progress >= 0 ? _progress : null),
           const SizedBox(height: 8),
@@ -92,12 +92,12 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
             ),
             TextButton(
               onPressed: () async {
-                final uri = Uri.parse('https://maxstreamweb.vercel.app/');
+                final uri = Uri.parse('https://github.com/theeb1230-dot/theeb_stream/releases');
                 if (await canLaunchUrl(uri)) {
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 }
               },
-              child: const Text('Open Website'),
+              child: const Text('فتح صفحة الإصدارات'),
             ),
           ],
         ],
@@ -117,7 +117,7 @@ class DownloadCompleteDialog extends StatelessWidget {
   });
 
   Future<void> _launchWebsite() async {
-    final uri = Uri.parse('https://maxstreamweb.vercel.app/');
+    final uri = Uri.parse('https://github.com/theeb1230-dot/theeb_stream/releases');
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
@@ -134,7 +134,7 @@ class DownloadCompleteDialog extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Failed to launch installer. Try downloading from website.'),
-            action: SnackBarAction(label: 'Website', onPressed: _launchWebsite),
+            action: SnackBarAction(label: 'الإصدارات', onPressed: _launchWebsite),
           ),
         );
       }
@@ -143,7 +143,7 @@ class DownloadCompleteDialog extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Install failed: $e'),
-            action: SnackBarAction(label: 'Website', onPressed: _launchWebsite),
+            action: SnackBarAction(label: 'الإصدارات', onPressed: _launchWebsite),
           ),
         );
       }
@@ -153,7 +153,7 @@ class DownloadCompleteDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Download Complete'),
+      title: const Text('اكتمل التنزيل'),
       content: const Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,15 +169,15 @@ class DownloadCompleteDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Later'),
+          child: const Text('لاحقًا'),
         ),
         TextButton(
           onPressed: _launchWebsite,
-          child: const Text('Website'),
+          child: const Text('الإصدارات'),
         ),
         FilledButton(
           onPressed: () => _tryInstall(context),
-          child: const Text('Install'),
+          child: const Text('تثبيت'),
         ),
       ],
     );
@@ -185,8 +185,8 @@ class DownloadCompleteDialog extends StatelessWidget {
 }
 
 class UpdateService {
-  static const String githubOwner = 'chila254';
-  static const String githubRepo = 'maxstream';
+  static const String githubOwner = 'theeb1230-dot';
+  static const String githubRepo = 'theeb_stream';
   static const String latestReleaseUrl =
       'https://api.github.com/repos/$githubOwner/$githubRepo/releases/latest';
 
@@ -227,7 +227,7 @@ class UpdateService {
 
       // Auto-detect device variant and find matching APK asset.
       final deviceArch = await getDeviceArch();
-      final expectedFilename = kApkVariants[deviceArch] ?? 'maxstream-arm64-v8a.apk';
+      final expectedFilename = kApkVariants[deviceArch] ?? 'theeb-stream-arm64-v8a.apk';
 
       final assets = response.data['assets'] as List<dynamic>? ?? [];
 
@@ -246,7 +246,7 @@ class UpdateService {
       // Fallback: find any arm64 APK (most common).
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
-        if (name.endsWith('.apk') && name.contains('maxstream-arm64')) {
+        if (name.endsWith('.apk') && name.contains('theeb-stream-arm64')) {
           return UpdateInfo(
             downloadUrl: asset['browser_download_url'] as String,
             version: latestVersion,
@@ -259,7 +259,7 @@ class UpdateService {
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
         if (name.endsWith('.apk') &&
-            name.contains('maxstream') &&
+            name.contains('theeb-stream') &&
             !name.contains('-tv')) {
           return UpdateInfo(
             downloadUrl: asset['browser_download_url'] as String,
@@ -290,9 +290,9 @@ class UpdateService {
       final notificationService = NotificationService();
       await notificationService.showNotification(
         id: 9999,
-        title: 'Update Available',
+        title: 'تحديث جديد متاح',
         body:
-            'MaxStream ${availableUpdate.version} is available (current: $currentVersion). Tap to download.',
+            'يتوفر ذيب ستريم ${availableUpdate.version} (الإصدار الحالي: $currentVersion). اضغط للتنزيل.',
         payload: 'update:${availableUpdate.downloadUrl}',
       );
     } catch (_) {
@@ -326,7 +326,7 @@ class UpdateService {
     bool progressShown = false;
     try {
       final directory = await getTemporaryDirectory();
-      filePath = '${directory.path}/MaxStream.apk';
+      filePath = '${directory.path}/TheebStream.apk';
 
       if (context.mounted) {
         progressShown = true;
@@ -386,9 +386,9 @@ class UpdateService {
           SnackBar(
             content: Text('Error downloading update: $e'),
             action: SnackBarAction(
-              label: 'Website',
+              label: 'الإصدارات',
               onPressed: () async {
-                final uri = Uri.parse('https://maxstreamweb.vercel.app/');
+                final uri = Uri.parse('https://github.com/theeb1230-dot/theeb_stream/releases');
                 if (await canLaunchUrl(uri)) {
                   await launchUrl(uri, mode: LaunchMode.externalApplication);
                 }
