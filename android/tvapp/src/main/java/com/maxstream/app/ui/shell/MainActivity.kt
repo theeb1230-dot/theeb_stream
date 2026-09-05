@@ -46,7 +46,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.maxstream.app.data.local.WatchEntryCompat
 import com.maxstream.app.ui.navigation.Screen
-import com.maxstream.app.ui.screens.auth.LoginScreen
 import com.maxstream.app.ui.screens.details.DetailsScreen
 import com.maxstream.app.ui.screens.genre.GenreScreen
 import com.maxstream.app.ui.screens.home.HomeScreen
@@ -65,10 +64,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         WatchEntryCompat.init(applicationContext)
-        // Continuous cloud sync (watch progress + watchlist) while signed in —
-        // mirrors the Dart phone app's CloudSyncService.startListening().
-        com.maxstream.app.data.repository.CloudSyncCoordinator.start(applicationContext)
-
         try {
             setContent {
                 MaxStreamTheme {
@@ -100,7 +95,7 @@ private fun TvAppRoot() {
     val contentFocusRequester  = remember { FocusRequester() }
 
     // ── Two NavHosts (mirrors Dart: IndexedStack shell + Navigator overlays) ─
-    // shellNavController holds Splash/Login/Shell. Once the Shell destination is
+    // shellNavController holds Splash/Shell. Once the Shell destination is
     // reached it STAYS composed — tab scroll/focus state (heroItem, RowNavState,
     // Genre section, …) survives every details/player excursion below.
     val shellNavController = rememberNavController()
@@ -204,7 +199,7 @@ private fun TvAppRoot() {
                 } else false
             }
     ) {
-        // ── Underlay NavHost: Splash / Login / Shell ──────────────────────
+        // ── Underlay NavHost: Splash / Shell ──────────────────────────────
         // The Shell destination stays composed once reached; tabs keep their
         // scroll/focus state across details/player excursions on the overlay.
         NavHost(
@@ -216,19 +211,9 @@ private fun TvAppRoot() {
             popExitTransition  = { fadeOut(tween(200)) },
         ) {
             composable(Screen.Splash.route) {
-                val context = androidx.compose.ui.platform.LocalContext.current
                 SplashScreen(onComplete = {
-                    val loggedIn = com.maxstream.app.data.local.SessionManager.isLoggedIn(context)
-                    val destination = if (loggedIn) Screen.Shell.route else Screen.Login.route
-                    shellNavController.navigate(destination) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                })
-            }
-            composable(Screen.Login.route) {
-                LoginScreen(onLoginSuccess = {
                     shellNavController.navigate(Screen.Shell.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                        popUpTo(Screen.Splash.route) { inclusive = true }
                     }
                 })
             }
@@ -401,17 +386,7 @@ private fun TvShell(
             TabScreen(visible = appState.selectedTab == 5) {
                 MoreScreen(
                     navController      = deepNavController,
-                    onReturnToSidebar  = { appState.updateFocusOnSidebar(true) },
-                    onSignOut = {
-                        // Navigate on the UNDERLAY nav graph (Login/Shell live
-                        // there), not the overlay deepNavController — the latter
-                        // only knows DeepRoot/Details/Player, so pointing it at
-                        // Screen.Login threw IllegalArgumentException and closed
-                        // the app.
-                        shellNavController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Shell.route) { inclusive = true }
-                        }
-                    },
+                    onReturnToSidebar  = { appState.updateFocusOnSidebar(true) },,
                     isVisible       = appState.selectedTab == 5,
                     focusKey        = contentFocusTick,
                     restoreFocusKey = deepNavReturnTick,
@@ -484,11 +459,11 @@ private fun ExitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
         onDismissRequest = onDismiss,
         containerColor   = Color(0xFF1E1E1E),
         title = {
-            Text("Exit MaxStream?", color = Color.White,
+            Text("الخروج من ذيب ستريم؟", color = Color.White,
                 fontSize = 24.sp, fontWeight = FontWeight.Bold)
         },
         text = {
-            Text("Do you want to exit the app?",
+            Text("هل تريد الخروج من التطبيق؟",
                 color = Color.White.copy(alpha = 0.7f), fontSize = 18.sp)
         },
         dismissButton = {
