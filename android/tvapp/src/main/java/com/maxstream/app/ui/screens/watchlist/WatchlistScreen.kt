@@ -59,7 +59,7 @@ import com.maxstream.app.ui.tv.GridNavState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private val TABS = listOf("All", "Movies", "TV Shows")
+private val TABS = listOf("الكل", "أفلام", "مسلسلات")
 private const val COLUMNS = 5
 private const val GRID_ID = "watchlist:grid"
 
@@ -207,7 +207,7 @@ fun WatchlistScreen(
         // stay reachable even when the list is empty or loading.
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = "My Watchlist",
+                text = "قائمتي",
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.ExtraBold,
@@ -266,10 +266,10 @@ fun WatchlistScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Your watchlist is empty", color = Color.White, fontSize = 18.sp)
+                        Text("قائمتك فارغة", color = Color.White, fontSize = 18.sp)
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            "Browse content to add items",
+                            "تصفح المحتوى لإضافة عناصر",
                             color = Color.White.copy(alpha = 0.5f),
                             fontSize = 14.sp,
                         )
@@ -281,7 +281,7 @@ fun WatchlistScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "No items in this category",
+                        text = "لا توجد عناصر في هذه الفئة",
                         color = Color.White.copy(alpha = 0.6f),
                     )
                 }
@@ -309,7 +309,7 @@ fun WatchlistScreen(
                                 title = item.title,
                                 rating = item.voteAverage.takeIf { it > 0 },
                                 year = item.releaseDate.take(4).toIntOrNull(),
-                                contentTypeLabel = if (item.mediaType == "tv") "TV Series" else "Movie",
+                                contentTypeLabel = if (item.mediaType == "tv") "مسلسل" else "فيلم",
                                 isFocused = focusedIndex == index,
                                 focusRequester = gridNav.requester(GRID_ID, index),
                                 onFocusChanged = { focused ->
