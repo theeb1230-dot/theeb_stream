@@ -1,9 +1,8 @@
 package com.maxstream.app.ui.navigation
 
 sealed class Screen(val route: String) {
-    // ── Auth / pre-shell ────────────────────────────────────────────────────
+    // ── Startup / pre-shell ───────────────────────────────────────────────
     data object Splash  : Screen("splash")
-    data object Login   : Screen("login")
 
     // ── Main shell (IndexedStack lives here) ────────────────────────────────
     data object Shell   : Screen("shell")
