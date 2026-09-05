@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maxstream/services/tmdb_api_service.dart';
-import 'package:maxstream/utils/tmdb_list_utils.dart';
+import 'package:theeb_stream/services/tmdb_api_service.dart';
+import 'package:theeb_stream/utils/tmdb_list_utils.dart';
 
 void main() {
   test('TMDB URI encodes search queries and preserves parameters', () {
