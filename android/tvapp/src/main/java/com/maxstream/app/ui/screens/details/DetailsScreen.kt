@@ -135,7 +135,7 @@ fun DetailsScreen(
 
     // ── Load detail + watchlist + continue-watching ────────────────────────
     LaunchedEffect(itemId, mediaType) {
-        val id = itemId.toIntOrNull() ?: run { error = "Invalid ID"; loading = false; return@LaunchedEffect }
+        val id = itemId.toIntOrNull() ?: run { error = "معرّف غير صالح"; loading = false; return@LaunchedEffect }
         loading = true; error = null
         try {
             // Load the right endpoint directly — TMDB ids are NOT unique across
@@ -184,7 +184,7 @@ fun DetailsScreen(
                         val s = arr.optJSONObject(i) ?: return@mapNotNull null
                         val num = s.optInt("season_number", 0)
                         if (num <= 0) return@mapNotNull null
-                        SeasonEntry(number = num, name = s.optString("name").ifBlank { "Season $num" })
+                        SeasonEntry(number = num, name = s.optString("name").ifBlank { "الموسم $num" })
                     }
                 } else emptyList()
             } else emptyList()
@@ -372,9 +372,9 @@ private fun TvCinematicDetailsView(
 
     // Play button label — matches Dart: "Watch S1E1" for series
     val playLabel = if (isTv) {
-        if (loadingEpisodes) "Loading…"
-        else "Watch S${selectedSeason}E${episodes.firstOrNull()?.number ?: 1}"
-    } else "Play"
+        if (loadingEpisodes) "جارٍ التحميل…"
+        else "شاهد الموسم ${selectedSeason} الحلقة ${episodes.firstOrNull()?.number ?: 1}"
+    } else "تشغيل"
 
     // ── Section navigation (mirrors Dart's FocusTraversalGroup + ensureVisible) ──
     // Sections are the outer LazyColumn items in fixed order:
@@ -609,7 +609,7 @@ private fun TvCinematicDetailsView(
                                 onClick = { onPlay(if (isTv) episodes.firstOrNull() else null) },
                             )
                             CinematicButton(
-                                label = if (state.isSaved) "In Watchlist" else "Watchlist",
+                                label = if (state.isSaved) "في قائمتي" else "إضافة إلى قائمتي",
                                 iconRes = if (state.isSaved) R.drawable.ic_watchlist else R.drawable.ic_watchlist,
                                 primary = false,
                                 focusRequester = watchlistFocusRequester,
@@ -627,7 +627,7 @@ private fun TvCinematicDetailsView(
             // ── Continue watching ──────────────────────────────────────────
             if (continueWatching.isNotEmpty()) {
                 item {
-                    CinematicSection(title = "Continue Watching", height = 240.dp) {
+                    CinematicSection(title = "متابعة المشاهدة", height = 240.dp) {
                         val rowId = "details:continue"
                         val rowListState = rememberLazyListState()
                         LaunchedEffect(rowId, rowListState) { rowStates[rowId] = rowListState }
@@ -657,7 +657,7 @@ private fun TvCinematicDetailsView(
             // ── Seasons (TV only) ──────────────────────────────────────────
             if (isTv && state.seasons.isNotEmpty()) {
                 item {
-                    CinematicSection(title = "Seasons", height = 52.dp) {
+                    CinematicSection(title = "المواسم", height = 52.dp) {
                         val rowId = "details:seasons"
                         val rowListState = rememberLazyListState()
                         LaunchedEffect(rowId, rowListState) { rowStates[rowId] = rowListState }
@@ -693,7 +693,7 @@ private fun TvCinematicDetailsView(
             // ── Episodes (TV only) ─────────────────────────────────────────
             if (isTv) {
                 item {
-                    CinematicSection(title = "Episodes", height = 190.dp) {
+                    CinematicSection(title = "الحلقات", height = 190.dp) {
                         if (loadingEpisodes) {
                             CircularProgressIndicator(color = Color(0xFFE50914), modifier = Modifier.padding(16.dp))
                         } else {
@@ -727,7 +727,7 @@ private fun TvCinematicDetailsView(
             // ── Cast ───────────────────────────────────────────────────────
             if (state.cast.isNotEmpty()) {
                 item {
-                    CinematicSection(title = "Cast", height = 150.dp) {
+                    CinematicSection(title = "طاقم التمثيل", height = 150.dp) {
                         val rowId = "details:cast"
                         val rowListState = rememberLazyListState()
                         LaunchedEffect(rowId, rowListState) { rowStates[rowId] = rowListState }
@@ -757,7 +757,7 @@ private fun TvCinematicDetailsView(
             // ── More Like This (recommendations) ──────────────────────────
             if (state.recommendations.isNotEmpty()) {
                 item {
-                    CinematicSection(title = "More Like This", height = 260.dp) {
+                    CinematicSection(title = "قد يعجبك أيضًا", height = 260.dp) {
                         val rowId = "details:recommendations"
                         val rowListState = rememberLazyListState()
                         LaunchedEffect(rowId, rowListState) { rowStates[rowId] = rowListState }
@@ -982,7 +982,7 @@ private fun EpisodeTileContent(episode: EpisodeRef) {
         )
         if (!released && episode.airDate.isNotBlank()) {
             Text(
-                text = "To be released on ${formatReleaseDate(episode.airDate)}",
+                text = "موعد العرض ${formatReleaseDate(episode.airDate)}",
                 color = Color(0xFFF5B81B),
                 fontSize = 12.sp,
                 maxLines = 1,

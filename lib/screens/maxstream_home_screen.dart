@@ -176,9 +176,9 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
                     ),
                   ),
                   SliverToBoxAdapter(child: _buildProvidersSection()),
-                  _buildSection('Trending Movies', trendingMovies, 'movie'),
-                  _buildSection('Popular Movies', popularMovies, 'movie'),
-                  _buildSection('Top Rated Movies', topRatedMovies, 'movie'),
+                  _buildSection('الأفلام الرائجة', trendingMovies, 'movie'),
+                  _buildSection('الأفلام الشائعة', popularMovies, 'movie'),
+                  _buildSection('الأفلام الأعلى تقييمًا', topRatedMovies, 'movie'),
                   if (upcomingContent.isNotEmpty) _buildUpcomingSection(),
                   const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
@@ -435,7 +435,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Streaming Providers',
+            'خدمات البث',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -630,7 +630,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Coming Soon',
+                      'قريبًا',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -674,7 +674,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
   }
 
   Widget _buildUpcomingCard(Map<String, dynamic> item) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final posterPath = item['poster_path'];
     final backdropPath = item['backdrop_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
@@ -785,7 +785,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        isWatchlistUpcoming ? 'IN YOUR WATCHLIST' : 'UPCOMING',
+                        isWatchlistUpcoming ? 'في قائمتك' : 'قريبًا',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
@@ -949,8 +949,8 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
     try {
       final parsed = DateTime.parse(date);
       final months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر',
       ];
       return '${months[parsed.month - 1]} ${parsed.day}, ${parsed.year}';
     } catch (_) {
@@ -959,11 +959,11 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
   }
 
   Widget _buildMovieCard(Map<String, dynamic> item, String mediaType) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final posterPath = item['poster_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
     final year = _getYear(item);
-    final typeLabel = mediaType == 'tv' ? 'TV' : 'MOVIE';
+    final typeLabel = mediaType == 'tv' ? 'مسلسل' : 'فيلم';
 
     return GestureDetector(
       onTap: () {
@@ -1381,7 +1381,7 @@ class _FullListScreenState extends State<_FullListScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        item['title'] ?? item['name'] ?? 'Unknown',
+                        item['title'] ?? item['name'] ?? 'غير معروف',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -1641,7 +1641,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
   }
 
   Widget _buildComingSoonCard(Map<String, dynamic> item) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final posterPath = item['poster_path'];
     final backdropPath = item['backdrop_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
@@ -1730,7 +1730,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        isWatchlistUpcoming ? 'IN YOUR WATCHLIST' : 'UPCOMING',
+                        isWatchlistUpcoming ? 'في قائمتك' : 'قريبًا',
                         style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                       ),
                     ),
@@ -1801,7 +1801,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
   }
 
   Widget _buildComingSoonGridCard(Map<String, dynamic> item) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final posterPath = item['poster_path'];
     final backdropPath = item['backdrop_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
@@ -1879,7 +1879,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
                         color: isWatchlistUpcoming ? Colors.amber.shade700 : Colors.purple.shade700,
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: Text(isWatchlistUpcoming ? 'WATCHLIST' : 'UPCOMING', style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold)),
+                      child: Text(isWatchlistUpcoming ? 'قائمتي' : 'قريبًا', style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.bold)),
                     ),
                   ),
                   if (rating != null && rating > 0)
@@ -1936,7 +1936,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text('Coming Soon', style: TextStyle(color: Colors.white)),
+        title: const Text('قريبًا', style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(

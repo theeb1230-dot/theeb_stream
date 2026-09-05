@@ -59,8 +59,8 @@ private const val COLUMNS = 5
 // SearchScreen
 // Matches Dart TvSearchScreen:
 //  - Left panel: keyboard
-//  - Right panel: "Discover" grid when no query (trending + popular mix)
-//                 "Movies" + "TV Series" sections when searching
+//  - Right panel: "استكشاف" grid when no query (trending + popular mix)
+//                 "أفلام" + "مسلسلات" sections when searching
 //  - D-pad: RIGHT from keyboard's last key → first result card
 //           LEFT on first column / UP on first row → back to keyboard
 //           ESC/Back from a card → sidebar
@@ -228,14 +228,14 @@ fun SearchScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
         ) {
             Text(
-                text = "Search",
+                text = "بحث",
                 color = Color.White,
                 fontSize = 34.sp,
                 fontWeight = FontWeight.W800,
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text = "Find movies and series",
+                text = "ابحث عن الأفلام والمسلسلات",
                 color = Color.White.copy(alpha = 0.55f),
                 fontSize = 15.sp,
             )
@@ -280,7 +280,7 @@ fun SearchScreen(
                 searchError != null -> item {
                     SearchMessage(
                         icon = R.drawable.ic_search,
-                        text = "Search unavailable. Please try again."
+                        text = "البحث غير متاح حاليًا. حاول مرة أخرى."
                     )
                 }
 
@@ -288,7 +288,7 @@ fun SearchScreen(
                     item {
                         SearchMessage(
                             icon = R.drawable.ic_search,
-                            text = "No matches for \"${query.trim()}\""
+                            text = "لا توجد نتائج لـ \"${query.trim()}\""
                         )
                     }
 
@@ -323,7 +323,7 @@ fun SearchScreen(
                                         title = item.title,
                                         rating = item.voteAverage.takeIf { it > 0 },
                                         year = item.releaseDate.take(4).toIntOrNull(),
-                                        contentTypeLabel = if (item.mediaType == "tv") "TV Series" else "Movie",
+                                        contentTypeLabel = if (item.mediaType == "tv") "مسلسلات" else "فيلم",
                                         isFocused = focusedKey == cardKey(entry.gridId, index),
                                         focusRequester = gridNav.requester(entry.gridId, index),
                                         onFocusChanged = { focused ->
@@ -417,12 +417,12 @@ private fun buildPanel(
     when {
         isSearching -> {}
         showingResults -> {
-            panel.add(PanelTitle("Results for \"$query\""))
-            addSection("search:movies", "Movies", movieResults)
-            addSection("search:series", "TV Series", seriesResults)
+            panel.add(PanelTitle("نتائج البحث عن \"$query\""))
+            addSection("search:movies", "أفلام", movieResults)
+            addSection("search:series", "مسلسلات", seriesResults)
         }
         else -> {
-            panel.add(PanelTitle("Discover"))
+            panel.add(PanelTitle("استكشاف"))
             if (discoverItems.isNotEmpty()) {
                 grids.add(GridDesc("search:discover", discoverItems.size, sectionIndex = panel.size))
                 discoverItems.chunked(COLUMNS).forEachIndexed { row, chunk ->
