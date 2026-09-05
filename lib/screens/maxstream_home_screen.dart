@@ -353,7 +353,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
           ),
           const SizedBox(width: 10),
           const Text(
-            'MaxStream',
+            'ذيب ستريم',
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,
