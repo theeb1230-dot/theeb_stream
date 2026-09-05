@@ -36,12 +36,6 @@
 @import firebase_database;
 #endif
 
-#if __has_include(<firebase_storage/FLTFirebaseStoragePlugin.h>)
-#import <firebase_storage/FLTFirebaseStoragePlugin.h>
-#else
-@import firebase_storage;
-#endif
-
 #if __has_include(<flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>)
 #import <flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>
 #else
@@ -58,6 +52,12 @@
 #import <flutter_secure_storage/FlutterSecureStoragePlugin.h>
 #else
 @import flutter_secure_storage;
+#endif
+
+#if __has_include(<fvp/FvpPlugin.h>)
+#import <fvp/FvpPlugin.h>
+#else
+@import fvp;
 #endif
 
 #if __has_include(<google_sign_in_ios/FLTGoogleSignInPlugin.h>)
@@ -96,6 +96,12 @@
 @import shared_preferences_foundation;
 #endif
 
+#if __has_include(<speech_to_text/SpeechToTextPlugin.h>)
+#import <speech_to_text/SpeechToTextPlugin.h>
+#else
+@import speech_to_text;
+#endif
+
 #if __has_include(<sqflite_darwin/SqflitePlugin.h>)
 #import <sqflite_darwin/SqflitePlugin.h>
 #else
@@ -128,16 +134,17 @@
   [FLTFirebaseCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCorePlugin"]];
   [FLTFirebaseCrashlyticsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCrashlyticsPlugin"]];
   [FLTFirebaseDatabasePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseDatabasePlugin"]];
-  [FLTFirebaseStoragePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseStoragePlugin"]];
   [InAppWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppWebViewFlutterPlugin"]];
   [FlutterLocalNotificationsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterLocalNotificationsPlugin"]];
   [FlutterSecureStoragePlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterSecureStoragePlugin"]];
+  [FvpPlugin registerWithRegistrar:[registry registrarForPlugin:@"FvpPlugin"]];
   [FLTGoogleSignInPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTGoogleSignInPlugin"]];
   [FLTImagePickerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTImagePickerPlugin"]];
   [LocalAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"LocalAuthPlugin"]];
   [FPPPackageInfoPlusPlugin registerWithRegistrar:[registry registrarForPlugin:@"FPPPackageInfoPlusPlugin"]];
   [PermissionHandlerPlugin registerWithRegistrar:[registry registrarForPlugin:@"PermissionHandlerPlugin"]];
   [SharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"SharedPreferencesPlugin"]];
+  [SpeechToTextPlugin registerWithRegistrar:[registry registrarForPlugin:@"SpeechToTextPlugin"]];
   [SqflitePlugin registerWithRegistrar:[registry registrarForPlugin:@"SqflitePlugin"]];
   [URLLauncherPlugin registerWithRegistrar:[registry registrarForPlugin:@"URLLauncherPlugin"]];
   [VideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"VideoPlayerPlugin"]];
