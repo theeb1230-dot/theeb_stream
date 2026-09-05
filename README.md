@@ -149,7 +149,7 @@ android/app/src/main/kotlin/com/maxstream/app/
 ### Prerequisites
 
 - Flutter SDK >=3.8.0
-- Firebase project with Auth enabled
+- Firebase project only if optional notification/Crashlytics services are enabled
 - TMDB API key
 
 ### Installation
@@ -163,7 +163,7 @@ flutter run
 
 ### Configuration
 
-1. **Firebase** — اختياري للخدمات غير المرتبطة بتسجيل الدخول مثل الإشعارات وCrashlytics عند تفعيلها.
+1. **Firebase** — اختياري فقط للخدمات غير المرتبطة بتسجيل الدخول مثل الإشعارات وCrashlytics عند تفعيلها؛ تشغيل التطبيق الأساسي لا يتطلب Firebase Auth.
 2. **TMDB** — Get API key from [themoviedb.org](https://www.themoviedb.org/settings/api), add to `lib/config/api_config.dart`
 
 ## Auto-Update System
