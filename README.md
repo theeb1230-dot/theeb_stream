@@ -1,9 +1,9 @@
-# MaxStream
+# ذيب ستريم (Theeb Stream)
 
-A Flutter streaming app for movies and TV series with native Kotlin stream extraction, multi-provider fallback, and smooth HLS playback.
+تطبيق مشاهدة واستكشاف للأفلام والمسلسلات مبني بـ Flutter، مع تطبيق Android TV أصلي بـ Kotlin ودعم مصادر متعددة وتشغيل HLS.
 
 <div align="center">
-  <img src="assets/images/maxstream_logo.png" alt="MaxStream Logo" width="128" height="128" />
+  <img src="assets/images/maxstream_logo.png" alt="Theeb Stream Logo" width="128" height="128" />
 </div>
 
 ## Screenshots
@@ -15,7 +15,6 @@ A Flutter streaming app for movies and TV series with native Kotlin stream extra
     <td align="center"><img src="Images/Watchlist_Screen.jpg" alt="Watchlist" width="220" /><br/><sub>Watchlist</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="Images/Login-Signup_Screen.jpg" alt="Login" width="220" /><br/><sub>Login</sub></td>
     <td align="center"><img src="Images/Search_Screen2.jpg" alt="Search Results" width="220" /><br/><sub>Search Results</sub></td>
     <td align="center"><img src="Images/More_Screen.jpg" alt="More" width="220" /><br/><sub>More</sub></td>
   </tr>
@@ -31,7 +30,6 @@ A Flutter streaming app for movies and TV series with native Kotlin stream extra
 - **Episode Autoplay** — Auto-advances to next episode with 30s countdown
 - **Watch History** — Resume playback from last position, saved every 15 seconds
 - **Watchlist** — Save favorite content for later
-- **Firebase Auth** — Email/password and Google Sign-In
 - **TMDB Integration** — Movie/series metadata, posters, backdrops, episode info
 - **TV Mode** — Dedicated Android TV interface with D-pad navigation
 - **Auto-Update** — Checks GitHub Releases for new versions, shows changelog, downloads and installs APK
@@ -102,7 +100,6 @@ Video plays with subtitles, quality switching, episode autoplay
 - **Native**: Kotlin (Android) — stream extraction, HLS validation
 - **Video**: video_player + Chewie (ExoPlayer on Android)
 - **HTTP**: OkHttp with DNS-over-HTTPS (Google DNS)
-- **Auth**: Firebase Auth (Email/Password, Google Sign-In)
 - **Database**: Firebase Firestore + SQLite (local)
 - **API**: TMDB API (movie/series metadata)
 - **State**: Provider
@@ -121,7 +118,6 @@ lib/
 │   ├── maxstream_details_screen.dart  # Movie/series detail pages
 │   ├── maxstream_series_list_screen.dart
 │   ├── maxstream_watchlist_screen.dart
-│   ├── profile_settings_screen.dart   # Profile, name, picture, password
 │   └── streaming_provider_settings_screen.dart
 ├── services/
 │   ├── native_stream_extractor.dart   # Platform channel bridge to Kotlin
@@ -131,7 +127,6 @@ lib/
 │   ├── watch_history_service.dart     # SQLite watch history
 │   ├── update_service.dart            # GitHub Releases auto-updater
 │   ├── notification_service.dart      # Local notifications
-│   ├── auth_service.dart              # Firebase authentication
 │   └── user_service.dart              # User profile management
 ├── tv/                               # Android TV interface
 │   ├── screens/                       # TV-optimized screens
@@ -160,31 +155,31 @@ android/app/src/main/kotlin/com/maxstream/app/
 ### Installation
 
 ```bash
-git clone https://github.com/chila254/maxstream.git
-cd maxstream
+git clone https://github.com/theeb1230-dot/theeb_stream.git
+cd theeb_stream
 flutter pub get
 flutter run
 ```
 
 ### Configuration
 
-1. **Firebase** — Create project, enable Auth, download `google-services.json` to `android/app/`
+1. **Firebase** — اختياري للخدمات غير المرتبطة بتسجيل الدخول مثل الإشعارات وCrashlytics عند تفعيلها.
 2. **TMDB** — Get API key from [themoviedb.org](https://www.themoviedb.org/settings/api), add to `lib/config/api_config.dart`
 
 ## Auto-Update System
 
 The app checks GitHub Releases on startup for newer versions:
 
-1. Hits `https://api.github.com/repos/chila254/maxstream/releases/latest`
+1. Hits `https://api.github.com/repos/theeb1230-dot/theeb_stream/releases/latest`
 2. Compares release tag (e.g. `v1.0.1`) with installed version
 3. Shows local notification + in-app dialog with changelog from release body
-4. Downloads `MaxStream.apk` from the release asset
+4. Downloads `TheebStream.apk` from the release asset
 5. Prompts Android package installer
 
 To release an update:
 1. Build APK: `flutter build apk --release`
 2. Create GitHub release with tag `v1.0.1`, title `v1.0.1`
-3. Attach `MaxStream.apk` as a release asset
+3. Attach `TheebStream.apk` as a release asset
 4. Write changelog in the release body
 
 ## Build
@@ -212,4 +207,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## Author
 
-**Chila254** — [github.com/chila254/maxstream](https://github.com/chila254/maxstream)
+**Theeb Stream** — [theeb1230-dot/theeb_stream](https://github.com/theeb1230-dot/theeb_stream)
