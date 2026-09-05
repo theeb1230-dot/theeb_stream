@@ -26,7 +26,15 @@ class CloudSyncService {
   /// Bumped whenever synced watchlist changes; screens listen to refresh.
   static final ValueNotifier<int> watchlistRevision = ValueNotifier<int>(0);
 
-  static String? get _uid => FirebaseAuth.instance.currentUser?.uid;
+  static String? get _uid {
+    try {
+      return FirebaseAuth.instance.currentUser?.uid;
+    } catch (_) {
+      // Authentication is optional in Theeb Stream. Tests and local-only
+      // sessions may run without a Firebase app; cloud sync must then be a no-op.
+      return null;
+    }
+  }
 
   static DatabaseReference _watchHistoryRef(String uid) =>
       _rtdb.ref('users/$uid/watch_history');
