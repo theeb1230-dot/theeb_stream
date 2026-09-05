@@ -63,18 +63,18 @@ flutter:
   assets:
     - assets/movies.json
     - assets/images/background.jpg
-    - assets/images/maxstream_logo.png
+    - assets/images/theeb_stream_logo.png
     - assets/images/app_icon.png
 
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: assets/images/app_icon.png
-  adaptive_icon_background: "#000000"
+  adaptive_icon_background: "#0F172A"
 
 flutter_native_splash:
-  color: "#000000"
-  image: assets/images/maxstream_logo.png
+  color: "#0F172A"
+  image: assets/images/theeb_stream_logo.png
   android: true
   ios: true
   fullscreen: true
