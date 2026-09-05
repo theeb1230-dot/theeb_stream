@@ -34,7 +34,7 @@ class _MaxStreamLibraryScreenState extends State<MaxStreamLibraryScreen>
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
-          'Library',
+          'المكتبة',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: const [
@@ -49,9 +49,9 @@ class _MaxStreamLibraryScreenState extends State<MaxStreamLibraryScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey,
           tabs: const [
-            Tab(icon: Icon(Icons.bookmark, size: 20), text: 'Watchlist'),
-            Tab(icon: Icon(Icons.download, size: 20), text: 'Downloads'),
-            Tab(icon: Icon(Icons.history, size: 20), text: 'History'),
+            Tab(icon: Icon(Icons.bookmark, size: 20), text: 'قائمتي'),
+            Tab(icon: Icon(Icons.download, size: 20), text: 'التنزيلات'),
+            Tab(icon: Icon(Icons.history, size: 20), text: 'السجل'),
           ],
         ),
       ),
