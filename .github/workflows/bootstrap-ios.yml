@@ -49,6 +49,8 @@ jobs:
             exit 0
           fi
           git commit -m "feat: restore complete iOS host project"
+          git restore .
+          git clean -fd --exclude=ios/
           git fetch origin bootstrap/theeb-stream-foundation
           git rebase origin/bootstrap/theeb-stream-foundation
           git push origin HEAD:bootstrap/theeb-stream-foundation
