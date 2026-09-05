@@ -138,9 +138,6 @@ fun DetailsScreen(
         val id = itemId.toIntOrNull() ?: run { error = "Invalid ID"; loading = false; return@LaunchedEffect }
         loading = true; error = null
         try {
-            // Pull the phone's watchlist/progress so the save state and the
-            // Continue Watching row match the phone (same account).
-            runCatching { com.maxstream.app.data.repository.CloudSyncRepository.pullToDevice(context) }
             // Load the right endpoint directly — TMDB ids are NOT unique across
             // types, so a series id can resolve to an unrelated movie (the old
             // "try movie first, fall back to tv" made series show movie details).
@@ -222,21 +219,6 @@ fun DetailsScreen(
         }
     }
 
-    // Continuous inbound sync: when the phone changes the watchlist or watch
-    // progress, CloudSyncCoordinator re-pulls and bumps these revisions — refresh
-    // the save state + Continue Watching row to match (like the phone's
-    // historyRevision/watchlistRevision notifiers).
-    val historyRevision by com.maxstream.app.data.repository.CloudSyncCoordinator.historyRevision.collectAsState()
-    val watchlistRevision by com.maxstream.app.data.repository.CloudSyncCoordinator.watchlistRevision.collectAsState()
-    LaunchedEffect(historyRevision, watchlistRevision) {
-        val s = state ?: return@LaunchedEffect
-        val id = itemId.toIntOrNull() ?: return@LaunchedEffect
-        val isTv = mediaType == "tv"
-        val item = MediaItem.fromJson(s.details ?: return@LaunchedEffect).copy(mediaType = mediaType)
-        state = s.copy(isSaved = WatchlistRepository.isIn(context, item))
-        continueWatching = WatchEntryCompat.getEntriesFor(id, isTv)
-    }
-
     // Season switch
     fun switchSeason(seasonNumber: Int) {
         if (loadingEpisodes) return
@@ -255,14 +237,6 @@ fun DetailsScreen(
         scope.launch {
             val nowSaved = WatchlistRepository.toggle(context, s.item)
             state = s.copy(isSaved = nowSaved)
-            // Keep the phone in sync: add/remove the Firestore doc.
-            if (nowSaved) {
-                com.maxstream.app.data.repository.CloudSyncRepository.pushWatchlist(context, s.item)
-            } else {
-                com.maxstream.app.data.repository.CloudSyncRepository.deleteWatchlist(
-                    context, s.item.id.toString(), s.item.mediaType,
-                )
-            }
         }
     }
 
