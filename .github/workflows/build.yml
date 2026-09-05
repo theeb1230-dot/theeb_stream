@@ -181,3 +181,47 @@ jobs:
           name: theeb-stream-tv
           path: release-artifact/theeb-stream-tv.apk
           retention-days: 7
+
+
+  build-ios:
+    name: iOS unsigned IPA
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Build iOS without code signing
+        run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          app="build/ios/iphoneos/Runner.app"
+          test -d "$app"
+          rm -rf release-ios Payload
+          mkdir -p release-ios Payload
+          cp -R "$app" Payload/Runner.app
+          /usr/bin/zip -qry release-ios/theeb-stream-ios-unsigned.ipa Payload
+          shasum -a 256 release-ios/theeb-stream-ios-unsigned.ipa > release-ios/SHA256SUMS.txt
+
+      - name: Upload unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: theeb-stream-ios-unsigned
+          path: |
+            release-ios/theeb-stream-ios-unsigned.ipa
+            release-ios/SHA256SUMS.txt
+          retention-days: 7
