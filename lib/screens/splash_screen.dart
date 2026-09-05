@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/theeb_stream_logo.png',
+                'assets/images/maxstream_logo.png',
                 width: 150,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
