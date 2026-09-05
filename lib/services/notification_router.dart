@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -44,8 +43,6 @@ class NotificationRouter {
     }
 
     if (payload.startsWith('content:')) {
-      // Only open details screens once the user is signed in.
-      if (FirebaseAuth.instance.currentUser == null) return;
       final context = navigatorKey?.currentContext;
       if (context == null || !context.mounted) return;
       final parts = payload.split(':');
