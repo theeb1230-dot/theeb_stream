@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maxstream/services/user_scope.dart';
-import 'package:maxstream/services/watch_history_service.dart';
+import 'package:theeb_stream/services/user_scope.dart';
+import 'package:theeb_stream/services/watch_history_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
