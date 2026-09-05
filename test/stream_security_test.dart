@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maxstream/services/media_download_service.dart';
-import 'package:maxstream/services/stream_security.dart';
+import 'package:theeb_stream/services/media_download_service.dart';
+import 'package:theeb_stream/services/stream_security.dart';
 
 void main() {
   group('StreamSecurity URLs', () {
