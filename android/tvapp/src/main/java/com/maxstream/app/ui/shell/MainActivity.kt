@@ -485,7 +485,7 @@ private fun ExitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
                     contentColor = if (cancelFocused) Color.Black else Color.White
                 ),
             ) {
-                Text("Cancel", fontSize = 18.sp, fontWeight = if (cancelFocused) FontWeight.Bold else FontWeight.Normal)
+                Text("إلغاء", fontSize = 18.sp, fontWeight = if (cancelFocused) FontWeight.Bold else FontWeight.Normal)
             }
         },
         confirmButton = {
@@ -507,7 +507,7 @@ private fun ExitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
                     contentColor = if (confirmFocused) Color.Black else Color.White
                 ),
             ) {
-                Text("Exit", fontSize = 18.sp, fontWeight = if (confirmFocused) FontWeight.Bold else FontWeight.Normal)
+                Text("خروج", fontSize = 18.sp, fontWeight = if (confirmFocused) FontWeight.Bold else FontWeight.Normal)
             }
         },
     )
