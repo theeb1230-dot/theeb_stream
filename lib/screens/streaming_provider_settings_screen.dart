@@ -160,7 +160,7 @@ class _StreamingProviderSettingsScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Error updating preference'),
+            content: Text('تعذر تحديث التفضيل'),
             backgroundColor: Colors.red,
           ),
         );
@@ -175,7 +175,7 @@ class _StreamingProviderSettingsScreenState
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
-          'Streaming Services',
+          'خدمات البث',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -189,7 +189,7 @@ class _StreamingProviderSettingsScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Select Your Favorite Providers',
+                      'اختر خدمات البث المفضلة',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -198,7 +198,7 @@ class _StreamingProviderSettingsScreenState
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Get notified when new content arrives on your favorite streaming services',
+                      'تلقي إشعارًا عند وصول محتوى جديد إلى خدمات البث المفضلة لديك',
                       style: TextStyle(color: Colors.grey[400], fontSize: 14),
                     ),
                     const SizedBox(height: 24),
@@ -307,8 +307,8 @@ class _StreamingProviderSettingsScreenState
                   const SizedBox(height: 4),
                   Text(
                     isSelected
-                        ? 'Notifications enabled'
-                        : 'Tap to enable notifications',
+                        ? 'الإشعارات مفعلة'
+                        : 'اضغط لتفعيل الإشعارات',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.7),
                       fontSize: 12,
@@ -348,7 +348,7 @@ class _StreamingProviderSettingsScreenState
               const SizedBox(width: 12),
               const Expanded(
                 child: Text(
-                  'About Notifications',
+                  'حول الإشعارات',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -360,10 +360,10 @@ class _StreamingProviderSettingsScreenState
           ),
           const SizedBox(height: 12),
           Text(
-            '• Receive instant notifications when new movies or series are added\n'
-            '• Get alerts when content becomes available on your favorite services\n'
-            '• Customize which providers you want to track\n'
-            '• Never miss out on trending content',
+            '• تلقي إشعارات فورية عند إضافة أفلام أو مسلسلات جديدة\n'
+            '• احصل على تنبيهات عند توفر المحتوى على خدماتك المفضلة\n'
+            '• اختر خدمات البث التي تريد متابعتها\n'
+            '• لا تفوّت المحتوى الرائج',
             style: TextStyle(
               color: Colors.grey[400],
               fontSize: 12,
