@@ -4,14 +4,13 @@ import 'firebase_options.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'screens/splash_screen.dart';
+import 'screens/maxstream_main_screen.dart';
 import 'services/notification_service.dart';
 import 'services/notification_router.dart';
 import 'services/media_download_manager.dart';
 import 'services/theme_service.dart';
 import 'services/crashlytics_service.dart';
 import 'services/memory_service.dart';
-import 'widgets/cloud_sync_bootstrap.dart';
 import 'widgets/crash_screen.dart';
 import 'package:fvp/fvp.dart' as fvp;
 
@@ -41,7 +40,7 @@ Future<void> main() async {
   );
 }
 
-/// Shows the MaxStream splash immediately and finishes network-backed service
+/// Shows the Theeb Stream startup shell immediately and finishes network-backed service
 /// initialization in the background, so a slow first launch (e.g. Firebase on a
 /// cold start) can never leave the app frozen on the native splash drawable.
 class _StartupGate extends StatefulWidget {
@@ -126,7 +125,7 @@ class ErrorApp extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'Failed to initialize the app:\n$error',
+              'تعذر تشغيل التطبيق:\n$error',
               style: const TextStyle(color: Colors.white, fontSize: 16),
               textAlign: TextAlign.center,
             ),
@@ -143,7 +142,7 @@ class MaxStreamApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MaxStream',
+      title: 'ذيب ستريم',
       navigatorKey: appNavigatorKey,
       theme: ThemeService.darkTheme,
       themeMode: ThemeMode.dark,
@@ -163,19 +162,8 @@ class MaxStreamApp extends StatelessWidget {
           child: child!,
         );
       },
-      home: const CloudSyncBootstrap(child: AuthGate()),
+      home: const MaxStreamMainScreen(),
     );
   }
 }
 
-class AuthGate extends StatelessWidget {
-  const AuthGate({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // The SplashScreen always plays first (logo + loading animation) and routes
-    // to the right screen after the auth session settles, so the MaxStream logo
-    // is visible on every launch whether or not the user is signed in.
-    return const SplashScreen();
-  }
-}
