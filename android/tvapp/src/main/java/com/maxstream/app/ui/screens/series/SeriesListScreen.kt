@@ -225,7 +225,7 @@ fun SeriesListScreen(
                         if (trendingSeries.isNotEmpty()) {
                             item {
                                 SeriesContentRow(
-                                    title = "Trending TV Shows",
+                                    title = "المسلسلات الرائجة",
                                     items = trendingSeries.take(15),
                                     navController = navController,
                                     rowId = "series:Trending",
@@ -242,7 +242,7 @@ fun SeriesListScreen(
                         if (popularSeries.isNotEmpty()) {
                             item {
                                 SeriesContentRow(
-                                    title = "Popular TV Shows",
+                                    title = "المسلسلات الشائعة",
                                     items = popularSeries.take(15),
                                     navController = navController,
                                     rowId = "series:Popular",
@@ -259,7 +259,7 @@ fun SeriesListScreen(
                         if (topRatedSeries.isNotEmpty()) {
                             item {
                                 SeriesContentRow(
-                                    title = "Top Rated TV Shows",
+                                    title = "المسلسلات الأعلى تقييمًا",
                                     items = topRatedSeries.take(15),
                                     navController = navController,
                                     rowId = "series:Top Rated",
@@ -285,14 +285,14 @@ fun SeriesListScreen(
 // ─────────────────────────────────────────────────────────────────────────────
 
 private val GENRE_NAMES = mapOf(
-    28 to "Action", 12 to "Adventure", 16 to "Animation", 35 to "Comedy",
-    80 to "Crime", 99 to "Documentary", 18 to "Drama", 10751 to "Family",
-    14 to "Fantasy", 36 to "History", 27 to "Horror", 10402 to "Music",
-    9648 to "Mystery", 10749 to "Romance", 878 to "Sci-Fi", 53 to "Thriller",
-    10752 to "War", 37 to "Western", 10759 to "Action & Adventure",
-    10762 to "Kids", 10763 to "News", 10764 to "Reality",
-    10765 to "Sci-Fi & Fantasy", 10766 to "Soap", 10767 to "Talk",
-    10768 to "War & Politics",
+    28 to "أكشن", 12 to "مغامرة", 16 to "رسوم متحركة", 35 to "كوميديا",
+    80 to "جريمة", 99 to "وثائقي", 18 to "دراما", 10751 to "عائلي",
+    14 to "فانتازيا", 36 to "تاريخي", 27 to "رعب", 10402 to "موسيقى",
+    9648 to "غموض", 10749 to "رومانسي", 878 to "خيال علمي", 53 to "إثارة",
+    10752 to "حرب", 37 to "غربي", 10759 to "أكشن ومغامرة",
+    10762 to "أطفال", 10763 to "أخبار", 10764 to "واقع",
+    10765 to "خيال علمي وفانتازيا", 10766 to "دراما يومية", 10767 to "حواري",
+    10768 to "حرب وسياسة",
 )
 
 @Composable
@@ -520,7 +520,7 @@ private fun SeriesContentRow(
                     title      = item.title,
                     rating     = item.voteAverage.takeIf { it > 0 },
                     year       = item.releaseDate.take(4).toIntOrNull(),
-                    contentTypeLabel = "TV Series",
+                    contentTypeLabel = "مسلسل",
                     isFocused  = focusedItemIndex == index,
                     focusRequester = rowNav.requester(rowId, index),
                     onClick    = {
