@@ -69,7 +69,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val COLUMNS = 5
-private val TYPE_OPTIONS = listOf("movie" to "Movies", "tv" to "TV Shows")
+private val TYPE_OPTIONS = listOf("movie" to "أفلام", "tv" to "مسلسلات")
 
 private data class GenreEntry(val source: String, val id: Int, val name: String) {
     val key: String get() = "$source:$id"
@@ -154,7 +154,7 @@ fun GenreScreen(
             } catch (e: Exception) {
                 if (request != generation) return@launch
                 loadingMore = false
-                pagingError = "More titles could not be loaded."
+                pagingError = "تعذر تحميل المزيد من العناوين."
             }
         }
     }
@@ -261,7 +261,7 @@ fun GenreScreen(
             } catch (e: Exception) {
                 if (request != generation) return@launch
                 loadingContent = false
-                contentError = "Content could not be loaded."
+                contentError = "تعذر تحميل المحتوى."
             }
         }
     }
@@ -326,7 +326,7 @@ fun GenreScreen(
                 if (request != generation) return@launch
                 loadingGenres = false
                 loadingContent = false
-                genreError = "Genres could not be loaded."
+                genreError = "تعذر تحميل التصنيفات."
                 requestFocus { typeFocusRequesters[source] }
             }
         }
@@ -473,7 +473,7 @@ fun GenreScreen(
         // ── Media type pane ─────────────────────────────────────────────────
         Column(modifier = Modifier.width(168.dp), horizontalAlignment = Alignment.Start) {
             Text(
-                text = "Browse",
+                text = "تصفح",
                 color = Color.White,
                 fontSize = 31.sp,
                 fontWeight = FontWeight.W700,
@@ -500,7 +500,7 @@ fun GenreScreen(
                 Spacer(Modifier.height(20.dp))
                 GenreMessage(
                     message = genreError!!,
-                    action = "Retry",
+                    action = "إعادة المحاولة",
                     onPressed = { selectType(selectedType, enterGenreBar = true) },
                     compact = true,
                 )
@@ -547,11 +547,11 @@ fun GenreScreen(
 
             val focusedItem = if (focusedCard in items.indices) items[focusedCard] else null
             val detailText = if (focusedItem == null) {
-                "Select a title to see details"
+                "اختر عنوانًا لعرض التفاصيل"
             } else {
                 val year = focusedItem.releaseDate.take(4).ifBlank { "—" }
                 val rating = if (focusedItem.voteAverage > 0) "%.1f".format(focusedItem.voteAverage) else "—"
-                val typeName = if (focusedItem.mediaType == "movie") "Movie" else "TV Series"
+                val typeName = if (focusedItem.mediaType == "movie") "فيلم" else "مسلسل"
                 "${focusedItem.title}  •  $year  •  $rating ★  •  $typeName"
             }
             Text(
@@ -573,7 +573,7 @@ fun GenreScreen(
                     )
                     contentError != null -> GenreMessage(
                         message = contentError!!,
-                        action = "Retry",
+                        action = "إعادة المحاولة",
                         onPressed = {
                             val genre = selectedGenre
                             if (genre != null) loadGenreContent(genre, enterGrid = true)
@@ -582,7 +582,7 @@ fun GenreScreen(
                         modifier = Modifier.align(Alignment.Center),
                     )
                     selectedGenre == null || items.isEmpty() -> GenreMessage(
-                        message = "No titles found for this genre.",
+                        message = "لا توجد عناوين ضمن هذا التصنيف.",
                         modifier = Modifier.align(Alignment.Center),
                     )
                     else -> Column(modifier = Modifier.fillMaxSize()) {
@@ -604,7 +604,7 @@ fun GenreScreen(
                                     title = item.title,
                                     rating = item.voteAverage.takeIf { it > 0 },
                                     year = item.releaseDate.take(4).toIntOrNull(),
-                                    contentTypeLabel = if (item.mediaType == "tv") "TV Series" else "Movie",
+                                    contentTypeLabel = if (item.mediaType == "tv") "مسلسل" else "فيلم",
                                     isFocused = focusedCard == index,
                                     focusRequester = cardFocusRequesters.getOrPut(cardKey(item)) { FocusRequester() },
                                     onFocusChanged = { focused ->
@@ -629,7 +629,7 @@ fun GenreScreen(
                         if (pagingError != null) {
                             GenreMessage(
                                 message = pagingError!!,
-                                action = "Retry",
+                                action = "إعادة المحاولة",
                                 onPressed = { loadMore() },
                                 compact = true,
                                 modifier = Modifier.padding(12.dp),
