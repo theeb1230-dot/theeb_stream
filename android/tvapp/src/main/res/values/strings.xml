@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ذيب ستريم</string>
-    <string name="home">Home</string>
-    <string name="search">Search</string>
-    <string name="genre">Genre</string>
-    <string name="series">Series</string>
-    <string name="watchlist">Watchlist</string>
-    <string name="more">More</string>
-    <string name="play">Play</string>
-    <string name="resume">Resume</string>
-    <string name="details">Details</string>
-    <string name="continue_watching">Continue Watching</string>
-    <string name="trending_movies">Trending Movies</string>
-    <string name="trending_series">Trending Series</string>
-    <string name="popular_movies">Popular Movies</string>
-    <string name="top_rated">Top Rated</string>
+    <string name="home">الرئيسية</string>
+    <string name="search">البحث</string>
+    <string name="genre">التصنيفات</string>
+    <string name="series">المسلسلات</string>
+    <string name="watchlist">قائمتي</string>
+    <string name="more">المزيد</string>
+    <string name="play">تشغيل</string>
+    <string name="resume">متابعة</string>
+    <string name="details">التفاصيل</string>
+    <string name="continue_watching">متابعة المشاهدة</string>
+    <string name="trending_movies">أفلام رائجة</string>
+    <string name="trending_series">مسلسلات رائجة</string>
+    <string name="popular_movies">أفلام شائعة</string>
+    <string name="top_rated">الأعلى تقييمًا</string>
 </resources>
