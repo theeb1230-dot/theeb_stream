@@ -9,6 +9,9 @@ project 'Runner', {
 }
 
 def flutter_root
+  env_root = ENV['FLUTTER_ROOT']
+  return env_root unless env_root.nil? || env_root.strip.empty?
+
   generated_xcode_build_settings_path = File.expand_path(
     File.join('..', 'Flutter', 'Generated.xcconfig'),
     __FILE__,
