@@ -189,7 +189,7 @@ fun Sidebar(
             contentAlignment = Alignment.Center,
         ) {
             Icon(
-                painter = painterResource(R.drawable.maxstream_logo),
+                painter = painterResource(R.drawable.ic_launcher_foreground),
                 contentDescription = "MaxStream",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(32.dp),
