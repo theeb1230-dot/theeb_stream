@@ -132,7 +132,7 @@ class _MaxStreamMainScreenState extends State<MaxStreamMainScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text('Update to v${info.version}'),
+        title: Text('التحديث إلى الإصدار v${info.version}'),
         content: SizedBox(
           width: double.maxFinite,
           child: Column(
@@ -140,13 +140,13 @@ class _MaxStreamMainScreenState extends State<MaxStreamMainScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'A new version is available. Would you like to download it?',
+                'يتوفر إصدار جديد. هل تريد تنزيله الآن؟',
                 style: TextStyle(fontSize: 14),
               ),
               if (info.changelog.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 const Text(
-                  'What\'s New:',
+                  'ما الجديد:',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 const SizedBox(height: 6),
@@ -166,14 +166,14 @@ class _MaxStreamMainScreenState extends State<MaxStreamMainScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Later'),
+            child: const Text('لاحقًا'),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
               UpdateService.downloadAndInstallUpdate(context, info.downloadUrl);
             },
-            child: const Text('Update Now'),
+            child: const Text('تحديث الآن'),
           ),
         ],
       ),
