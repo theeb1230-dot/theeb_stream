@@ -17,11 +17,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MaxStreamPhone());
+  runApp(const TheebStreamPhone());
 }
 
-class MaxStreamPhone extends StatelessWidget {
-  const MaxStreamPhone({super.key});
+class TheebStreamPhone extends StatelessWidget {
+  const TheebStreamPhone({super.key});
 
   @override
   Widget build(BuildContext context) {
