@@ -98,10 +98,10 @@ class _StartupGateState extends State<_StartupGate> {
         debugShowCheckedModeBanner: false,
         theme: ThemeService.darkTheme,
         home: const Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: const Color(0xFF0F172A),
           body: Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+              valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF00F2FE)),
             ),
           ),
         ),
@@ -156,10 +156,14 @@ class MaxStreamApp extends StatelessWidget {
           minScaleFactor: 0.8,
           maxScaleFactor: 1.3,
         );
-        if (clamped == mq.textScaler) return child!;
+        final content = Directionality(
+          textDirection: TextDirection.rtl,
+          child: child!,
+        );
+        if (clamped == mq.textScaler) return content;
         return MediaQuery(
           data: mq.copyWith(textScaler: clamped),
-          child: child!,
+          child: content,
         );
       },
       home: const MaxStreamMainScreen(),
