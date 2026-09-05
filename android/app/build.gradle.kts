@@ -29,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.maxstream.app"
+        applicationId = "com.theebstream.app"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
