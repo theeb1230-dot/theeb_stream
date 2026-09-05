@@ -215,7 +215,6 @@ fun HomeScreen(
             attempt++
         }
     }
-    }
 
     Box(
         modifier = Modifier
