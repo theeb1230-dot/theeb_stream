@@ -48,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF0F172A),
       body: Center(
         child: FadeTransition(
           opacity: _animation,
@@ -56,13 +56,13 @@ class _SplashScreenState extends State<SplashScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                'assets/images/maxstream_logo.png',
+                'assets/images/theeb_stream_logo.png',
                 width: 150,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(
                     Icons.play_circle_fill,
                     size: 150,
-                    color: Colors.red,
+                    color: const Color(0xFF00F2FE),
                   );
                 },
               ),
