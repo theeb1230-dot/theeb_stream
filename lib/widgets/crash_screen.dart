@@ -333,7 +333,7 @@ class CrashScreen extends StatelessWidget {
   String? get _origin {
     final frames = report.stack.toString().split('\n');
     for (final frame in frames) {
-      final app = RegExp(r'package:maxstream/([^\s]+)').firstMatch(frame);
+      final app = RegExp(r'package:theeb_stream/([^\s]+)').firstMatch(frame);
       if (app == null) continue;
       final symbol = frame.trim().split(' (')[0];
       return '${app.group(1)}${symbol.isNotEmpty ? '  $symbol' : ''}';
