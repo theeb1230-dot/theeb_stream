@@ -1,4 +1,5 @@
-# Bootstrap extraction workflow. A second push ensures GitHub registers the newly added workflow before execution.
+# Bootstrap extraction workflow. Original project workflows are staged outside .github
+# because GITHUB_TOKEN cannot create/update workflow files during a workflow run.
 name: Bootstrap Theeb Stream source
 
 on:
@@ -42,14 +43,21 @@ jobs:
 
           mapfile -t roots < <(find "$tmpdir" -mindepth 1 -maxdepth 1 -printf '%f\n')
           if [ "${#roots[@]}" -eq 1 ] && [ -d "$tmpdir/${roots[0]}" ]; then
-            src="$tmpdir/${roots[0]}/"
+            src="$tmpdir/${roots[0]}"
           else
-            src="$tmpdir/"
+            src="$tmpdir"
           fi
 
-          rsync -a "$src" ./ \
+          mkdir -p .bootstrap/original-workflows
+          if [ -d "$src/.github/workflows" ]; then
+            find "$src/.github/workflows" -maxdepth 1 -type f -print0 | while IFS= read -r -d '' f; do
+              cp "$f" ".bootstrap/original-workflows/$(basename "$f").txt"
+            done
+          fi
+
+          rsync -a "$src/" ./ \
             --exclude '.git/' \
-            --exclude '.github/workflows/bootstrap-source.yml'
+            --exclude '.github/workflows/'
 
           rm maxstream-main.zip
 
