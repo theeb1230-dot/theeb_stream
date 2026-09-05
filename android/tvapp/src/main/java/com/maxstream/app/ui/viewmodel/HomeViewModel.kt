@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import android.annotation.SuppressLint
 import com.maxstream.app.data.local.WatchProgressRepository
 import com.maxstream.app.data.model.MediaItem
-import com.maxstream.app.data.repository.CloudSyncRepository
 import com.maxstream.app.di.Modules
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -48,7 +47,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             // Pull the phone's watch progress/watchlist into local storage so
             // Continue Watching reflects what was watched on the phone.
             // Never let sync failure block catalogue loading.
-            runCatching { CloudSyncRepository.pullToDevice(getApplication()) }
             // Fetch all catalogue rows in parallel; a single TMDB failure must
             // not blank the whole home screen (previously sequential without
             // per-row catch left every list empty on the first exception).
@@ -85,19 +83,5 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
                 _error.value = _error.value ?: "No content available. Pull to refresh or check connection."
             }
         }
-    }
-
-    /**
-     * Re-reads locally-synced progress for Continue Watching. Inbound cloud
-     * changes are mirrored by [CloudSyncCoordinator] (which also pulls on
-     * [loadAll]); this only re-reads local storage so it is cheap and safe to
-     * call on tab visibility + every revision bump.
-     */
-    @SuppressLint("NullSafeMutableLiveData")
-    fun refreshSynced() {
-        _continueWatching.value = WatchProgressRepository
-            .recent(getApplication(), limit = 20)
-            .filter { entry -> entry.isVisibleInContinueWatching() }
-            .map { it.toMediaItem() }
     }
 }
