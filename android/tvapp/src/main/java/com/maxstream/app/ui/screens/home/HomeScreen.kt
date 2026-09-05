@@ -215,22 +215,6 @@ fun HomeScreen(
             attempt++
         }
     }
-
-    // While Home is visible, continuously mirror the phone's synced progress so
-    // Continue Watching reflects what was watched on the phone. The 30s poll
-    // keeps the row fresh even if a revision bump is missed; CloudSyncCoordinator
-    // also bumps historyRevision on every inbound change (mirrors the phone's
-    // real-time Firestore listener + historyRevision notifier).
-    val historyRevision by com.maxstream.app.data.repository.CloudSyncCoordinator.historyRevision
-        .collectAsState()
-    LaunchedEffect(isVisible, historyRevision) {
-        if (isVisible) viewModel.refreshSynced()
-    }
-    LaunchedEffect(isVisible) {
-        while (isVisible && coroutineContext.isActive) {
-            delay(30_000)
-            viewModel.refreshSynced()
-        }
     }
 
     Box(
