@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.maxstream.app.R
-import com.maxstream.app.data.local.SessionManager
 import com.maxstream.app.ui.navigation.Screen
 import com.maxstream.app.ui.theme.Background
 import kotlinx.coroutines.delay
@@ -62,13 +61,12 @@ import kotlinx.coroutines.delay
 private data class MoreMenuItem(val label: String, val isDestructive: Boolean = false)
 
 private val MENU_ITEMS = listOf(
-    MoreMenuItem("Help & Support"),
-    MoreMenuItem("About MaxStream"),
-    MoreMenuItem("Join Community"),
-    MoreMenuItem("Sign Out", isDestructive = true),
+    MoreMenuItem("المساعدة والدعم"),
+    MoreMenuItem("عن ذيب ستريم"),
+    MoreMenuItem("المجتمع"),
 )
 
-private const val COMMUNITY_URL = "https://t.me/maxstream254"
+private const val COMMUNITY_URL = "https://github.com/theeb1230-dot/theeb_stream"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MoreScreen (Tab 6)
@@ -83,30 +81,19 @@ private const val COMMUNITY_URL = "https://t.me/maxstream254"
 fun MoreScreen(
     navController: NavController,
     onReturnToSidebar: () -> Unit = {},
-    onSignOut: () -> Unit = {},
     isVisible: Boolean = true,
     focusKey: Int = 0,
     restoreFocusKey: Int = 0,
 ) {
     val context = LocalContext.current
-    var userName  by remember { mutableStateOf("MaxStream User") }
-    var userEmail by remember { mutableStateOf("") }
+    val userName = "ذيب ستريم"
 
-    var showHelpDialog     by remember { mutableStateOf(false) }
-    var showAboutDialog    by remember { mutableStateOf(false) }
-    var showSignOutConfirm by remember { mutableStateOf(false) }
+    var showHelpDialog  by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
 
     // One FocusRequester per menu item so we can navigate and seed focus precisely
     val focusRequesters = remember { List(MENU_ITEMS.size) { FocusRequester() } }
     var focusedIndex by remember { mutableIntStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        val email = SessionManager.email(context)
-        if (email.isNotBlank()) {
-            userName  = email.substringBefore("@").replaceFirstChar { it.uppercase() }
-            userEmail = email
-        }
-    }
 
     // Seed focus on menu item when tab becomes visible, or re-seed the
     // previously focused item when focus returns from the sidebar (focusKey bump).
@@ -134,8 +121,8 @@ fun MoreScreen(
     // Restore focus to the previously focused menu row after a dialog closes.
     // Compose dialogs run in their own window, so dismissing one leaves the
     // menu without focus until a direction key is pressed again.
-    LaunchedEffect(showHelpDialog, showAboutDialog, showSignOutConfirm) {
-        if (showHelpDialog || showAboutDialog || showSignOutConfirm || !isVisible) return@LaunchedEffect
+    LaunchedEffect(showHelpDialog, showAboutDialog) {
+        if (showHelpDialog || showAboutDialog || !isVisible) return@LaunchedEffect
         delay(80)
         val index = focusedIndex.coerceIn(0, MENU_ITEMS.lastIndex)
         runCatching { focusRequesters[index].requestFocus() }
@@ -151,7 +138,6 @@ fun MoreScreen(
             0 -> showHelpDialog = true
             1 -> showAboutDialog = true
             2 -> launchCommunity()
-            3 -> showSignOutConfirm = true
         }
     }
 
@@ -185,10 +171,7 @@ fun MoreScreen(
 
             Spacer(Modifier.height(16.dp))
             Text(text = userName, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
-            if (userEmail.isNotBlank()) {
-                Spacer(Modifier.height(4.dp))
-                Text(text = userEmail, color = Color(0xFFB3B3B3), fontSize = 14.sp)
-            }
+
         }
 
         Spacer(Modifier.height(40.dp))
@@ -235,7 +218,7 @@ fun MoreScreen(
             containerColor   = Color(0xFF1E1E1E),
             title = {
                 Text(
-                    text = "Help & Support",
+                    text = "المساعدة والدعم",
                     color = Color.White,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
@@ -243,14 +226,14 @@ fun MoreScreen(
             },
             text = {
                 Text(
-                    text = "For help and support, please join our community or contact us through the app.",
+                    text = "للمساعدة والدعم، استخدم صفحة المشروع أو قسم المجتمع.",
                     color = Color.White.copy(alpha = 0.85f),
                     fontSize = 18.sp,
                 )
             },
             confirmButton = {
                 TextButton(onClick = { showHelpDialog = false }) {
-                    Text("OK", color = Color(0xFFE50914), fontSize = 18.sp)
+                    Text("حسنًا", color = Color(0xFFE50914), fontSize = 18.sp)
                 }
             },
         )
@@ -267,7 +250,7 @@ fun MoreScreen(
             containerColor   = Color(0xFF1E1E1E),
             title = {
                 Text(
-                    text = "About MaxStream",
+                    text = "عن ذيب ستريم",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -276,18 +259,18 @@ fun MoreScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        text = "MaxStream Tv v$tvVersion",
+                        text = "ذيب ستريم للتلفزيون v$tvVersion",
                         color = Color.White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "A modern movie and TV discovery app powered by The Movie Database (TMDb).",
+                        text = "تطبيق ذيب ستريم لعرض واستكشاف محتوى الأفلام والمسلسلات.",
                         color = Color.White.copy(alpha = 0.85f),
                         fontSize = 16.sp,
                     )
                     Text(
-                        text = "Discover, explore, and manage your watchlist with ease.",
+                        text = "استكشف المحتوى وأدر قائمتك ومشاهداتك بسهولة.",
                         color = Color.Gray,
                         fontSize = 16.sp,
                     )
@@ -295,53 +278,13 @@ fun MoreScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showAboutDialog = false }) {
-                    Text("OK", color = Color(0xFFE50914), fontSize = 16.sp)
+                    Text("حسنًا", color = Color(0xFFE50914), fontSize = 16.sp)
                 }
             },
         )
     }
 
-    if (showSignOutConfirm) {
-        AlertDialog(
-            onDismissRequest = { showSignOutConfirm = false },
-            containerColor   = Color(0xFF1E1E1E),
-            title = {
-                Text(
-                    text = "Sign Out",
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            },
-            text = {
-                Text(
-                    text = "Are you sure you want to sign out?",
-                    color = Color.White.copy(alpha = 0.85f),
-                    fontSize = 18.sp,
-                )
-            },
-            dismissButton = {
-                TextButton(onClick = { showSignOutConfirm = false }) {
-                    Text("Cancel", color = Color.Gray, fontSize = 18.sp)
-                }
-            },
-            confirmButton = {
-                FilledTonalButton(
-                    onClick = {
-                        showSignOutConfirm = false
-                        SessionManager.signOut(context)
-                        onSignOut()
-                    },
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = Color(0xFFE50914),
-                        contentColor   = Color.White,
-                    ),
-                ) {
-                    Text("Sign Out", color = Color.White, fontSize = 18.sp)
-                }
-            },
-        )
-    }
+
 }
 
 @Composable
