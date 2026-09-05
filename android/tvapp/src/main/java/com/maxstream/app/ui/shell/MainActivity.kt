@@ -386,7 +386,7 @@ private fun TvShell(
             TabScreen(visible = appState.selectedTab == 5) {
                 MoreScreen(
                     navController      = deepNavController,
-                    onReturnToSidebar  = { appState.updateFocusOnSidebar(true) },,
+                    onReturnToSidebar  = { appState.updateFocusOnSidebar(true) },
                     isVisible       = appState.selectedTab == 5,
                     focusKey        = contentFocusTick,
                     restoreFocusKey = deepNavReturnTick,
