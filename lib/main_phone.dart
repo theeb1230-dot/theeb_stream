@@ -28,6 +28,10 @@ class MaxStreamPhone extends StatelessWidget {
     return MaterialApp(
       title: 'ذيب ستريم',
       theme: ThemeData.dark(),
+      builder: (context, child) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: child!,
+      ),
       home: const MaxStreamMainScreen(),
     );
   }
