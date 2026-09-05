@@ -93,18 +93,8 @@ fun WatchlistScreen(
     val gridNav = remember { GridNavState(COLUMNS) }
     val gridState = rememberLazyGridState()
 
-    // Continuous inbound sync: CloudSyncCoordinator mirrors the phone's real-time
-    // Firestore listener by re-pulling every few seconds and bumping
-    // watchlistRevision when the cloud watchlist changes (add/remove on phone).
-    // On change, reload from local storage so the TV always matches the phone.
-    val watchlistRevision by com.maxstream.app.data.repository.CloudSyncCoordinator.watchlistRevision
-        .collectAsState()
-
     LaunchedEffect(Unit) {
         try {
-            // Pull the phone's watchlist into local storage so the TV shows the
-            // same saved titles as the phone (same account).
-            runCatching { com.maxstream.app.data.repository.CloudSyncRepository.pullToDevice(context) }
             watchlist = WatchlistRepository.getAll(context)
         } catch (e: Exception) {
             error = e.message
@@ -113,10 +103,8 @@ fun WatchlistScreen(
         }
     }
 
-    // Re-pull + reload whenever the tab becomes visible again (e.g. returning
-    // from details after toggling the watchlist, or from the sidebar), and when
-    // the synced watchlist changes on the phone.
-    LaunchedEffect(isVisible, focusKey, watchlistRevision) {
+    // Reload local watchlist whenever the tab becomes visible again.
+    LaunchedEffect(isVisible, focusKey) {
         if (!isVisible) return@LaunchedEffect
         watchlist = runCatching { WatchlistRepository.getAll(context) }.getOrDefault(watchlist)
     }
