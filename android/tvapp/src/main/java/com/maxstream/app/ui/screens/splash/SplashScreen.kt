@@ -68,7 +68,7 @@ fun SplashScreen(onComplete: () -> Unit) {
         ) {
             // Logo mark — enlarged to match the Dart splash (which uses ~200dp)
             Image(
-                painter = painterResource(R.drawable.maxstream_logo),
+                painter = painterResource(R.drawable.ic_launcher_foreground),
                 contentDescription = "MaxStream logo",
                 modifier = Modifier
                     .scale(scale)
