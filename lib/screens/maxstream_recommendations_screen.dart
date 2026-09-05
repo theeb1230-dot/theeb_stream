@@ -257,7 +257,7 @@ class _MaxStreamRecommendationsScreenState
       expandedHeight: 60,
       backgroundColor: const Color(0xFF0A0A0A),
       title: const Text(
-        'Recommendations',
+        'التوصيات',
         style: TextStyle(
           color: Colors.white,
           fontSize: 22,
@@ -397,7 +397,7 @@ class _MaxStreamRecommendationsScreenState
   }
 
   Widget _buildCard(Map<String, dynamic> item, String mediaType) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final posterPath = item['poster_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
     final year = (item['release_date'] ?? item['first_air_date'] ?? '')
@@ -604,7 +604,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'No recommendations yet',
+              'لا توجد توصيات بعد',
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 18,
@@ -613,7 +613,7 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Watch some movies and series to get\npersonalized recommendations',
+              'شاهد بعض الأفلام والمسلسلات للحصول على\nتوصيات مخصصة لك',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.grey[600],
