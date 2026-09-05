@@ -62,7 +62,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
             pinned: true,
             backgroundColor: const Color(0xFF0A0A0A),
             title: const Text(
-              'About',
+              'عن التطبيق',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 22,
@@ -78,72 +78,72 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
                 children: [
                   _buildHeroSection(),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('About MaxStream'),
+                  _buildSectionTitle('عن ذيب ستريم'),
                   const SizedBox(height: 12),
                   _buildInfoCard(
                     icon: Icons.info_outline,
-                    title: 'What is MaxStream?',
+                    title: 'ما هو ذيب ستريم؟',
                     content:
-                        'MaxStream is a modern movie and TV discovery app powered by '
-                        'The Movie Database (TMDB). Discover, explore, and manage your '
-                        'watchlist with ease.',
+                        'ذيب ستريم تطبيق حديث لاستكشاف الأفلام والمسلسلات ويعتمد على بيانات '
+                        'The Movie Database (TMDB). يمكنك استكشاف المحتوى وإدارة '
+                        'قائمتك ومشاهداتك بسهولة.',
                   ),
                   const SizedBox(height: 8),
                   _buildInfoCard(
                     icon: Icons.code,
-                    title: 'Version',
+                    title: 'الإصدار',
                     content: _version,
                   ),
                   const SizedBox(height: 8),
                   _buildInfoCard(
                     icon: Icons.architecture,
-                    title: 'Variant',
+                    title: 'المعمارية',
                     content: _variant,
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Get Help'),
+                  _buildSectionTitle('المساعدة'),
                   const SizedBox(height: 12),
                   _buildActionCard(
                     icon: Icons.help_outline,
-                    title: 'Help & Support',
-                    subtitle: 'Get help with using MaxStream',
+                    title: 'المساعدة والدعم',
+                    subtitle: 'مساعدة في استخدام ذيب ستريم',
                     onTap: () => _showHelpDialog(context),
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Community'),
+                  _buildSectionTitle('المجتمع'),
                   const SizedBox(height: 12),
                   _buildActionCard(
                     icon: Icons.telegram,
-                    title: 'Join Our Community',
-                    subtitle: 'Connect with other MaxStream users',
-                    onTap: () => _launchUrl('https://t.me/maxstream254'),
+                    title: 'مجتمع ذيب ستريم',
+                    subtitle: 'تابع المشروع وتحديثاته',
+                    onTap: () => _launchUrl('https://github.com/theeb1230-dot/theeb_stream'),
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Website'),
+                  _buildSectionTitle('المشروع'),
                   const SizedBox(height: 12),
                   _buildActionCard(
                     icon: Icons.language,
-                    title: 'Official Website',
-                    subtitle: 'https://maxstreamweb.vercel.app',
-                    onTap: () => _launchUrl('https://maxstreamweb.vercel.app/'),
+                    title: 'صفحة المستودع',
+                    subtitle: 'github.com/theeb1230-dot/theeb_stream',
+                    onTap: () => _launchUrl('https://github.com/theeb1230-dot/theeb_stream'),
                   ),
                   const SizedBox(height: 12),
                   _buildActionCard(
                     icon: Icons.code,
-                    title: 'GitHub Repository',
-                    subtitle: 'https://github.com/chila254/maxstream',
-                    onTap: () => _launchUrl('https://github.com/chila254/maxstream'),
+                    title: 'مستودع GitHub',
+                    subtitle: 'https://github.com/theeb1230-dot/theeb_stream',
+                    onTap: () => _launchUrl('https://github.com/theeb1230-dot/theeb_stream'),
                   ),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Legal'),
+                  _buildSectionTitle('المعلومات القانونية'),
                   const SizedBox(height: 12),
                   _buildInfoCard(
                     icon: Icons.gavel,
-                    title: 'TMDB Attribution',
+                    title: 'نسبة بيانات TMDB',
                     content:
-                        'This product uses the TMDB API but is not endorsed or '
-                        'certified by TMDB. All movie and TV show data is provided '
-                        'by The Movie Database.',
+                        'يستخدم هذا التطبيق واجهة TMDB، لكنه غير معتمد أو '
+                        'مصدق رسميًا من TMDB. بيانات الأفلام والمسلسلات مقدمة '
+                        'من The Movie Database.',
                   ),
                   const SizedBox(height: 100),
                 ],
@@ -197,7 +197,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'MaxStream',
+            'ذيب ستريم',
             style: TextStyle(
               color: Colors.white,
               fontSize: 28,
@@ -214,7 +214,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Discover. Watch. Enjoy.',
+            'اكتشف. شاهد. استمتع.',
             style: TextStyle(
               color: Colors.grey[400],
               fontSize: 14,
@@ -354,17 +354,17 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
         backgroundColor: const Color(0xFF1E1E1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
-          'Help & Support',
+          'المساعدة والدعم',
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          'For help and support, please join our community or contact us through the app.',
+          'للمساعدة والدعم، راجع مستودع ذيب ستريم على GitHub.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK', style: TextStyle(color: Colors.red)),
+            child: const Text('حسنًا', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
