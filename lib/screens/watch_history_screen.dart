@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/watch_history_service.dart';
 
-import 'package:maxstream/widgets/video_player_screen.dart';
+import 'package:theeb_stream/widgets/video_player_screen.dart';
 import '../widgets/app_network_image.dart';
 
 class WatchHistoryScreen extends StatefulWidget {
