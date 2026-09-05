@@ -3,7 +3,7 @@
 تطبيق مشاهدة واستكشاف للأفلام والمسلسلات مبني بـ Flutter، مع تطبيق Android TV أصلي بـ Kotlin ودعم مصادر متعددة وتشغيل HLS.
 
 <div align="center">
-  <img src="assets/images/maxstream_logo.png" alt="Theeb Stream Logo" width="128" height="128" />
+  <img src="assets/images/theeb_stream_logo.png" alt="Theeb Stream Logo" width="128" height="128" />
 </div>
 
 ## Screenshots
@@ -194,7 +194,7 @@ flutter build appbundle --release
 
 ## Version
 
-- **Current**: 1.5.0+7
+- **Current**: 1.6.0+8
 - **Min SDK**: 3.8.0
 
 ## Contributing
