@@ -55,12 +55,12 @@ void main() {
     expect(await WatchHistoryService.isWatched('42', true, 0, 0), isFalse);
   });
 
-  test('empty injected owner uses stable anonymous owner', () {
+  test('empty injected owner uses stable local owner', () {
     UserScope.ownerResolver = () => '  ';
     expect(UserScope.currentOwner, UserScope.anonymousOwner);
     expect(
       WatchHistoryService.getWatchHistoryKey('7', false, 1, 2),
-      'watch_history___anonymous___tv_7_1_2',
+      'watch_history___local___tv_7_1_2',
     );
   });
 }
