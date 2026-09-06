@@ -1,0 +1,236 @@
+name: Publish Theeb Stream Release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: theeb-stream-release
+  cancel-in-progress: false
+
+jobs:
+  metadata:
+    if: startsWith(github.event.head_commit.message, 'Release:')
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: version
+        name: Resolve version from pubspec
+        shell: bash
+        run: |
+          set -euo pipefail
+          raw="$(awk '/^version:/ {print $2; exit}' pubspec.yaml)"
+          version="${raw%%+*}"
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+  quality:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Flutter analyze
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+      - name: Flutter tests
+        run: flutter test
+
+  android-mobile:
+    needs: metadata
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+      EXCLUDE_TV: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Decode signing inputs
+        if: env.KEYSTORE_BASE64 != ''
+        shell: bash
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/key.jks
+          cat > android/keystore.properties <<EOF
+          storeFile=../app/key.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}
+          EOF
+      - name: Decode Google Services
+        if: env.GOOGLE_SERVICES_JSON != ''
+        run: echo "$GOOGLE_SERVICES_JSON" | base64 -di > android/app/google-services.json
+      - run: flutter pub get
+      - name: Build release APKs
+        run: flutter build apk --release --split-per-abi
+      - name: Stage mobile assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-mobile
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk release-mobile/Theeb-Stream-Android-Mobile-arm64-v8a.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk release-mobile/Theeb-Stream-Android-Mobile-armeabi-v7a.apk
+          cp build/app/outputs/flutter-apk/app-x86_64-release.apk release-mobile/Theeb-Stream-Android-Mobile-x86_64.apk
+          (cd release-mobile && sha256sum *.apk > SHA256SUMS-Mobile.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-android-mobile
+          path: release-mobile/*
+          retention-days: 7
+
+  android-tv:
+    needs: metadata
+    runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Create local.properties
+        shell: bash
+        run: |
+          FLUTTER_PATH=$(which flutter | sed 's|/bin/flutter||')
+          echo "flutter.sdk=$FLUTTER_PATH" > android/local.properties
+      - name: Decode signing inputs
+        if: env.KEYSTORE_BASE64 != ''
+        shell: bash
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > android/app/key.jks
+          cat > android/keystore.properties <<EOF
+          storeFile=../app/key.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}
+          EOF
+      - name: Build Android TV release
+        run: cd android && ./gradlew assembleFossUniversalRelease --no-daemon
+      - name: Stage TV asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-tv
+          apk="$(find build/tvapp -maxdepth 6 -name '*.apk' -type f | head -n1)"
+          test -n "$apk"
+          cp "$apk" release-tv/Theeb-Stream-Android-TV.apk
+          (cd release-tv && sha256sum *.apk > SHA256SUMS-TV.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-android-tv
+          path: release-tv/*
+          retention-days: 7
+
+  ios-unsigned:
+    needs: metadata
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Install CocoaPods dependencies
+        run: cd ios && pod install --repo-update
+      - name: Build iOS without code signing
+        run: flutter build ios --release --no-codesign
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d build/ios/iphoneos/Runner.app
+          rm -rf Payload release-ios
+          mkdir -p Payload release-ios
+          cp -R build/ios/iphoneos/Runner.app Payload/Runner.app
+          /usr/bin/zip -qry release-ios/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa Payload
+          (cd release-ios && shasum -a 256 Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa > SHA256SUMS-iOS.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-ios-unsigned
+          path: release-ios/*
+          retention-days: 7
+
+  publish:
+    needs: [metadata, quality, android-mobile, android-tv, ios-unsigned]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release
+          merge-multiple: true
+      - name: Verify final assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f release/Theeb-Stream-Android-Mobile-arm64-v8a.apk
+          test -f release/Theeb-Stream-Android-TV.apk
+          test -f release/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa
+          (cd release && sha256sum Theeb-Stream-Android-Mobile-*.apk Theeb-Stream-Android-TV.apk Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa > SHA256SUMS.txt)
+      - name: Write release notes
+        shell: bash
+        run: |
+          cat > release/RELEASE_NOTES.md <<EOF
+          # Theeb Stream ${{ needs.metadata.outputs.version }}
+
+          Commit: ${{ github.sha }}
+          Tag: ${{ needs.metadata.outputs.tag }}
+
+          Validated in this release workflow:
+          - Flutter analyze
+          - Flutter tests
+          - Android Mobile release APKs
+          - Android TV release APK
+          - iOS release build with --no-codesign
+
+          iOS note: Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa is unsigned and is not directly installable. It requires valid Apple signing and provisioning externally.
+
+          SHA-256 checksums are attached in SHA256SUMS.txt.
+          EOF
+      - name: Create GitHub Release and upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.metadata.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Theeb Stream ${{ needs.metadata.outputs.version }}
+          body_path: release/RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          files: |
+            release/Theeb-Stream-Android-Mobile-arm64-v8a.apk
+            release/Theeb-Stream-Android-Mobile-armeabi-v7a.apk
+            release/Theeb-Stream-Android-Mobile-x86_64.apk
+            release/Theeb-Stream-Android-TV.apk
+            release/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa
+            release/SHA256SUMS.txt
