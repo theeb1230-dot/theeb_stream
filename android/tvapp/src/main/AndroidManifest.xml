@@ -16,7 +16,7 @@
             android:exported="true"
             android:banner="@drawable/tv_banner"
             android:screenOrientation="landscape"
-            android:theme="@style/Theme.MaxStream.NoActionBar">
+            android:theme="@style/Theme.TheebStream.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
