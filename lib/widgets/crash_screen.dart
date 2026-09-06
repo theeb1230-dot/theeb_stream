@@ -63,7 +63,7 @@ Future<void> checkUnexpectedExit() async {
     crashReport.value = CrashInfo(
       tag: 'UnexpectedExit',
       error:
-          'Your TV closed MaxStream while you were watching (usually '
+          'أُغلق ذيب ستريم أثناء المشاهدة، وغالبًا '
           'because it ran low on memory, or the device restarted).'
           '${trace.isEmpty ? '' : '\n\n$trace'}',
       stack: StackTrace.fromString(
