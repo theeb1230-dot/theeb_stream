@@ -1,4 +1,4 @@
-name: Build Theeb Stream (Mobile + TV + iOS)
+name: Build Theeb Stream (Mobile + TV)
 
 on:
   push:
@@ -73,19 +73,11 @@ jobs:
           cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/armeabi-v7a/Theeb-Stream-Android-Mobile-armeabi-v7a.apk
           cp build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/x86_64/Theeb-Stream-Android-Mobile-x86_64.apk
 
-      - name: Generate Mobile APK SHA-256
-        run: |
-          sha256sum build/app/outputs/flutter-apk/arm64-v8a/Theeb-Stream-Android-Mobile-arm64-v8a.apk > build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
-          sha256sum build/app/outputs/flutter-apk/armeabi-v7a/Theeb-Stream-Android-Mobile-armeabi-v7a.apk >> build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
-          sha256sum build/app/outputs/flutter-apk/x86_64/Theeb-Stream-Android-Mobile-x86_64.apk >> build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
-
       - name: Upload arm64-v8a APK
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-arm64-v8a
-          path: |
-            build/app/outputs/flutter-apk/arm64-v8a/Theeb-Stream-Android-Mobile-arm64-v8a.apk
-            build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
+          path: build/app/outputs/flutter-apk/arm64-v8a/Theeb-Stream-Android-Mobile-arm64-v8a.apk
           retention-days: 7
 
       - name: Upload armeabi-v7a APK
@@ -183,16 +175,11 @@ jobs:
           test -n "$apk"
           cp "$apk" "release-artifact/Theeb-Stream-Android-TV.apk"
 
-      - name: Generate TV APK SHA-256
-        run: sha256sum release-artifact/Theeb-Stream-Android-TV.apk > release-artifact/SHA256SUMS.txt
-
       - name: Upload TV APK
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-tv
-          path: |
-            release-artifact/Theeb-Stream-Android-TV.apk
-            release-artifact/SHA256SUMS.txt
+          path: release-artifact/Theeb-Stream-Android-TV.apk
           retention-days: 7
 
 
@@ -238,3 +225,89 @@ jobs:
             release-ios/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa
             release-ios/SHA256SUMS.txt
           retention-days: 7
+
+
+  publish-release:
+    name: Publish GitHub Release
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release]')
+    needs: [build-mobile, build-tv, build-ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download final build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: theeb-stream-*
+          merge-multiple: true
+          path: release-files
+
+      - name: Verify required release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f release-files/Theeb-Stream-Android-Mobile-arm64-v8a.apk
+          test -f release-files/Theeb-Stream-Android-TV.apk
+          test -f release-files/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa
+          ls -lh release-files
+
+      - name: Generate release checksums and notes
+        id: meta
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(awk '/^version:/{print $2}' pubspec.yaml | cut -d+ -f1)"
+          test -n "$version"
+          tag="v$version"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          (
+            cd release-files
+            sha256sum               Theeb-Stream-Android-Mobile-arm64-v8a.apk               Theeb-Stream-Android-TV.apk               Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa               > SHA256SUMS.txt
+          )
+          cat > release-notes.md <<EOF
+          # Theeb Stream $tag
+
+          Final build produced from commit `$GITHUB_SHA` in one GitHub Actions run after all required build jobs succeeded.
+
+          Included platforms:
+          - Android Mobile: `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
+          - Android TV: `Theeb-Stream-Android-TV.apk`
+          - iOS: `Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa`
+
+          Verification:
+          - Flutter/branch CI is required before the release trigger is merged.
+          - Android Mobile build succeeded in this release workflow.
+          - Android TV build succeeded in this release workflow.
+          - iOS no-codesign build succeeded in this release workflow.
+          - SHA-256 hashes are attached in `SHA256SUMS.txt`.
+
+          iOS note: the IPA is unsigned/no-codesign and is not directly installable on an iPhone without external signing and valid provisioning.
+          EOF
+
+      - name: Create GitHub Release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ steps.meta.outputs.tag }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "::error::Release $tag already exists; refusing to overwrite a published release."
+            exit 1
+          fi
+          gh release create "$tag"             --target "$GITHUB_SHA"             --title "Theeb Stream $tag"             --notes-file release-notes.md             release-files/Theeb-Stream-Android-Mobile-arm64-v8a.apk             release-files/Theeb-Stream-Android-TV.apk             release-files/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa             release-files/SHA256SUMS.txt
+
+      - name: Verify published release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${{ steps.meta.outputs.tag }}"
+          gh release view "$tag" --json tagName,url,assets
+          names="$(gh release view "$tag" --json assets --jq '.assets[].name')"
+          grep -Fx 'Theeb-Stream-Android-Mobile-arm64-v8a.apk' <<<"$names"
+          grep -Fx 'Theeb-Stream-Android-TV.apk' <<<"$names"
+          grep -Fx 'Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa' <<<"$names"
