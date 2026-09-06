@@ -1,4 +1,4 @@
-name: Build Theeb Stream (Mobile + TV)
+name: Build Theeb Stream (Mobile + TV + iOS)
 
 on:
   push:
@@ -69,29 +69,37 @@ jobs:
           mkdir -p build/app/outputs/flutter-apk/arm64-v8a
           mkdir -p build/app/outputs/flutter-apk/armeabi-v7a
           mkdir -p build/app/outputs/flutter-apk/x86_64
-          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/arm64-v8a/theeb-stream-arm64-v8a.apk
-          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/armeabi-v7a/theeb-stream-armeabi-v7a.apk
-          cp build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/x86_64/theeb-stream-x86_64.apk
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk build/app/outputs/flutter-apk/arm64-v8a/Theeb-Stream-Android-Mobile-arm64-v8a.apk
+          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk build/app/outputs/flutter-apk/armeabi-v7a/Theeb-Stream-Android-Mobile-armeabi-v7a.apk
+          cp build/app/outputs/flutter-apk/app-x86_64-release.apk build/app/outputs/flutter-apk/x86_64/Theeb-Stream-Android-Mobile-x86_64.apk
+
+      - name: Generate Mobile APK SHA-256
+        run: |
+          sha256sum build/app/outputs/flutter-apk/arm64-v8a/Theeb-Stream-Android-Mobile-arm64-v8a.apk > build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
+          sha256sum build/app/outputs/flutter-apk/armeabi-v7a/Theeb-Stream-Android-Mobile-armeabi-v7a.apk >> build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
+          sha256sum build/app/outputs/flutter-apk/x86_64/Theeb-Stream-Android-Mobile-x86_64.apk >> build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
 
       - name: Upload arm64-v8a APK
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-arm64-v8a
-          path: build/app/outputs/flutter-apk/arm64-v8a/theeb-stream-arm64-v8a.apk
+          path: |
+            build/app/outputs/flutter-apk/arm64-v8a/Theeb-Stream-Android-Mobile-arm64-v8a.apk
+            build/app/outputs/flutter-apk/arm64-v8a/SHA256SUMS.txt
           retention-days: 7
 
       - name: Upload armeabi-v7a APK
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-armeabi-v7a
-          path: build/app/outputs/flutter-apk/armeabi-v7a/theeb-stream-armeabi-v7a.apk
+          path: build/app/outputs/flutter-apk/armeabi-v7a/Theeb-Stream-Android-Mobile-armeabi-v7a.apk
           retention-days: 7
 
       - name: Upload x86_64 APK
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-x86_64
-          path: build/app/outputs/flutter-apk/x86_64/theeb-stream-x86_64.apk
+          path: build/app/outputs/flutter-apk/x86_64/Theeb-Stream-Android-Mobile-x86_64.apk
           retention-days: 7
 
   build-tv:
@@ -173,13 +181,18 @@ jobs:
           mkdir -p release-artifact
           apk="$(find build/tvapp -maxdepth 6 -name '*.apk' -type f | head -n1)"
           test -n "$apk"
-          cp "$apk" "release-artifact/theeb-stream-tv.apk"
+          cp "$apk" "release-artifact/Theeb-Stream-Android-TV.apk"
+
+      - name: Generate TV APK SHA-256
+        run: sha256sum release-artifact/Theeb-Stream-Android-TV.apk > release-artifact/SHA256SUMS.txt
 
       - name: Upload TV APK
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-tv
-          path: release-artifact/theeb-stream-tv.apk
+          path: |
+            release-artifact/Theeb-Stream-Android-TV.apk
+            release-artifact/SHA256SUMS.txt
           retention-days: 7
 
 
@@ -214,14 +227,14 @@ jobs:
           rm -rf release-ios Payload
           mkdir -p release-ios Payload
           cp -R "$app" Payload/Runner.app
-          /usr/bin/zip -qry release-ios/theeb-stream-ios-unsigned.ipa Payload
-          shasum -a 256 release-ios/theeb-stream-ios-unsigned.ipa > release-ios/SHA256SUMS.txt
+          /usr/bin/zip -qry release-ios/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa Payload
+          shasum -a 256 release-ios/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa > release-ios/SHA256SUMS.txt
 
       - name: Upload unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: theeb-stream-ios-unsigned
           path: |
-            release-ios/theeb-stream-ios-unsigned.ipa
+            release-ios/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa
             release-ios/SHA256SUMS.txt
           retention-days: 7
