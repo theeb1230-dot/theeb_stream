@@ -296,8 +296,8 @@ fun PlayerScreen(
     var menuOpen by remember { mutableStateOf(false) }
     var activeMenu by remember { mutableStateOf<PlayerMenu?>(null) }
     var menuIndex by remember { mutableStateOf(0) }
-    var selectedQualityLabel by remember { mutableStateOf("Auto") }
-    var selectedSubtitleLabel by remember { mutableStateOf("Off") }
+    var selectedQualityLabel by remember { mutableStateOf("تلقائي") }
+    var selectedSubtitleLabel by remember { mutableStateOf("إيقاف") }
     var resumePositionMs by remember { mutableStateOf(0L) }
     // True after a memory-pressure release so the recovery effect rebuilds the
     // player (distinct from the initial load, which must not double-resolve).
@@ -408,9 +408,9 @@ fun PlayerScreen(
     }
 
     fun qualityLabelFor(s: Source): String {
-        if (s.separateAudio) return "Auto"
+        if (s.separateAudio) return "تلقائي"
         val currentUrl = s.url
-        return s.qualities.firstOrNull { it.url == currentUrl }?.label ?: "Auto"
+        return s.qualities.firstOrNull { it.url == currentUrl }?.label ?: "تلقائي"
     }
 
     fun subtitleMimeType(url: String, source: String = ""): String = when {
@@ -429,7 +429,7 @@ fun PlayerScreen(
         // Dedupe by label so a repeated rendition label (e.g. two "1080p"
         // entries) only appears once — otherwise selecting that label would
         // highlight every matching row (mirrors Dart's seen.add(q.label)).
-        return listOf(Quality(label = "Auto", url = "", height = 0)) + q.distinctBy { it.label }
+        return listOf(Quality(label = "تلقائي", url = "", height = 0)) + q.distinctBy { it.label }
     }
 
     /**
@@ -459,10 +459,10 @@ fun PlayerScreen(
                         else menuEpisodesCache[nextSeason]?.orEmpty())
                 ?.firstOrNull { it.number == nextEpisode }
             if (next != null && !next.isReleased()) {
-                status = "To be released on ${formatReleaseDate(next.airDate)}"
+                status = "موعد العرض ${formatReleaseDate(next.airDate)}"
                 return
             }
-            status = "Auto-playing S${nextSeason}E$nextEpisode..."
+            status = "تشغيل تلقائي للموسم ${nextSeason} الحلقة $nextEpisode..."
             currentSeason = nextSeason
             currentEpisode = nextEpisode
             resumePositionMs = 0L
@@ -602,7 +602,7 @@ fun PlayerScreen(
                                     error = null
                                 } catch (e: Exception) {
                                     Log.e("TVPlayer", "Switch to ${next.displayName} failed: ${e.message}")
-                                    error = e.message ?: "Playback failed"
+                                    error = e.message ?: "فشل التشغيل"
                                     loading = false
                                 }
                             }
@@ -632,13 +632,13 @@ fun PlayerScreen(
                                 exoPlayer = p
                             } catch (e: Exception) {
                                 Log.e("TVPlayer", "Retry failed: ${e.message}")
-                                error = e.message ?: "Playback failed"
+                                error = e.message ?: "فشل التشغيل"
                                 loading = false
                             }
                         }
                     } else {
                         Log.e("TVPlayer", "Playback error after $MAX_PLAYER_RETRIES retries: ${playbackError.message}")
-                        error = playbackError.message ?: "Playback failed"
+                        error = playbackError.message ?: "فشل التشغيل"
                         loading = false
                     }
                 }
@@ -826,7 +826,7 @@ fun PlayerScreen(
         releasePlayer(old)
         val gen = ++rebuildGeneration.value
         loading = true
-        status = "Switching..."
+        status = "جارٍ التبديل..."
         coroutineScope.launch {
             // Subtitles are fetched with the server's headers and parsed into
             // timed cues that WE render as an overlay — media3's own subtitle
@@ -855,16 +855,16 @@ fun PlayerScreen(
             activeSubtitle = newSubtitle
             subtitleCues = cueSet
             activeSubtitleText = ""
-            selectedSubtitleLabel = newSubtitle?.label ?: "Off"
+            selectedSubtitleLabel = newSubtitle?.label ?: "إيقاف"
             // Surface the outcome so the user can tell whether cues actually
             // loaded — a label alone doesn't prove the text rendered.
             if (subtitleChanged || newSubtitle == null) {
                 subtitleToast = if (newSubtitle == null) {
-                    "Subtitles off"
+                    "الترجمة متوقفة"
                 } else if (cueSet.isEmpty()) {
-                    "Subtitles: ${newSubtitle.label} (failed to load)"
+                    "الترجمة: ${newSubtitle.label} (تعذر التحميل)"
                 } else {
-                    "Subtitles: ${newSubtitle.label} (${cueSet.size} cues)"
+                    "الترجمة: ${newSubtitle.label} (${cueSet.size} سطر)"
                 }
             }
         }
@@ -945,7 +945,7 @@ fun PlayerScreen(
                 title = title,
             )
             if (primary == null) {
-                error = "No stream found"
+                error = "لم يتم العثور على رابط تشغيل"
                 loading = false
                 return
             }
@@ -1062,11 +1062,11 @@ fun PlayerScreen(
             activeSubtitle = initialSub
             subtitleCues = initialCues
             activeSubtitleText = ""
-            selectedSubtitleLabel = initialSub?.label ?: "Off"
+            selectedSubtitleLabel = initialSub?.label ?: "إيقاف"
             subtitleToast = if (initialSub != null) {
-                "Subtitles (auto): ${initialSub.label} (${initialCues.size})"
+                "الترجمة (تلقائي): ${initialSub.label} (${initialCues.size} سطر)"
             } else {
-                "Subtitles off"
+                "الترجمة متوقفة"
             }
             loading = false
 
@@ -1103,7 +1103,7 @@ fun PlayerScreen(
                 }
             }
         } catch (e: Exception) {
-            error = e.message ?: "Failed to load stream"
+            error = e.message ?: "تعذر تحميل البث"
             loading = false
         }
     }
@@ -1148,7 +1148,7 @@ fun PlayerScreen(
                     exoPlayer = null
                     memoryReleased = true
                     loading = true
-                    status = "Resuming..."
+                    status = "جارٍ الاستئناف..."
                 }
             }
 
@@ -1159,7 +1159,7 @@ fun PlayerScreen(
                 exoPlayer = null
                 memoryReleased = true
                 loading = true
-                status = "Resuming..."
+                status = "جارٍ الاستئناف..."
             }
 
             @Deprecated("Deprecated in Java")
@@ -1263,14 +1263,14 @@ fun PlayerScreen(
                         seasons.add(
                             SeasonInfo(
                                 number = number,
-                                name = s.optString("name").ifBlank { "Season $number" },
+                                name = s.optString("name").ifBlank { "الموسم $number" },
                                 episodeCount = s.optInt("episode_count", 0),
                             ),
                         )
                     }
                 }
                 menuSeasons = seasons.ifEmpty {
-                    listOf(SeasonInfo(currentSeason, "Season $currentSeason", 0))
+                    listOf(SeasonInfo(currentSeason, "الموسم $currentSeason", 0))
                 }
                 menuSeason = currentSeason
             }
@@ -1293,7 +1293,7 @@ fun PlayerScreen(
     /** Re-queues playback onto the SAME player for the chosen episode. */
     fun playEpisode(newSeason: Int, newEpisode: Int) {
         if (newSeason == currentSeason && newEpisode == currentEpisode) return
-        status = "Loading S${newSeason}E$newEpisode..."
+        status = "جارٍ تحميل الموسم ${newSeason} الحلقة $newEpisode..."
         currentSeason = newSeason
         currentEpisode = newEpisode
         resumePositionMs = 0L
@@ -1308,7 +1308,7 @@ fun PlayerScreen(
             add(
                 TopMenuButton(
                     index = 0,
-                    label = "Episodes",
+                    label = "الحلقات",
                     subLabel = "S$currentSeason  E$currentEpisode",
                     onClick = {
                         savedMenuButtonPosition = focusedMenuButton
@@ -1324,7 +1324,7 @@ fun PlayerScreen(
         add(
             TopMenuButton(
                 index = 1,
-                label = "Subtitles",
+                label = "الترجمة",
                 subLabel = selectedSubtitleLabel,
                     onClick = {
                         savedMenuButtonPosition = focusedMenuButton
@@ -1338,7 +1338,7 @@ fun PlayerScreen(
         add(
             TopMenuButton(
                 index = 2,
-                label = "Quality",
+                label = "الجودة",
                 subLabel = selectedQualityLabel,
                     onClick = {
                         savedMenuButtonPosition = focusedMenuButton
@@ -1352,8 +1352,8 @@ fun PlayerScreen(
         add(
             TopMenuButton(
                 index = 3,
-                label = "Server",
-                subLabel = source?.displayName ?: "Auto",
+                label = "الخادم",
+                subLabel = source?.displayName ?: "تلقائي",
                     onClick = {
                         savedMenuButtonPosition = focusedMenuButton
                         menuOpen = true
@@ -1449,7 +1449,7 @@ fun PlayerScreen(
                     return
                 }
                 if (q.url.isBlank()) {
-                    selectedQualityLabel = "Auto"
+                    selectedQualityLabel = "تلقائي"
                     switchMedia(s.url, s.headers, s.isHls, activeSubtitle)
                     return
                 }
@@ -1459,7 +1459,7 @@ fun PlayerScreen(
             PlayerMenu.Subtitles -> {
                 // Index 0 = Off.
                 if (menuIndex == 0) {
-                    selectedSubtitleLabel = "Off"
+                    selectedSubtitleLabel = "إيقاف"
                     subtitleCues = emptyList()
                     activeSubtitleText = ""
                     menuOpen = false
@@ -1854,7 +1854,7 @@ fun PlayerScreen(
                     CircularProgressIndicator(color = Color(0xFFE50914))
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = status.ifBlank { "Loading stream..." },
+                        text = status.ifBlank { "جارٍ تحميل البث..." },
                         color = Color.White,
                         fontSize = 16.sp,
                     )
@@ -1870,7 +1870,7 @@ fun PlayerScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Error: $error", color = Color(0xFFCF6679), fontSize = 18.sp)
+                    Text(text = "خطأ: $error", color = Color(0xFFCF6679), fontSize = 18.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         Button(
@@ -1879,8 +1879,8 @@ fun PlayerScreen(
                                 loading = true
                                 coroutineScope.launch { loadAndPlay() }
                             },
-                        ) { Text("Retry") }
-                        TextButton(onClick = { navController.popBackStack() }) { Text("Back") }
+                        ) { Text("إعادة المحاولة") }
+                        TextButton(onClick = { navController.popBackStack() }) { Text("رجوع") }
                     }
                 }
             }
@@ -1898,7 +1898,7 @@ fun PlayerScreen(
                     text = if (isMovie) {
                         title.ifBlank { source?.displayName ?: "" }
                     } else {
-                        val ep = episodeName.ifBlank { "Episode $currentEpisode" }
+                        val ep = episodeName.ifBlank { "الحلقة $currentEpisode" }
                         val series = seriesTitle.ifBlank { title }
                         "$series · S$currentSeason E$currentEpisode · $ep"
                     },
@@ -1949,21 +1949,21 @@ fun PlayerScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     PlaybackControlButton(
                         iconRes = R.drawable.ic_replay_10,
-                        label = "Back 10s",
+                        label = "رجوع 10 ثوانٍ",
                         isFocused = focusedPlaybackControl == 0,
                         requester = playbackControlRequesters[0],
                         onClick = { seekBy(-10) },
                     )
                     PlaybackControlButton(
                         iconRes = if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play,
-                        label = if (isPlaying) "Pause" else "Play",
+                        label = if (isPlaying) "إيقاف مؤقت" else "تشغيل",
                         isFocused = focusedPlaybackControl == 1,
                         requester = playbackControlRequesters[1],
                         onClick = { togglePlayPause() },
                     )
                     PlaybackControlButton(
                         iconRes = R.drawable.ic_forward_10,
-                        label = "Fwd 10s",
+                        label = "تقديم 10 ثوانٍ",
                         isFocused = focusedPlaybackControl == 2,
                         requester = playbackControlRequesters[2],
                         onClick = { seekBy(10) },
@@ -2216,17 +2216,17 @@ private fun MenuPanel(
         PlayerMenu.Servers -> servers.map { it.displayName to (it.url == currentServerUrl) }
         PlayerMenu.Quality -> qualities.map { it.label to (it.label == currentQualityLabel) }
         PlayerMenu.Subtitles ->
-            listOf("Off" to (currentSubtitleLabel == "Off")) +
+            listOf("إيقاف" to (currentSubtitleLabel == "إيقاف")) +
                 subtitles.map { it.label to (it.label == currentSubtitleLabel) }
         PlayerMenu.Episodes -> emptyList()
         null -> emptyList()
     }
 
     val title = when (activeMenu) {
-        PlayerMenu.Servers -> "Server"
-        PlayerMenu.Quality -> "Quality"
-        PlayerMenu.Subtitles -> "Subtitles"
-        PlayerMenu.Episodes -> "Episodes"
+        PlayerMenu.Servers -> "الخادم"
+        PlayerMenu.Quality -> "الجودة"
+        PlayerMenu.Subtitles -> "الترجمة"
+        PlayerMenu.Episodes -> "الحلقات"
         null -> ""
     }
 
@@ -2353,7 +2353,7 @@ private fun EpisodePanel(
                 RoundedCornerShape(12.dp),
             ),
     ) {
-        // Header (mirrors Dart's series title + "Episodes").
+        // Header (mirrors Dart's series title + "الحلقات").
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -2369,7 +2369,7 @@ private fun EpisodePanel(
                 modifier = Modifier.weight(1f),
             )
             Text(
-                text = "Episodes",
+                text = "الحلقات",
                 color = Color(0xFFE50914),
                 fontSize = 16.sp,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
@@ -2465,7 +2465,7 @@ private fun EpisodePanel(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "No episodes found",
+                        text = "لم يتم العثور على حلقات",
                         color = Color(0xB3FFFFFF),
                         fontSize = 16.sp,
                     )
@@ -2555,7 +2555,7 @@ private fun EpisodePanel(
                                 if (!released && ep.airDate.isNotBlank()) {
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
-                                        text = "To be released on ${formatReleaseDate(ep.airDate)}",
+                                        text = "موعد العرض ${formatReleaseDate(ep.airDate)}",
                                         color = Color(0xFFF5B81B),
                                         fontSize = 12.sp,
                                         maxLines = 1,
