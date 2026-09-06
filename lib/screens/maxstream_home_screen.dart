@@ -572,7 +572,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
                     _showFullList(title, mediaType);
                   },
                   child: const Text(
-                    'See All',
+                    'عرض الكل',
                     style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ),
@@ -644,7 +644,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
                     );
                   },
                   child: const Text(
-                    'See All',
+                    'عرض الكل',
                     style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ),
@@ -678,7 +678,7 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
         '';
     final overview = item['overview']?.toString() ?? '';
     final isTv = item['media_type'] == 'tv';
-    final typeLabel = isTv ? 'TV' : 'MOVIE';
+    final typeLabel = isTv ? 'مسلسل' : 'فيلم';
     final isWatchlistUpcoming = item['_isWatchlistUpcoming'] == true;
     final nextSeason = item['_nextSeason'];
     final nextEpisode = item['_nextEpisode'];
@@ -1643,7 +1643,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
     final releaseDate = (item['release_date'] ?? item['first_air_date'])?.toString() ?? '';
     final overview = item['overview']?.toString() ?? '';
     final isTv = item['media_type'] == 'tv';
-    final typeLabel = isTv ? 'TV' : 'MOVIE';
+    final typeLabel = isTv ? 'مسلسل' : 'فيلم';
     final isWatchlistUpcoming = item['_isWatchlistUpcoming'] == true;
     final nextSeason = item['_nextSeason'];
     final nextEpisode = item['_nextEpisode'];
@@ -1803,7 +1803,7 @@ class _ComingSoonFullListScreenState extends State<_ComingSoonFullListScreen> {
     final releaseDate = (item['release_date'] ?? item['first_air_date'])?.toString() ?? '';
     final overview = item['overview']?.toString() ?? '';
     final isTv = item['media_type'] == 'tv';
-    final typeLabel = isTv ? 'TV' : 'MOVIE';
+    final typeLabel = isTv ? 'مسلسل' : 'فيلم';
     final isWatchlistUpcoming = item['_isWatchlistUpcoming'] == true;
     final nextSeason = item['_nextSeason'];
     final nextEpisode = item['_nextEpisode'];
