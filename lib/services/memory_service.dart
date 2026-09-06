@@ -33,7 +33,7 @@ void installMemoryTrimHandler({MemoryPressureCallback? onPressure}) {
     // Always clear Flutter-side image caches – this is cheap and always safe.
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
-    debugPrint('MaxStream: onTrimMemory level=$level – image cache cleared');
+    debugPrint('TheebStream: onTrimMemory level=$level – image cache cleared');
     // Forward to the registered callback so the player screen can release
     // native resources (e.g. dispose ExoPlayer) when memory is critical.
     _onPressure?.call(level);

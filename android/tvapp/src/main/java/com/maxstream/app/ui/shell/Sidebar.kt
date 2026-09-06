@@ -190,7 +190,7 @@ fun Sidebar(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_launcher_foreground),
-                contentDescription = "MaxStream",
+                contentDescription = "ذيب ستريم",
                 tint = Color.Unspecified,
                 modifier = Modifier.size(32.dp),
             )
