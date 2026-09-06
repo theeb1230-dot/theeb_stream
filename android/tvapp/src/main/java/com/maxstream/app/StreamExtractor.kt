@@ -222,6 +222,9 @@ class StreamExtractor(private val context: Context) {
             StaticTmdbProvider(),
             VidrockServerProvider(),
             PrimeSrcServerProvider(),
+            MoflixProvider(),
+            CommunityServerProvider(),
+            FrembedServerProvider(),
         )
     }
 
