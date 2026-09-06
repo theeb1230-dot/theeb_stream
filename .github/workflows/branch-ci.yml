@@ -27,13 +27,31 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      - name: Audit legacy identity and auth references
+      - name: Audit release-facing identity and login remnants
         shell: bash
         run: |
-          echo "=== package:maxstream imports ==="
-          grep -RIn --exclude-dir=.git --exclude='*.lock' 'package:maxstream' lib test || true
-          echo "=== visible/auth references ==="
-          grep -RIn --exclude-dir=.git -E 'MaxStream|Sign[ -]?In|Sign[ -]?Out|Login|FirebaseAuth|AuthRepository|SessionManager' lib android/tvapp/src/main || true
+          set -euo pipefail
+          failed=0
+
+          echo "=== obsolete release/update URLs or asset names ==="
+          if grep -RIn --exclude-dir=.git -E 'chila254/maxstream|maxstream-(arm64|armeabi|x86_64).*\.apk' lib README.md web 2>/dev/null; then
+            failed=1
+          fi
+
+          echo "=== obsolete login/signup UI artifacts ==="
+          if find Images assets -type f 2>/dev/null | grep -Ei '(login|sign[-_ ]?up|sign[-_ ]?in)' ; then
+            failed=1
+          fi
+
+          echo "=== user-visible old branding literals ==="
+          if grep -RIn --exclude-dir=.git -E '["'\''>]MaxStream([ <"'\''.:]|$)' lib android/tvapp/src/main/res android/tvapp/src/main/java 2>/dev/null               | grep -Ev 'class MaxStream|MaxStream[A-Za-z]+|fun MaxStreamTheme|Theme\.MaxStream|com\.maxstream|Log\.|_tag'; then
+            failed=1
+          fi
+
+          if [ "$failed" -ne 0 ]; then
+            echo "::error::Release-facing legacy identity/login remnants found."
+            exit 1
+          fi
 
       - name: Flutter analyze
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
