@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 
-/// Simple logging service for MaxStream
+/// Simple logging service for Theeb Stream
 /// Replaces print() and debugPrint() calls with structured logging
 class LoggerService {
-  static const String _tag = 'MaxStream';
+  static const String _tag = 'TheebStream';
 
   /// Log debug message
   static void debug(String message) {
