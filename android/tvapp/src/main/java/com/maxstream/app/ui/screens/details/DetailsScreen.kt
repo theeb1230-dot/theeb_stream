@@ -247,7 +247,7 @@ fun DetailsScreen(
                 modifier = Modifier.align(Alignment.Center),
             )
             error != null -> Text(
-                text = "Error: $error",
+                text = "خطأ: $error",
                 color = Color(0xFFCF6679),
                 modifier = Modifier.align(Alignment.Center),
             )
@@ -331,20 +331,20 @@ private fun TvCinematicDetailsView(
     val metadata = buildList<String> {
         if (item.voteAverage > 0) add("★ ${String.format("%.1f", item.voteAverage)}")
         if (year.isNotEmpty()) add(year)
-        if (runtime != null) add("${runtime}m")
-        if (isTv && seasonCount != null) add("$seasonCount Season${if (seasonCount != 1) "s" else ""}")
+        if (runtime != null) add("${runtime} دقيقة")
+        if (isTv && seasonCount != null) add("$seasonCount موسم")
         addAll(genresFromDetails)
     }.joinToString("  •  ")
 
     // Production / air status (mirrors mobile's buildInfoRow('Status', ...)):
     //  • TV series: "Returning Series" / "Ended" / "Canceled"
-    //  • Movies: "Released" vs "To be released on <date>" vs "Post Production"
+    //  • Movies: "صدر" vs "To be released on <date>" vs "قيد ما بعد الإنتاج"
     val statusText: String?
     val statusColor: Color
     if (isTv) {
         val raw = details?.optString("status").orEmpty().ifBlank { null }
         statusText = when (raw) {
-            "Canceled" -> "Cancelled"
+            "Canceled" -> "ملغى"
             else -> raw
         }
         statusColor = when (raw) {
@@ -357,14 +357,14 @@ private fun TvCinematicDetailsView(
         val raw = details?.optString("status").orEmpty().ifBlank { null }
         val rd = details?.optString("release_date").orEmpty()
         statusText = when {
-            raw == "Post Production" -> "Post Production"
-            rd.isNotBlank() && !isAirDateReleased(rd) -> "To be released on ${formatReleaseDate(rd)}"
-            raw == "Released" -> "Released"
-            rd.isNotBlank() -> "Released"
+            raw == "قيد ما بعد الإنتاج" -> "قيد ما بعد الإنتاج"
+            rd.isNotBlank() && !isAirDateReleased(rd) -> "موعد العرض ${formatReleaseDate(rd)}"
+            raw == "صدر" -> "صدر"
+            rd.isNotBlank() -> "صدر"
             else -> raw
         }
         statusColor = when {
-            raw == "Post Production" -> Color(0xFFD29922)
+            raw == "قيد ما بعد الإنتاج" -> Color(0xFFD29922)
             rd.isNotBlank() && !isAirDateReleased(rd) -> Color(0xFFD29922)
             else -> Color(0xFF3FB950)
         }

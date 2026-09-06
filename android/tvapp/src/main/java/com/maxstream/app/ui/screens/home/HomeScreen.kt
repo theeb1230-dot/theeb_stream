@@ -430,11 +430,11 @@ private fun HeroSection(
         val overview = item.overview
 
         val heroMetadata = buildString {
-            if (isResume) append("Resume")
+            if (isResume) append("متابعة")
             if (rating > 0) { if (isNotEmpty()) append("   "); append(String.format("★ %.1f", rating)) }
             if (year > 0)   { if (isNotEmpty()) append("   "); append(year) }
             if (isNotEmpty()) append("   ")
-            append(if (mediaType == "series") "TV Series" else "Movie")
+            append(if (mediaType == "series") "مسلسل" else "فيلم")
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -682,7 +682,7 @@ private fun ContentRow(
                         title = item.title,
                         rating = item.voteAverage.takeIf { it > 0 },
                         year = item.releaseDate.take(4).toIntOrNull(),
-                        contentTypeLabel = if (isSeries) "TV Series" else "Movie",
+                        contentTypeLabel = if (isSeries) "مسلسل" else "فيلم",
                         isFocused = focusedItemIndex == index,
                         focusRequester = rowNav.requester(rowId, index),
                         progress = null,
