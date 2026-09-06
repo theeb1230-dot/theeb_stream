@@ -18,20 +18,13 @@ final GlobalKey<NavigatorState> appNavigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Enable FVP (libmdk + FFmpeg) as video_player backend for HEVC/H265 software
-  // decode fallback on devices without HEVC HW decoder. Falls back to MediaCodec
-  // HW first, then FFmpeg SW - fixes Vidlink noon.mooncase.online H265 mp4 on phones.
   fvp.registerWith(options: {'platforms': ['android', 'ios']});
   installGlobalCrashHandlers();
   installMemoryTrimHandler();
-  // Surface the previous process's native crash / unexpected exit before the
-  // first frame (see checkForNativeCrash in widgets/crash_screen.dart).
   await checkForNativeCrash();
   await checkUnexpectedExit();
   runZonedGuarded(
-    () {
-      runApp(const CrashReportGate(child: _StartupGate()));
-    },
+    () => runApp(const CrashReportGate(child: _StartupGate())),
     (error, stack) {
       if (isBenignError(error)) return;
       recordCrash('UncaughtZone', error, stack);
@@ -40,9 +33,8 @@ Future<void> main() async {
   );
 }
 
-/// Shows the Theeb Stream startup shell immediately and finishes network-backed service
-/// initialization in the background, so a slow first launch (e.g. Firebase on a
-/// cold start) can never leave the app frozen on the native splash drawable.
+/// Starts the user-facing shell even when optional network-backed services fail.
+/// Playback/navigation must not depend on Firebase, notifications or downloads.
 class _StartupGate extends StatefulWidget {
   const _StartupGate();
 
@@ -51,7 +43,6 @@ class _StartupGate extends StatefulWidget {
 }
 
 class _StartupGateState extends State<_StartupGate> {
-  Object? _fatal;
   bool _ready = false;
 
   @override
@@ -60,48 +51,57 @@ class _StartupGateState extends State<_StartupGate> {
     _initialize();
   }
 
-  Future<void> _initialize() async {
+  Future<void> _bestEffort(String name, Future<void> Function() operation) async {
     try {
-      // A named Firebase app is unnecessary because only the default app is initialized.
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-
-      // Crashlytics captures native crashes (which Dart can never see) and
-      // receives fatal Dart errors once initialized.
-      await enableCrashlyticsReporting();
-      attachCrashlyticsFatalHandlers();
-
-      if (!kIsWeb) await NotificationService().initialize();
-      if (!kIsWeb) await MediaDownloadManager.instance.initialize();
-      await ThemeService.instance.loadTheme();
-    } catch (e, stack) {
-      recordCrash('Bootstrap', e, stack);
-      _fatal = e;
+      await operation();
+    } catch (error, stack) {
+      recordCrash('Bootstrap:$name', error, stack);
     }
-    if (!mounted) return;
-    setState(() => _ready = true);
-    if (_fatal == null) {
-      // Attach the navigator once the first frame is up so notification taps
-      // (including cold-start taps) can be routed to the right screen.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        NotificationRouter.registerNavigator(appNavigatorKey);
+  }
+
+  Future<void> _initialize() async {
+    var firebaseReady = false;
+    try {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      firebaseReady = true;
+    } catch (error, stack) {
+      recordCrash('Bootstrap:Firebase', error, stack);
+    }
+
+    if (firebaseReady) {
+      await _bestEffort('Crashlytics', () async {
+        await enableCrashlyticsReporting();
+        attachCrashlyticsFatalHandlers();
       });
     }
+
+    if (!kIsWeb) {
+      await _bestEffort('Notifications', () => NotificationService().initialize());
+      await _bestEffort(
+        'Downloads',
+        () => MediaDownloadManager.instance.initialize(),
+      );
+    }
+    await _bestEffort('Theme', () => ThemeService.instance.loadTheme());
+
+    if (!mounted) return;
+    setState(() => _ready = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationRouter.registerNavigator(appNavigatorKey);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_fatal != null) return ErrorApp(error: _fatal!);
     if (!_ready) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeService.darkTheme,
         home: const Scaffold(
-          backgroundColor: const Color(0xFF0F172A),
+          backgroundColor: Color(0xFF0F172A),
           body: Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(const Color(0xFF00F2FE)),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00F2FE)),
             ),
           ),
         ),
@@ -147,9 +147,6 @@ class TheebStreamApp extends StatelessWidget {
       theme: ThemeService.darkTheme,
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      // Clamp system font scaling (e.g. Honor MagicOS / Android 16) to avoid
-      // RenderFlex overflows on small viewports when users set 150-200% text
-      // zoom. The 1.3 max is recommended by Gemini analysis for this crash.
       builder: (context, child) {
         final mq = MediaQuery.of(context);
         final clamped = mq.textScaler.clamp(
@@ -170,4 +167,3 @@ class TheebStreamApp extends StatelessWidget {
     );
   }
 }
-
