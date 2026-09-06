@@ -62,7 +62,7 @@ class _StartupGateState extends State<_StartupGate> {
 
   Future<void> _initialize() async {
     try {
-      // Remove name: 'MaxStreamApp' – only needed if initializing multiple apps
+      // A named Firebase app is unnecessary because only the default app is initialized.
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
@@ -107,7 +107,7 @@ class _StartupGateState extends State<_StartupGate> {
         ),
       );
     }
-    return const MaxStreamApp();
+    return const TheebStreamApp();
   }
 }
 
@@ -136,8 +136,8 @@ class ErrorApp extends StatelessWidget {
   }
 }
 
-class MaxStreamApp extends StatelessWidget {
-  const MaxStreamApp({super.key});
+class TheebStreamApp extends StatelessWidget {
+  const TheebStreamApp({super.key});
 
   @override
   Widget build(BuildContext context) {
