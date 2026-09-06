@@ -92,7 +92,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
         appBar: AppBar(
           backgroundColor: const Color(0xFF1A1A1A),
           title: const Text(
-            'Actor Details',
+            'تفاصيل الممثل',
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -106,13 +106,13 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
         appBar: AppBar(
           backgroundColor: const Color(0xFF1A1A1A),
           title: const Text(
-            'Actor Details',
+            'تفاصيل الممثل',
             style: TextStyle(color: Colors.white),
           ),
         ),
         body: const Center(
           child: Text(
-            'Failed to load actor details',
+            'تعذر تحميل تفاصيل الممثل',
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -135,7 +135,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
 
   Widget _buildSliverAppBar() {
     final profilePath = actorDetails?['profile_path'];
-    final name = actorDetails?['name'] ?? 'Unknown Actor';
+    final name = actorDetails?['name'] ?? 'ممثل غير معروف';
 
     return SliverAppBar(
       expandedHeight: 300,
@@ -190,7 +190,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
           IconButton(
             onPressed: _launchInstagram,
             icon: const Icon(Icons.camera_alt, color: Colors.white),
-            tooltip: 'View Instagram',
+            tooltip: 'عرض إنستغرام',
           ),
       ],
     );
@@ -210,7 +210,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
         children: [
           if (biography != null && biography.isNotEmpty) ...[
             const Text(
-              'Biography',
+              'السيرة الذاتية',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -230,7 +230,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
           ],
 
           const Text(
-            'Personal Info',
+            'المعلومات الشخصية',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -239,12 +239,12 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
           ),
           const SizedBox(height: 8),
 
-          if (knownFor != null) _buildInfoRow('Known For', knownFor),
+          if (knownFor != null) _buildInfoRow('اشتهر بـ', knownFor),
           if (birthday != null)
-            _buildInfoRow('Birthday', _formatDate(birthday)),
-          if (deathday != null) _buildInfoRow('Death', _formatDate(deathday)),
+            _buildInfoRow('تاريخ الميلاد', _formatDate(birthday)),
+          if (deathday != null) _buildInfoRow('تاريخ الوفاة', _formatDate(deathday)),
           if (placeOfBirth != null)
-            _buildInfoRow('Place of Birth', placeOfBirth),
+            _buildInfoRow('مكان الميلاد', placeOfBirth),
         ],
       ),
     );
@@ -287,8 +287,8 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
         labelColor: Colors.white,
         unselectedLabelColor: Colors.grey,
         tabs: [
-          Tab(text: 'Movies (${movieCredits.length})'),
-          Tab(text: 'TV Shows (${tvCredits.length})'),
+          Tab(text: 'الأفلام (${movieCredits.length})'),
+          Tab(text: 'المسلسلات (${tvCredits.length})'),
         ],
       ),
     );
@@ -313,7 +313,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
     if (credits.isEmpty) {
       return const Center(
         child: Text(
-          'No credits found',
+          'لا توجد أعمال',
           style: TextStyle(color: Colors.grey, fontSize: 16),
         ),
       );
@@ -379,7 +379,7 @@ class _ActorDetailsScreenState extends State<ActorDetailsScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            credit['title'] ?? credit['name'] ?? 'Unknown',
+            credit['title'] ?? credit['name'] ?? 'غير معروف',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 12,
