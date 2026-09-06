@@ -55,7 +55,7 @@ import com.maxstream.app.ui.screens.search.SearchScreen
 import com.maxstream.app.ui.screens.series.SeriesListScreen
 import com.maxstream.app.ui.screens.splash.SplashScreen
 import com.maxstream.app.ui.screens.watchlist.WatchlistScreen
-import com.maxstream.app.ui.theme.MaxStreamTheme
+import com.maxstream.app.ui.theme.TheebStreamTheme
 import com.maxstream.app.ui.tv.TvFocusManager
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
         WatchEntryCompat.init(applicationContext)
         try {
             setContent {
-                MaxStreamTheme {
+                TheebStreamTheme {
                     TvAppRoot()
                 }
             }
