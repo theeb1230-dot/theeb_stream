@@ -880,14 +880,45 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         return;
       }
 
-      _showStatus('لم يتم العثور على بث');
+      _showStatus('جارٍ تجربة الخوادم البديلة...');
+      await _discoverAvailableServers(discoveryGeneration);
+      final fallbackCandidates = _availableServers
+          .where((s) => (s['url']?.toString() ?? '').isNotEmpty)
+          .toList();
+      final resumePosition = resume
+          ? await WatchHistoryService.loadWatchPosition(
+              widget.tmdbId,
+              widget.isMovie,
+              _currentSeason,
+              _currentEpisode,
+            )
+          : Duration.zero;
+
+      for (final server in fallbackCandidates) {
+        if (!mounted) return;
+        _showStatus(
+          'جارٍ تجربة ' +
+              (server['source'] ?? server['server'] ?? 'خادم بديل').toString() +
+              '...',
+        );
+        final initialized = await _tryPlayServer(
+          server,
+          position: resumePosition,
+          primaryUrl: '',
+        );
+        if (initialized) {
+          if (mounted) setState(() => _nextEpisodeCancelled = false);
+          return;
+        }
+      }
+
+      _showStatus('لم يتم العثور على بث صالح');
       if (mounted) {
         setState(() {
           _error =
-              'No working streaming sources found.\n\n'
-              '• Check your internet connection\n'
-              '• Try again later\n'
-              '• Content might be unavailable';
+              'لم يتم العثور على مصدر بث يعمل لهذا المحتوى حاليًا.\n\n'
+              '• تم فحص الخوادم المتاحة تلقائيًا\n'
+              '• أعد المحاولة بعد قليل أو جرّب محتوى آخر';
         });
       }
     } catch (e) {
@@ -3305,7 +3336,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             Icon(Icons.error_outline, size: 64, color: Colors.red[400]),
             const SizedBox(height: 16),
             const Text(
-              'Unable to Load Video',
+              'تعذر تشغيل الفيديو',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -3314,7 +3345,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _error ?? 'Unknown error',
+              _error ?? 'خطأ غير معروف',
               style: const TextStyle(color: Colors.grey, fontSize: 13),
               textAlign: TextAlign.center,
             ),
@@ -3325,7 +3356,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: 'Error: $_error\nStatus: $_statusMessage'));
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Error copied to clipboard'), duration: Duration(seconds: 1)),
+                    const SnackBar(content: Text('تم نسخ تفاصيل الخطأ'), duration: Duration(seconds: 1)),
                   );
                 },
                 child: Container(
@@ -3346,7 +3377,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             if (_availableServers.isNotEmpty) ...[
               const SizedBox(height: 20),
               const Text(
-                'Try another server:',
+                'جرّب خادمًا آخر:',
                 style: TextStyle(
                   color: Colors.white70,
                   fontSize: 13,
@@ -3422,7 +3453,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Retry',
+                    'إعادة المحاولة',
                     style: TextStyle(color: Colors.white, fontSize: 15),
                   ),
                 ),
@@ -3437,7 +3468,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     ),
                   ),
                   child: const Text(
-                    'Go Back',
+                    'رجوع',
                     style: TextStyle(color: Colors.white, fontSize: 15),
                   ),
                 ),
