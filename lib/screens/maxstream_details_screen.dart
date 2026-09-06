@@ -87,7 +87,6 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
   }
 
   Future<void> _loadWatchProgress() async {
-    await CloudSyncService.pullToDevice();
     final continueWatching = await WatchHistoryService.getContinueWatching();
     if (!mounted) return;
 
@@ -176,7 +175,6 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
   }
 
   Future<void> _checkWatchlistStatus() async {
-    await CloudSyncService.pullToDevice();
     final watchlist = await DBHelper.getWatchlistItems();
     if (mounted) {
       setState(() {
