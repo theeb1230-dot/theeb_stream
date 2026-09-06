@@ -125,7 +125,7 @@ class ErrorApp extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
-              'تعذر تشغيل التطبيق:\n$error',
+              'تعذر تشغيل التطبيق حاليًا. أعد المحاولة بعد قليل.',
               style: const TextStyle(color: Colors.white, fontSize: 16),
               textAlign: TextAlign.center,
             ),
