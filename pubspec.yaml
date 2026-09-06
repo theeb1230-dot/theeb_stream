@@ -1,7 +1,7 @@
 name: theeb_stream
 description: ذيب ستريم - تطبيق Flutter وAndroid TV للمشاهدة والاستكشاف
 publish_to: 'none'
-version: 1.6.0+8
+version: 1.6.1+9
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
