@@ -64,14 +64,13 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
     if (mounted) setState(() => isLoading = true);
 
     try {
-      final syncFuture = CloudSyncService.pullToDevice().catchError((_) {});
       final results = await Future.wait([
         _safeList(() => TmdbApiService.fetchTrendingMovies()),
         _safeList(() => TmdbApiService.fetchPopularMovies()),
         _safeList(() => TmdbApiService.fetchTopRatedMovies()),
         _safeList(() => TmdbApiService.fetchUpcomingMovies()),
         _safeList(() => TmdbApiService.fetchUpcomingSeries()),
-        syncFuture.then((_) => WatchHistoryService.getContinueWatching())
+        WatchHistoryService.getContinueWatching()
             .catchError((_) => <Map<String, dynamic>>[]),
         _safeList(() => _loadWatchlistUpcoming()),
       ]);
@@ -188,10 +187,6 @@ class _MaxStreamHomeScreenState extends State<MaxStreamHomeScreen> {
   }
 
   Future<void> _loadContinueWatching() async {
-    // Pull TV watches first so Haven S4E9 mid-watch appears immediately
-    try {
-      await CloudSyncService.pullToDevice();
-    } catch (_) {}
     final history = await WatchHistoryService.getContinueWatching();
     if (!mounted) return;
     setState(() => continueWatching = history.take(10).toList());
