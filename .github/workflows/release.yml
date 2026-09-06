@@ -1,0 +1,223 @@
+name: Publish Theeb Stream Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version without v prefix (leave empty to use pubspec.yaml)"
+        required: false
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - "pubspec.yaml"
+      - ".github/workflows/release.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: theeb-stream-release
+  cancel-in-progress: false
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        name: Resolve release version
+        shell: bash
+        run: |
+          set -euo pipefail
+          requested="${{ github.event.inputs.version || '' }}"
+          if [ -n "$requested" ]; then
+            version="$requested"
+          else
+            version="$(awk '/^version:/ {print $2; exit}' pubspec.yaml | cut -d+ -f1)"
+          fi
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+  mobile:
+    name: Build universal Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Build universal mobile APK
+        run: flutter build apk --release
+
+      - name: Prepare mobile asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          cp build/app/outputs/flutter-apk/app-release.apk release-assets/theeb-stream-mobile.apk
+          ls -lh release-assets/theeb-stream-mobile.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-mobile
+          path: release-assets/theeb-stream-mobile.apk
+          retention-days: 7
+
+  tv:
+    name: Build Android TV APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Create local.properties
+        shell: bash
+        run: |
+          set -euo pipefail
+          flutter_path="$(which flutter | sed 's|/bin/flutter||')"
+          echo "flutter.sdk=$flutter_path" > android/local.properties
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Build TV release APK
+        run: cd android && ./gradlew assembleFossUniversalRelease --no-daemon
+
+      - name: Prepare TV asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          apk="$(find build/tvapp -maxdepth 6 -name '*.apk' -type f | head -n1)"
+          test -n "$apk"
+          cp "$apk" release-assets/theeb-stream-tv.apk
+          ls -lh release-assets/theeb-stream-tv.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-tv
+          path: release-assets/theeb-stream-tv.apk
+          retention-days: 7
+
+  ios:
+    name: Build unsigned iOS IPA
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Install CocoaPods dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Build iOS without code signing
+        run: flutter build ios --release --no-codesign
+
+      - name: Package unsigned IPA
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf Payload release-assets
+          mkdir -p Payload release-assets
+          cp -R build/ios/iphoneos/Runner.app Payload/
+          /usr/bin/zip -qry release-assets/theeb-stream-ios-unsigned.ipa Payload
+          ls -lh release-assets/theeb-stream-ios-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-ios
+          path: release-assets/theeb-stream-ios-unsigned.ipa
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - metadata
+      - mobile
+      - tv
+      - ios
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.metadata.outputs.tag }}
+      VERSION: ${{ needs.metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify exactly the three requested release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f release-assets/theeb-stream-mobile.apk
+          test -f release-assets/theeb-stream-tv.apk
+          test -f release-assets/theeb-stream-ios-unsigned.ipa
+          count="$(find release-assets -maxdepth 1 -type f | wc -l | tr -d ' ')"
+          test "$count" = "3"
+          ls -lh release-assets
+
+      - name: Create or update GitHub Release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          notes_file="$(mktemp)"
+          cat > "$notes_file" <<EOF
+          ## ذيب ستريم $VERSION
+
+          ملفات التثبيت:
+          - **theeb-stream-mobile.apk** — Android Mobile Universal APK.
+          - **theeb-stream-tv.apk** — Android TV APK.
+          - **theeb-stream-ios-unsigned.ipa** — iOS IPA غير موقع.
+
+          > تنبيه iOS: ملف IPA غير موقع ويحتاج إعادة توقيع بشهادة وProvisioning صالحين قبل تثبيته على iPhone عبر مزود خارجي.
+          EOF
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "ذيب ستريم $VERSION" --notes-file "$notes_file"
+            gh release upload "$TAG"               release-assets/theeb-stream-mobile.apk               release-assets/theeb-stream-tv.apk               release-assets/theeb-stream-ios-unsigned.ipa               --clobber
+          else
+            gh release create "$TAG"               release-assets/theeb-stream-mobile.apk               release-assets/theeb-stream-tv.apk               release-assets/theeb-stream-ios-unsigned.ipa               --title "ذيب ستريم $VERSION"               --notes-file "$notes_file"               --target main
+          fi
