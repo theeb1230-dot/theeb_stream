@@ -42,6 +42,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
   bool _speechEnabled = false;
   bool _isListening = false;
   Timer? _voiceDebounce;
+  Timer? _searchDebounce;
 
   @override
   void initState() {
@@ -58,7 +59,6 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
       }
     });
     _loadSearchRecommendations();
-    _initSpeech();
   }
 
   Future<void> _initSpeech() async {
@@ -143,6 +143,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
     // finalResult always fires immediately for reliability.
     if (result.finalResult) {
       _voiceDebounce?.cancel();
+    _searchDebounce?.cancel();
       _performSearch(words);
       if (mounted) setState(() => _isListening = false);
     } else {
@@ -167,8 +168,8 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
       final trending = [...results[0], ...results[1]]..shuffle();
       final popular = [...results[2], ...results[3]]..shuffle();
       setState(() {
-        topSearched = trending.take(10).toList();
-        mostWatched = popular.take(10).toList();
+        topSearched = trending.take(6).toList();
+        mostWatched = popular.take(6).toList();
       });
     } catch (_) {
     } finally {
@@ -450,9 +451,17 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
                   contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                 ),
                 onChanged: (value) {
+                  _searchDebounce?.cancel();
                   setState(() {});
-                  if (value.length >= 2) {
-                    _performSearch(value);
+                  final trimmed = value.trim();
+                  if (trimmed.length >= 2) {
+                    _searchDebounce = Timer(
+                      const Duration(milliseconds: 450),
+                      () {
+                        if (!mounted) return;
+                        _performSearch(trimmed);
+                      },
+                    );
                   } else {
                     _searchGeneration++;
                     setState(() {
