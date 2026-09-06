@@ -48,8 +48,8 @@ class CloudSyncService {
   }
 
   static Future<void> pullToDevice() async {
-    // Local state is already authoritative in the account-free product.
-    historyRevision.value++;
-    watchlistRevision.value++;
+    // Account-free mode is local-only. Pulling must never mutate revision
+    // notifiers, otherwise listeners can recursively call pullToDevice() and
+    // create an infinite notification loop / Stack Overflow.
   }
 }
