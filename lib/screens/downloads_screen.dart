@@ -89,7 +89,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => buildVideoPlayerScreen(
-          title: download['title']?.toString() ?? 'Downloaded video',
+          title: download['title']?.toString() ?? 'فيديو مُنزّل',
           tmdbId: download['mediaId']?.toString() ?? '',
           isMovie: isMovie,
           season: (download['seasonNumber'] as num?)?.toInt() ?? 1,
@@ -112,18 +112,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete download?'),
+        title: const Text('حذف التنزيل؟'),
         content: Text(
-          '${download['title'] ?? 'This video'} will be removed from this device.',
+          '${download['title'] ?? 'هذا الفيديو'} will be removed from this device.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: const Text('حذف'),
           ),
         ],
       ),
@@ -152,18 +152,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cancel download?'),
+        title: const Text('إلغاء التنزيل؟'),
         content: Text(
           '${download.label} and its partial files will be removed.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Keep'),
+            child: const Text('إبقاء'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Cancel download'),
+            child: const Text('إلغاء التنزيل'),
           ),
         ],
       ),
@@ -222,12 +222,12 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 Icon(Icons.download_done, size: 64, color: Colors.white38),
                 SizedBox(height: 16),
                 Text(
-                  'No downloads yet',
+                  'لا توجد تنزيلات بعد',
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
                 SizedBox(height: 6),
                 Text(
-                  'Use the download button inside the video player.',
+                  'استخدم زر التنزيل داخل مشغل الفيديو.',
                   style: TextStyle(color: Colors.white54),
                 ),
               ],
@@ -240,7 +240,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               children: [
                 if (_downloadManager.activeDownloads.isNotEmpty) ...[
                   _sectionTitle(
-                    'Downloading${activeTotal.isNotEmpty ? ' • $activeTotal' : ''}',
+                    'جارٍ التنزيل${activeTotal.isNotEmpty ? ' • $activeTotal' : ''}',
                     _downloadManager.activeDownloads.length,
                   ),
                   ..._downloadManager.activeDownloads.map(
@@ -250,16 +250,16 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
                 ],
                 if (_downloads.isNotEmpty)
                   _sectionTitle(
-                    'Downloaded${downloadedMoviesSize.isNotEmpty ? ' • $downloadedMoviesSize' : ''}',
+                    'تم التنزيل${downloadedMoviesSize.isNotEmpty ? ' • $downloadedMoviesSize' : ''}',
                     _downloads.length,
                   ),
                 if (movies.isNotEmpty) ...[
-                  _subsectionTitle('Movies${downloadedMoviesSize.isNotEmpty ? ' • $downloadedMoviesSize' : ''}'),
+                  _subsectionTitle('الأفلام${downloadedMoviesSize.isNotEmpty ? ' • $downloadedMoviesSize' : ''}'),
                   ...movies.map(_downloadTile),
                   const SizedBox(height: 20),
                 ],
                 if (series.isNotEmpty) ...[
-                  _subsectionTitle('Series'),
+                  _subsectionTitle('المسلسلات'),
                   ...series.values.map(_seriesGroup),
                 ],
               ],
@@ -277,10 +277,10 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       backgroundColor: const Color(0xFF121212),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
-        title: const Text('Downloads'),
+        title: const Text('التنزيلات'),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: 'تحديث',
             onPressed: _loadDownloads,
             icon: const Icon(Icons.refresh),
           ),
@@ -356,7 +356,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
               const SizedBox(height: 5),
               Text(
                 isPaused
-                    ? 'Paused — ${download.sizeLabel}'
+                    ? 'متوقف مؤقتًا — ${download.sizeLabel}'
                     : download.sizeLabel,
                 style: TextStyle(
                   color: isPaused ? Colors.orange : Colors.white54,
@@ -371,18 +371,18 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
           children: [
             if (isPaused)
               IconButton(
-                tooltip: 'Resume download',
+                tooltip: 'استئناف التنزيل',
                 onPressed: () => _resumeDownload(download.downloadKey),
                 icon: const Icon(Icons.play_arrow_rounded, color: Colors.green),
               )
             else
               IconButton(
-                tooltip: 'Pause download',
+                tooltip: 'إيقاف التنزيل مؤقتًا',
                 onPressed: () => _pauseDownload(download.downloadKey),
                 icon: const Icon(Icons.pause_rounded, color: Colors.orange),
               ),
             IconButton(
-              tooltip: 'Cancel download',
+              tooltip: 'إلغاء التنزيل',
               onPressed: () => _cancelDownload(download),
               icon: const Icon(Icons.close_rounded, color: Colors.redAccent),
             ),
@@ -404,7 +404,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
             );
     });
     final first = episodes.first;
-    final title = first['title']?.toString().split(' - S').first ?? 'Series';
+    final title = first['title']?.toString().split(' - S').first ?? 'المسلسلات';
     // Total size for this series (sum of local files + active downloads for its episodes)
     String seriesTotal() {
       int total = 0;
@@ -468,7 +468,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       leading: _thumbnail(download['thumbnail']?.toString() ?? ''),
       title: Text(
-        download['title']?.toString() ?? 'Downloaded video',
+        download['title']?.toString() ?? 'فيديو مُنزّل',
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(color: Colors.white),
