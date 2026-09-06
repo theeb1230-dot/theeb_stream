@@ -86,7 +86,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
           if (isDone) ...[
             const SizedBox(height: 12),
             const Text(
-              'If the installer doesn’t open, download directly from our website.',
+              'إذا لم يفتح المثبّت، نزّل الملف مباشرة من صفحة الإصدارات.',
               style: TextStyle(fontSize: 12, color: Colors.white70),
               textAlign: TextAlign.center,
             ),
@@ -133,7 +133,7 @@ class DownloadCompleteDialog extends StatelessWidget {
       if (result != 'ok' && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Failed to launch installer. Try downloading from website.'),
+            content: const Text('تعذر فتح المثبّت. جرّب التنزيل من صفحة الإصدارات.'),
             action: SnackBarAction(label: 'الإصدارات', onPressed: _launchWebsite),
           ),
         );
@@ -142,7 +142,7 @@ class DownloadCompleteDialog extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Install failed: $e'),
+            content: Text('فشل التثبيت'),
             action: SnackBarAction(label: 'الإصدارات', onPressed: _launchWebsite),
           ),
         );
@@ -158,10 +158,10 @@ class DownloadCompleteDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('The update has been downloaded.'),
+          Text('تم تنزيل التحديث.'),
           SizedBox(height: 8),
           Text(
-            'Tap Install to launch the system installer. If nothing happens, use the website fallback.',
+            'اضغط «تثبيت» لفتح مثبّت النظام. إذا لم يحدث شيء، استخدم صفحة الإصدارات.',
             style: TextStyle(fontSize: 12, color: Colors.white70),
           ),
         ],
@@ -255,7 +255,7 @@ class UpdateService {
         }
       }
 
-      // Last fallback: any maxstream APK (not TV).
+      // Last fallback: any Theeb Stream APK (not TV).
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
         if (name.endsWith('.apk') &&
@@ -384,7 +384,7 @@ class UpdateService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error downloading update: $e'),
+            content: Text('فشل تنزيل التحديث'),
             action: SnackBarAction(
               label: 'الإصدارات',
               onPressed: () async {
