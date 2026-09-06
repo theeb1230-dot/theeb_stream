@@ -45,7 +45,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
     // Show loading state
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text('Removing from history...'),
+        content: Text('جارٍ الحذف من السجل...'),
         backgroundColor: Colors.grey,
         duration: Duration(seconds: 1),
       ),
@@ -70,7 +70,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Removed from history'),
+            content: Text('تم الحذف من السجل'),
             backgroundColor: Colors.green,
             duration: Duration(seconds: 2),
           ),
@@ -80,7 +80,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error removing item: $e'),
+            content: Text('تعذر حذف العنصر من السجل'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
@@ -124,7 +124,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          'Watch History',
+          'سجل المشاهدة',
           style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.black,
@@ -134,7 +134,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
             IconButton(
               onPressed: () => _showClearDialog(),
               icon: const Icon(Icons.clear_all),
-              tooltip: 'Clear History',
+              tooltip: 'مسح السجل',
             ),
         ],
       ),
@@ -153,7 +153,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
               Icon(Icons.history, size: 80, color: Colors.grey),
               SizedBox(height: 16),
               Text(
-                'No Watch History',
+                'لا يوجد سجل مشاهدة',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -164,7 +164,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32),
                 child: Text(
-                  'Start watching movies and shows to see your history here',
+                  'ابدأ مشاهدة الأفلام والمسلسلات ليظهر سجل المشاهدة هنا',
                   style: TextStyle(color: Colors.grey, fontSize: 14),
                   textAlign: TextAlign.center,
                 ),
@@ -230,7 +230,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item['title'] ?? 'Unknown Title',
+                      item['title'] ?? 'عنوان غير معروف',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -295,7 +295,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
                       children: [
                         Icon(Icons.delete, color: Colors.red),
                         SizedBox(width: 8),
-                        Text('Remove', style: TextStyle(color: Colors.white)),
+                        Text('حذف', style: TextStyle(color: Colors.white)),
                       ],
                     ),
                   ),
@@ -309,7 +309,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
   }
 
   String _formatTimestamp(int? timestamp) {
-    if (timestamp == null) return 'Unknown';
+    if (timestamp == null) return 'غير معروف';
 
     final date = DateTime.fromMillisecondsSinceEpoch(timestamp);
     final now = DateTime.now();
@@ -322,7 +322,7 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
     } else if (difference.inMinutes > 0) {
       return '${difference.inMinutes} minute${difference.inMinutes == 1 ? '' : 's'} ago';
     } else {
-      return 'Just now';
+      return 'الآن';
     }
   }
 
@@ -332,24 +332,24 @@ class _WatchHistoryScreenState extends State<WatchHistoryScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey[900],
         title: const Text(
-          'Clear Watch History',
+          'مسح سجل المشاهدة',
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          'Are you sure you want to clear all watch history? This action cannot be undone.',
+          'هل تريد مسح سجل المشاهدة بالكامل؟ لا يمكن التراجع عن هذا الإجراء.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _clearHistory();
             },
-            child: const Text('Clear', style: TextStyle(color: Colors.red)),
+            child: const Text('مسح', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
