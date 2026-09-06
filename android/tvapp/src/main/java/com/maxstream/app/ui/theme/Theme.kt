@@ -20,7 +20,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun MaxStreamTheme(
+fun TheebStreamTheme(
     darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
