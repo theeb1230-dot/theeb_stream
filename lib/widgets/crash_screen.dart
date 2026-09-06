@@ -63,8 +63,8 @@ Future<void> checkUnexpectedExit() async {
     crashReport.value = CrashInfo(
       tag: 'UnexpectedExit',
       error:
-          'أُغلق ذيب ستريم أثناء المشاهدة، وغالبًا '
-          'because it ran low on memory, or the device restarted).'
+          'أُغلق ذيب ستريم أثناء المشاهدة بشكل غير متوقع، وقد يكون السبب '
+          'انخفاض الذاكرة المتاحة أو إعادة تشغيل الجهاز.'
           '${trace.isEmpty ? '' : '\n\n$trace'}',
       stack: StackTrace.fromString(
         'The player was active when the previous process was terminated '
@@ -185,7 +185,7 @@ String get _traceClock {
 /// empty string when there is nothing to show.
 String get playbackTraceNote {
   if (playbackTrace.isEmpty) return '';
-  return 'Last player steps:\n${playbackTrace.join('\n')}';
+  return 'آخر خطوات المشغل:\n${playbackTrace.join('\n')}';
 }
 
 /// True for the benign channel-error thrown by the video player's
