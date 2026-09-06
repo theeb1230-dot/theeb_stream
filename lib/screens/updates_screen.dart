@@ -23,9 +23,9 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
 
   // APK variant names matching GitHub release assets
   static const Map<String, String> variantNames = {
-    'arm64-v8a': 'theeb-stream-arm64-v8a.apk',
-    'armeabi-v7a': 'theeb-stream-armeabi-v7a.apk',
-    'x86_64': 'theeb-stream-x86_64.apk',
+    'arm64-v8a': 'Theeb-Stream-Android-Mobile-arm64-v8a.apk',
+    'armeabi-v7a': 'Theeb-Stream-Android-Mobile-armeabi-v7a.apk',
+    'x86_64': 'Theeb-Stream-Android-Mobile-x86_64.apk',
   };
 
   static const Map<String, String> variantLabels = {
