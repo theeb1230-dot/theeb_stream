@@ -34,7 +34,22 @@ class DirectM3u8Service {
       title: title,
     );
 
-    return StreamSecurity.sanitizeResolverResult(result);
+    final sanitized = StreamSecurity.sanitizeResolverResult(result);
+    if (sanitized != null) return sanitized;
+
+    final alternatives = await NativeStreamExtractor.resolveStreams(
+      tmdbId: id,
+      isMovie: true,
+      title: title,
+    );
+    for (final candidate in alternatives) {
+      final fallback = StreamSecurity.sanitizeResolverResult(candidate);
+      if (fallback != null &&
+          (fallback['url']?.toString().isNotEmpty ?? false)) {
+        return fallback;
+      }
+    }
+    return null;
   }
 
   static Future<Map<String, dynamic>?> fetchSeriesStreamUrl(
@@ -65,7 +80,24 @@ class DirectM3u8Service {
       title: title,
     );
 
-    return StreamSecurity.sanitizeResolverResult(result);
+    final sanitized = StreamSecurity.sanitizeResolverResult(result);
+    if (sanitized != null) return sanitized;
+
+    final alternatives = await NativeStreamExtractor.resolveStreams(
+      tmdbId: id,
+      isMovie: false,
+      season: season,
+      episode: episode,
+      title: title,
+    );
+    for (final candidate in alternatives) {
+      final fallback = StreamSecurity.sanitizeResolverResult(candidate);
+      if (fallback != null &&
+          (fallback['url']?.toString().isNotEmpty ?? false)) {
+        return fallback;
+      }
+    }
+    return null;
   }
 
   static Future<List<Map<String, dynamic>>> fetchAvailableStreams({
