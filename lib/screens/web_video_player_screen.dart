@@ -249,7 +249,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
 
       if (mounted) {
         setState(() {
-          _error = 'No streaming sources found.';
+          _error = 'لم يتم العثور على مصادر بث.';
           _isLoading = false;
         });
       }
@@ -257,7 +257,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
       debugPrint('WebVideoPlayer: Error: $e');
       if (mounted) {
         setState(() {
-          _error = 'Failed to load: $e';
+          _error = 'تعذر التحميل';
           _isLoading = false;
         });
       }
@@ -311,7 +311,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Select Server',
+              'اختر الخادم',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -346,7 +346,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
                 ),
                 subtitle: isSelected
                     ? const Text(
-                        'Playing',
+                        'جارٍ التشغيل',
                         style: TextStyle(color: Colors.red, fontSize: 12),
                       )
                     : null,
@@ -455,7 +455,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
                         const Icon(Icons.dns, color: Colors.white70, size: 14),
                         const SizedBox(width: 5),
                         Text(
-                          _sourceName ?? 'Server',
+                          _sourceName ?? 'الخادم',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 11,
@@ -509,7 +509,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
           const Icon(Icons.error_outline, color: Colors.red, size: 64),
           const SizedBox(height: 16),
           const Text(
-            'Unable to Load Stream',
+            'تعذر تحميل البث',
             style: TextStyle(
               color: Colors.red,
               fontSize: 20,
@@ -543,7 +543,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
                   ),
                 ),
                 child: const Text(
-                  'Retry',
+                  'إعادة المحاولة',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
@@ -558,7 +558,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
                   ),
                 ),
                 child: const Text(
-                  'Go Back',
+                  'رجوع',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
@@ -567,7 +567,7 @@ class _WebVideoPlayerScreenState extends State<WebVideoPlayerScreen> {
           const SizedBox(height: 24),
           // Quick server switch buttons
           const Text(
-            'Or try a different server:',
+            'أو جرّب خادمًا آخر:',
             style: TextStyle(color: Colors.white54, fontSize: 14),
           ),
           const SizedBox(height: 12),
