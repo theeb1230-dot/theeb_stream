@@ -266,7 +266,7 @@ class _StablePlayerControlsState extends State<_StablePlayerControls> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        tooltip: 'Back 10 seconds',
+                        tooltip: 'رجوع 10 ثوانٍ',
                         iconSize: 42,
                         onPressed: () => _seekBy(const Duration(seconds: -10)),
                         icon: const Icon(Icons.replay_10, color: Colors.white),
@@ -284,7 +284,7 @@ class _StablePlayerControlsState extends State<_StablePlayerControls> {
                       ),
                       const SizedBox(width: 24),
                       IconButton(
-                        tooltip: 'Forward 10 seconds',
+                        tooltip: 'تقديم 10 ثوانٍ',
                         iconSize: 42,
                         onPressed: () => _seekBy(const Duration(seconds: 10)),
                         icon: const Icon(Icons.forward_10, color: Colors.white),
@@ -302,7 +302,7 @@ class _StablePlayerControlsState extends State<_StablePlayerControls> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            tooltip: 'Back',
+                            tooltip: 'رجوع',
                             onPressed: widget.onBack,
                             icon: const Icon(
                               Icons.arrow_back,
@@ -310,7 +310,7 @@ class _StablePlayerControlsState extends State<_StablePlayerControls> {
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Minimize',
+                            tooltip: 'تصغير',
                             onPressed: widget.onMinimize,
                             icon: const Icon(
                               Icons.picture_in_picture_alt,
@@ -405,7 +405,7 @@ class _StablePlayerControlsState extends State<_StablePlayerControls> {
                               style: const TextStyle(color: Colors.white),
                             ),
                             IconButton(
-                              tooltip: value.volume == 0 ? 'Unmute' : 'Mute',
+                              tooltip: value.volume == 0 ? 'تشغيل الصوت' : 'كتم الصوت',
                               onPressed: () => widget.controller.setVolume(
                                 value.volume == 0 ? 1 : 0,
                               ),
@@ -420,10 +420,10 @@ class _StablePlayerControlsState extends State<_StablePlayerControls> {
                             if (widget.showDownload)
                               IconButton(
                                 tooltip: widget.downloadCompleted
-                                    ? 'Downloaded'
+                                    ? 'تم التنزيل'
                                     : widget.downloadProgress == null
-                                    ? 'Download for offline viewing'
-                                    : 'Downloading',
+                                    ? 'تنزيل للمشاهدة دون اتصال'
+                                    : 'جارٍ التنزيل',
                                 onPressed:
                                     !widget.downloadCompleted &&
                                         widget.downloadProgress == null
@@ -567,19 +567,19 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   bool _isRetryingServer = false;
   String? _error;
   String? _currentSource;
-  String _selectedQuality = 'Auto';
+  String _selectedQuality = 'تلقائي';
   Map<String, String> _streamHeaders = const {};
   List<_StreamQuality> _qualities = const [];
   bool _separateAudio = false;
   List<_SubtitleTrack> _subtitleTracks = const [];
   final ValueNotifier<List<Subtitle>> _activeSubtitles =
       ValueNotifier<List<Subtitle>>(const []);
-  final ValueNotifier<String> _selectedSubtitle = ValueNotifier<String>('Off');
+  final ValueNotifier<String> _selectedSubtitle = ValueNotifier<String>('إيقاف');
   /// URL of the currently selected subtitle track, used as a stable key
   /// to re-sync the display value when group names change after re-discovery.
   String? _selectedSubtitleUrl;
   double _subtitleOffsetMs = 0; // Subtitle timing offset in milliseconds
-  String _statusMessage = 'Initializing...';
+  String _statusMessage = 'جارٍ التهيئة...';
   Timer? _progressTimer;
   bool _isLeaving = false;
   bool _isMinimizing = false;
@@ -717,14 +717,14 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
 
     setState(() {
       _error = null;
-      _statusMessage = 'Fetching servers...';
+      _statusMessage = 'جارٍ جلب الخوادم...';
       _availableServers = const [];
       _serversLoading = false;
       _selectedServerKey = null;
     });
 
     try {
-      _showStatus('Fetching available servers...');
+      _showStatus('جارٍ جلب الخوادم المتاحة...');
       await _loadMediaMetadata();
       Map<String, dynamic>? result;
 
@@ -747,7 +747,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
 
       if (result != null && result['url'] != null) {
         final url = result['url'] as String;
-        final source = result['source'] as String? ?? 'Unknown';
+        final source = result['source'] as String? ?? 'غير معروف';
         final headers = <String, String>{};
         if (result['referer'] != null) {
           headers['Referer'] = result['referer'].toString();
@@ -793,7 +793,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             initialSubtitle = null;
           }
         }
-        var selectedQuality = 'Auto';
+        var selectedQuality = 'تلقائي';
         for (final quality in qualities) {
           if (quality.url == url) {
             selectedQuality = quality.label;
@@ -813,7 +813,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         _activeSubtitles.value = initialSubtitles;
         _selectedSubtitle.value = initialSubtitle != null
             ? _subtitleTileValue(initialSubtitle)
-            : 'Off';
+            : 'إيقاف';
         _selectedSubtitleUrl = initialSubtitle?.url;
 
         _showStatus('Stream found from $source! Initializing player...');
@@ -835,7 +835,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
               url.toLowerCase().contains('.m3u8'),
         );
         if (!initialized) {
-          _showStatus('Trying next server...');
+          _showStatus('جارٍ تجربة الخادم التالي...');
           discoveredServers = true;
           await _discoverAvailableServers(discoveryGeneration);
           final candidates = _availableServers
@@ -880,7 +880,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         return;
       }
 
-      _showStatus('No stream found');
+      _showStatus('لم يتم العثور على بث');
       if (mounted) {
         setState(() {
           _error =
@@ -913,14 +913,14 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     final fallbackSource = server['source']?.toString() ?? 'Server';
     final fallbackQualities = _parseQualities(server['qualities']);
     _subtitleTracks = _unionSubtitleTracks();
-    _selectedSubtitle.value = 'Off';
+    _selectedSubtitle.value = 'إيقاف';
     _activeSubtitles.value = const [];
     final ok = await _initializePlayer(
       fallbackUrl,
       headers: _parseStreamHeaders(server),
       source: fallbackSource,
       qualities: fallbackQualities,
-      selectedQuality: 'Auto',
+      selectedQuality: 'تلقائي',
       position: position,
       isHls:
           server['type'] == 'direct_m3u8' ||
@@ -936,7 +936,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     final previousVideo = _videoPlayerController;
     setState(() {
       _error = null;
-      _statusMessage = 'Opening download...';
+      _statusMessage = 'جارٍ فتح التنزيل...';
       _availableServers = const [];
       _serversLoading = false;
     });
@@ -944,7 +944,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     final exists = await file.exists();
     if (!mounted) return;
     if (!exists) {
-      setState(() => _error = 'This downloaded video file no longer exists.');
+      setState(() => _error = 'ملف الفيديو المُنزّل لم يعد موجودًا.');
       return;
     }
     final controller = VideoPlayerController.file(
@@ -979,13 +979,13 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         _videoPlayerController = controller;
         _useNativePlayer = true;
         _videoInitialized = true;
-        _currentSource = 'Downloaded';
+        _currentSource = 'تم التنزيل';
         _currentStreamUrl = null;
         _currentStreamIsHls = path.toLowerCase().endsWith('.m3u8');
         _streamHeaders = const {};
         _qualities = const [];
         _subtitleTracks = subtitleTracks;
-        _selectedSubtitle.value = 'Off';
+        _selectedSubtitle.value = 'إيقاف';
         _activeSubtitles.value = const [];
         _nextEpisodeCancelled = false;
         _selectedServerKey = null;
@@ -999,8 +999,8 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       if (mounted) {
         setState(() {
           _error =
-              'This downloaded video is incomplete or damaged and cannot play. '
-              'Delete it and download it again.';
+              'الفيديو المُنزّل غير مكتمل أو تالف ولا يمكن تشغيله. '
+              'احذفه ثم أعد تنزيله.';
         });
       }
     }
@@ -1036,7 +1036,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       _nextEpisode = null;
       return;
     }
-    final title = next['title']?.toString() ?? 'Next episode';
+    final title = next['title']?.toString() ?? 'الحلقة التالية';
     _nextEpisode = {
       'season': next['seasonNumber'],
       'episode': next['episodeNumber'],
@@ -1073,13 +1073,13 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Download completed')));
+        ).showSnackBar(const SnackBar(content: Text('اكتمل التنزيل')));
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Download failed: $error')));
+        ).showSnackBar(SnackBar(content: Text('فشل التنزيل')));
       }
     }
   }
@@ -1194,7 +1194,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         : {
             'season': nextSeason,
             'episode': (next['episode_number'] as num).toInt(),
-            'name': next['name']?.toString() ?? 'Next episode',
+            'name': next['name']?.toString() ?? 'الحلقة التالية',
             'stillUrl': TmdbApiService.getBackdropUrl(
               next['still_path']?.toString(),
             ),
@@ -1210,14 +1210,14 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   Future<bool> _initializePlayer(
     String m3u8Url, {
     Map<String, String> headers = const {},
-    String source = 'Unknown',
+    String source = 'غير معروف',
     List<_StreamQuality> qualities = const [],
-    String selectedQuality = 'Auto',
+    String selectedQuality = 'تلقائي',
     Duration position = Duration.zero,
     bool isHls = true,
   }) async {
     try {
-      _showStatus('Initializing video player...');
+      _showStatus('جارٍ تهيئة مشغل الفيديو...');
       await _replacePlayer(
         m3u8Url,
         headers: headers,
@@ -1252,7 +1252,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         .whereType<Map>()
         .map((quality) {
           return _StreamQuality(
-            label: quality['label']?.toString() ?? 'Auto',
+            label: quality['label']?.toString() ?? 'تلقائي',
             url: quality['url']?.toString() ?? '',
             height: int.tryParse(quality['height']?.toString() ?? '') ?? 0,
           );
@@ -1329,12 +1329,12 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   /// Match by the stable URL to find the correct new value.
   void _resyncSubtitleSelection() {
     final current = _selectedSubtitle.value;
-    if (current == 'Off') return;
+    if (current == 'إيقاف') return;
     // Already valid?  Nothing to do.
     if (_subtitleTracks.any((t) => _subtitleTileValue(t) == current)) return;
     final url = _selectedSubtitleUrl;
     if (url == null || url.isEmpty) {
-      _selectedSubtitle.value = 'Off';
+      _selectedSubtitle.value = 'إيقاف';
       return;
     }
     final match = _subtitleTracks.where((t) => t.url == url).firstOrNull;
@@ -1342,7 +1342,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       _selectedSubtitle.value = _subtitleTileValue(match);
     } else {
       // Track no longer available (different server set).
-      _selectedSubtitle.value = 'Off';
+      _selectedSubtitle.value = 'إيقاف';
       _selectedSubtitleUrl = null;
       _activeSubtitles.value = const [];
     }
@@ -1503,7 +1503,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         final isFallback = attemptUrl != url;
         _showStatus(
           position == Duration.zero
-              ? (isFallback ? 'Trying compatible codec...' : 'Loading video...')
+              ? (isFallback ? 'جارٍ تجربة ترميز متوافق...' : 'جارٍ تحميل الفيديو...')
               : 'Switching to $selectedQuality...',
         );
         // Timeout after 30s - HLS playlists on slow/CDN can take >15s, and
@@ -1564,7 +1564,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       setState(() {
         _error =
             'This downloaded video is incomplete or damaged and cannot continue. '
-            'Delete it and download it again.';
+            'احذفه ثم أعد تنزيله.';
       });
       return;
     }
@@ -1630,7 +1630,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     if (mounted) {
       setState(() {
         _isBuffering = true;
-        _statusMessage = 'Stream interrupted. Trying next server...';
+        _statusMessage = 'انقطع البث. جارٍ تجربة الخادم التالي...';
       });
     }
     await Future<void>.delayed(Duration(seconds: 2));
@@ -1667,14 +1667,14 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         }
         if (!switched) {
           _showStatus(
-            'All streams are unavailable right now. Please try again later.',
+            'جميع مصادر البث غير متاحة حاليًا. حاول مرة أخرى لاحقًا.',
           );
         }
       } else {
         await _replacePlayer(
           url,
           headers: _streamHeaders,
-          source: _currentSource ?? 'Unknown',
+          source: _currentSource ?? 'غير معروف',
           qualities: _qualities,
           selectedQuality: _selectedQuality,
           isHls: _currentStreamIsHls,
@@ -1689,7 +1689,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-              'The current server stopped responding. Please try again.',
+              'توقف الخادم الحالي عن الاستجابة. حاول مرة أخرى.',
             ),
           ),
         );
@@ -1711,7 +1711,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         _nextEpisodeCancelled = true;
         _showNextEpisode = false;
         _isSwitchingQuality = true;
-        _statusMessage = 'Loading next episode...';
+        _statusMessage = 'جارٍ تحميل الحلقة التالية...';
       });
     }
     await _saveProgress();
@@ -1839,9 +1839,9 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   }
 
   String get _aspectRatioLabel => switch (_aspectRatioMode) {
-    _AspectRatioMode.fit => 'Fit',
-    _AspectRatioMode.stretch => 'Stretch',
-    _AspectRatioMode.zoom => 'Zoom',
+    _AspectRatioMode.fit => 'ملاءمة',
+    _AspectRatioMode.stretch => 'تمديد',
+    _AspectRatioMode.zoom => 'تكبير',
   };
 
   Future<void> _showServerPicker() async {
@@ -1856,7 +1856,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             ListTile(
               leading: const Icon(Icons.dns_outlined, color: Colors.white),
               title: const Text(
-                'Select server',
+                'اختر الخادم',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -1864,7 +1864,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
               ),
               subtitle: Text(
                 _serversLoading
-                    ? 'Checking other servers...'
+                    ? 'جارٍ فحص خوادم أخرى...'
                     : '${_availableServers.length} server${_availableServers.length == 1 ? '' : 's'}',
                 style: const TextStyle(color: Colors.white60),
               ),
@@ -1908,7 +1908,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                       ? (server == source
                           ? 'Server ${entry.key + 1}'
                           : 'Via $server · Server ${entry.key + 1}')
-                      : 'Unavailable · Tap to retry',
+                      : 'غير متاح · اضغط لإعادة المحاولة',
                   style: TextStyle(
                     color: available ? Colors.white54 : Colors.orangeAccent,
                   ),
@@ -1942,14 +1942,14 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       final headers = _parseStreamHeaders(stream);
       final qualities = _parseQualities(stream['qualities']);
       _separateAudio = stream['separateAudio'] == true;
-      var selectedQuality = 'Auto';
+      var selectedQuality = 'تلقائي';
       for (final q in qualities) if (q.url == url) selectedQuality = q.label;
       final position = _lastStablePosition;
       setState(() {
         _isSwitchingServer = true;
         _error = null;
         _subtitleTracks = _unionSubtitleTracks();
-        _selectedSubtitle.value = 'Off';
+        _selectedSubtitle.value = 'إيقاف';
         _activeSubtitles.value = const [];
       });
       try {
@@ -1975,7 +1975,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     final headers = _parseStreamHeaders(stream);
     final qualities = _parseQualities(stream['qualities']);
     _separateAudio = stream['separateAudio'] == true;
-    var selectedQuality = 'Auto';
+    var selectedQuality = 'تلقائي';
     for (final quality in qualities) {
       if (quality.url == url) selectedQuality = quality.label;
     }
@@ -1986,7 +1986,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     setState(() {
       _isSwitchingServer = true;
       _subtitleTracks = _unionSubtitleTracks();
-      _selectedSubtitle.value = 'Off';
+      _selectedSubtitle.value = 'إيقاف';
       _activeSubtitles.value = const [];
     });
     try {
@@ -2060,7 +2060,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         final resolvedUrl = resolved['url']!.toString();
         final headers = _parseStreamHeaders(resolved);
         final qualities = _parseQualities(resolved['qualities']);
-        var selectedQuality = 'Auto';
+        var selectedQuality = 'تلقائي';
         for (final quality in qualities) {
           if (quality.url == resolvedUrl) {
             selectedQuality = quality.label;
@@ -2100,7 +2100,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             const ListTile(
               leading: Icon(Icons.hd, color: Colors.white),
               title: Text(
-                'Video quality',
+                'جودة الفيديو',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -2141,7 +2141,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
               const ListTile(
                 leading: Icon(Icons.subtitles, color: Colors.white),
                 title: Text(
-                  'Subtitles',
+                  'الترجمة',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -2149,21 +2149,21 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                 ),
               ),
               RadioListTile<String>(
-                value: 'Off',
+                value: 'إيقاف',
                 groupValue: _selectedSubtitle.value,
                 activeColor: Colors.red,
-                title: const Text('Off', style: TextStyle(color: Colors.white)),
+                title: const Text('إيقاف', style: TextStyle(color: Colors.white)),
                 onChanged: (_) {
                   Navigator.of(sheetContext).pop();
                   setState(() {
-                    _selectedSubtitle.value = 'Off';
+                    _selectedSubtitle.value = 'إيقاف';
                     _selectedSubtitleUrl = null;
                     _activeSubtitles.value = const [];
                   });
                 },
               ),
               // Subtitle offset adjustment
-              if (_selectedSubtitle.value != 'Off') ...[
+              if (_selectedSubtitle.value != 'إيقاف') ...[
                 const Divider(color: Colors.white24),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -2174,7 +2174,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Subtitle Offset',
+                            'توقيت الترجمة',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -2191,7 +2191,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                       ),
                       const SizedBox(height: 4),
                       const Text(
-                        'Adjust if subtitles are out of sync with video',
+                        'عدّل التوقيت إذا كانت الترجمة غير متزامنة مع الفيديو',
                         style: TextStyle(color: Colors.white54, fontSize: 12),
                       ),
                       SliderTheme(
@@ -2225,16 +2225,16 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                               setState(() {});
                             },
                             child: const Text(
-                              'Reset',
+                              'إعادة ضبط',
                               style: TextStyle(color: Colors.red),
                             ),
                           ),
                           Text(
                             _subtitleOffsetMs > 0
-                                ? 'Subtitles later'
+                                ? 'تأخير الترجمة'
                                 : _subtitleOffsetMs < 0
-                                ? 'Subtitles earlier'
-                                : 'Synced',
+                                ? 'تقديم الترجمة'
+                                : 'متزامنة',
                             style: const TextStyle(
                               color: Colors.white54,
                               fontSize: 12,
@@ -2428,7 +2428,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         lastError = e is Exception ? e : Exception(e.toString());
       }
     }
-    throw lastError ?? Exception('Failed to load subtitles');
+    throw lastError ?? Exception('تعذر تحميل الترجمة');
   }
 
   /// Best-effort merge of a locally saved HLS subtitle playlist (M3U8) where
@@ -2935,7 +2935,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       await _replacePlayer(
         playUrl,
         headers: _streamHeaders,
-        source: _currentSource ?? 'Unknown',
+        source: _currentSource ?? 'غير معروف',
         qualities: _qualities,
         selectedQuality: quality.label,
         isHls: _currentStreamIsHls,
@@ -3086,7 +3086,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     Transform.translate(
                       offset: Offset(0, 58),
                       child: Text(
-                        'Loading video...',
+                        'جارٍ تحميل الفيديو...',
                         style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                     ),
