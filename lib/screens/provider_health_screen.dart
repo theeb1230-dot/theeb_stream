@@ -205,7 +205,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           final list = isServer ? _serverResults : _extractorResults;
           list[index] = provider.copyWith(
             healthy: null,
-            error: 'No domain configured',
+            error: 'لا يوجد نطاق مهيأ',
           );
         });
       }
@@ -246,7 +246,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           final isHealthy = code != null && code > 0 && code < 500;
           list[index] = provider.copyWith(
             healthy: isHealthy,
-            error: isHealthy ? null : (e.message ?? 'Connection failed'),
+            error: isHealthy ? null : (e.message ?? 'فشل الاتصال'),
             responseMs: sw.elapsedMilliseconds,
           );
         });
@@ -275,7 +275,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
-          'Provider Health',
+          'حالة المصادر',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -306,8 +306,8 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey,
           tabs: const [
-            Tab(text: 'Servers'),
-            Tab(text: 'Extractors'),
+            Tab(text: 'الخوادم'),
+            Tab(text: 'المستخرجات'),
           ],
         ),
       ),
@@ -339,7 +339,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           ),
         ),
         if (!_serversComplete && !_testingServers)
-          _buildTestButton('Test All Servers', _testAllServers),
+          _buildTestButton('اختبار جميع الخوادم', _testAllServers),
       ],
     );
   }
@@ -364,15 +364,15 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
               if (webviewExtractors.isNotEmpty) ...[
-                _buildSectionHeader('WebView-Based', Icons.web, webviewExtractors),
+                _buildSectionHeader('معتمدة على WebView', Icons.web, webviewExtractors),
                 ...webviewExtractors.map((e) => _buildProviderCard(e)),
               ],
               if (apiExtractors.isNotEmpty) ...[
-                _buildSectionHeader('API / Worker', Icons.api, apiExtractors),
+                _buildSectionHeader('واجهة API / عامل', Icons.api, apiExtractors),
                 ...apiExtractors.map((e) => _buildProviderCard(e)),
               ],
               if (nativeExtractors.isNotEmpty) ...[
-                _buildSectionHeader('Native / HTTP', Icons.code, nativeExtractors),
+                _buildSectionHeader('أصلي / HTTP', Icons.code, nativeExtractors),
                 ...nativeExtractors.map((e) => _buildProviderCard(e)),
               ],
               const SizedBox(height: 80),
@@ -380,7 +380,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           ),
         ),
         if (!_extractorsComplete && !_testingExtractors)
-          _buildTestButton('Test All Extractors', _testAllExtractors),
+          _buildTestButton('اختبار جميع المستخرجات', _testAllExtractors),
       ],
     );
   }
@@ -398,9 +398,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildSummaryItem('Healthy', healthy, Colors.green),
-          _buildSummaryItem('Unhealthy', unhealthy, Colors.red),
-          _buildSummaryItem('Unknown', pending, Colors.grey),
+          _buildSummaryItem('سليم', healthy, Colors.green),
+          _buildSummaryItem('غير سليم', unhealthy, Colors.red),
+          _buildSummaryItem('غير معروف', pending, Colors.grey),
         ],
       ),
     );
@@ -464,11 +464,11 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     } else if (provider.healthy == false) {
       statusColor = Colors.red;
       statusIcon = Icons.error;
-      statusText = provider.error ?? 'Failed';
+      statusText = provider.error ?? 'فشل';
     } else {
       statusColor = Colors.grey;
       statusIcon = Icons.help_outline;
-      statusText = provider.domain == '-' ? 'No domain' : 'Not tested';
+      statusText = provider.domain == '-' ? 'لا يوجد نطاق' : 'لم يُختبر';
     }
 
     return Container(
@@ -496,7 +496,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  provider.domain == '-' ? 'No domain' : provider.domain,
+                  provider.domain == '-' ? 'لا يوجد نطاق' : provider.domain,
                   style: TextStyle(color: Colors.grey[500], fontSize: 12),
                 ),
               ],
