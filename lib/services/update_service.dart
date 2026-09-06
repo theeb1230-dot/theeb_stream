@@ -11,9 +11,9 @@ import 'notification_service.dart';
 
 /// APK variant names matching GitHub release assets.
 const Map<String, String> kApkVariants = {
-  'arm64-v8a': 'theeb-stream-arm64-v8a.apk',
-  'armeabi-v7a': 'theeb-stream-armeabi-v7a.apk',
-  'x86_64': 'theeb-stream-x86_64.apk',
+  'arm64-v8a': 'Theeb-Stream-Android-Mobile-arm64-v8a.apk',
+  'armeabi-v7a': 'Theeb-Stream-Android-Mobile-armeabi-v7a.apk',
+  'x86_64': 'Theeb-Stream-Android-Mobile-x86_64.apk',
 };
 
 /// Get the device's primary ABI (arm64-v8a, armeabi-v7a, x86_64).
@@ -227,7 +227,7 @@ class UpdateService {
 
       // Auto-detect device variant and find matching APK asset.
       final deviceArch = await getDeviceArch();
-      final expectedFilename = kApkVariants[deviceArch] ?? 'theeb-stream-arm64-v8a.apk';
+      final expectedFilename = kApkVariants[deviceArch] ?? 'Theeb-Stream-Android-Mobile-arm64-v8a.apk';
 
       final assets = response.data['assets'] as List<dynamic>? ?? [];
 
@@ -246,7 +246,7 @@ class UpdateService {
       // Fallback: find any arm64 APK (most common).
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
-        if (name.endsWith('.apk') && name.contains('theeb-stream-arm64')) {
+        if (name.endsWith('.apk') && name.contains('theeb-stream-android-mobile-arm64')) {
           return UpdateInfo(
             downloadUrl: asset['browser_download_url'] as String,
             version: latestVersion,
@@ -259,7 +259,7 @@ class UpdateService {
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
         if (name.endsWith('.apk') &&
-            name.contains('theeb-stream') &&
+            name.contains('theeb-stream-android-mobile') &&
             !name.contains('-tv')) {
           return UpdateInfo(
             downloadUrl: asset['browser_download_url'] as String,
