@@ -123,7 +123,7 @@ lib/
 │   ├── native_stream_extractor.dart   # Platform channel bridge to Kotlin
 │   ├── direct_m3u8_service.dart       # Stream URL resolution service
 │   ├── tmdb_api_service.dart          # TMDB API client
-│   ├── profile_service.dart           # Firebase profile picture upload
+│   ├── profile_service.dart           # Local-only profile customization
 │   ├── watch_history_service.dart     # SQLite watch history
 │   ├── update_service.dart            # GitHub Releases auto-updater
 │   ├── notification_service.dart      # Local notifications
@@ -141,7 +141,9 @@ lib/
 
 android/app/src/main/kotlin/com/maxstream/app/
 ├── MainActivity.kt                   # Platform channel handler
-└── StreamExtractor.kt                # ~1500 lines: 4 server providers, 17 host extractors, HLS validation
+└── StreamExtractor.kt                # Stream extraction + HLS validation
+
+> ملاحظة: مسار Kotlin/namespace التاريخي بقي كما هو لتجنب كسر المعرفات الداخلية بلا داعٍ، بينما applicationId النهائي لأندرويد هو `com.theebstream.app`.
 ```
 
 ## Getting Started
@@ -173,24 +175,35 @@ The app checks GitHub Releases on startup for newer versions:
 1. Hits `https://api.github.com/repos/theeb1230-dot/theeb_stream/releases/latest`
 2. Compares release tag (e.g. `v1.0.1`) with installed version
 3. Shows local notification + in-app dialog with changelog from release body
-4. Downloads `TheebStream.apk` from the release asset
+4. Downloads `Theeb-Stream-Android-Mobile-arm64-v8a.apk` from the release assets
 5. Prompts Android package installer
 
 To release an update:
-1. Build APK: `flutter build apk --release`
-2. Create GitHub release with tag `v1.0.1`, title `v1.0.1`
-3. Attach `TheebStream.apk` as a release asset
-4. Write changelog in the release body
+1. استخدم نفس commit/tag لبناء Android Mobile وAndroid TV وiOS.
+2. يجب أن يطابق tag نسخة `pubspec.yaml` الحالية، مثل `v1.6.0`.
+3. ارفع الأصول النهائية إلى قسم GitHub Releases في هذا المستودع:
+   - `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
+   - `Theeb-Stream-Android-TV.apk`
+   - `Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa`
+4. أرفق SHA-256 ونتائج analyze/tests/build في release notes.
+5. ملف iOS الموصوف بأنه UNSIGNED/no-codesign غير قابل للتثبيت مباشرة ويحتاج توقيع Apple وprovisioning صالحين خارجيًا.
 
 ## Build
 
 ```bash
-# Android APK
-flutter build apk --release
+# Android Mobile APKs
+flutter build apk --release --split-per-abi
 
-# Android App Bundle
-flutter build appbundle --release
+# Android TV
+cd android
+./gradlew assembleFossUniversalRelease
+
+# iOS unsigned / no-codesign
+cd ..
+flutter build ios --release --no-codesign
 ```
+
+GitHub Actions يبني المسارات الثلاثة بصورة مستقلة. نجاح build وحده لا يعني أن iOS IPA قابلة للتثبيت؛ ملف iOS غير الموقع يحتاج توقيعًا وprovisioning خارجيين صالحين.
 
 ## Version
 
