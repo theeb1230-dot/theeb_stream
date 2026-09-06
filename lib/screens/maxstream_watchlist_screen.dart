@@ -76,7 +76,7 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                Text('${item.title} removed from watchlist'),
+                Text('تمت إزالة ${item.title} من قائمة المشاهدة'),
               ],
             ),
             backgroundColor: Colors.red.shade600,
@@ -96,7 +96,7 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
               children: [
                 const Icon(Icons.error, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
-                Text('Error removing from watchlist'),
+                Text('تعذر الحذف من قائمة المشاهدة'),
               ],
             ),
             backgroundColor: Colors.red.shade600,
@@ -157,9 +157,9 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
             tabs: [
-              Tab(text: 'All (${watchlistItems.length})'),
-              Tab(text: 'Movies (${movies.length})'),
-              Tab(text: 'Series (${series.length})'),
+              Tab(text: 'الكل (${watchlistItems.length})'),
+              Tab(text: 'الأفلام (${movies.length})'),
+              Tab(text: 'المسلسلات (${series.length})'),
             ],
           ),
           Expanded(child: body),
@@ -172,7 +172,7 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
-          'My Watchlist',
+          'قائمة المشاهدة',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
@@ -187,9 +187,9 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.grey,
           tabs: [
-            Tab(text: 'All (${watchlistItems.length})'),
-            Tab(text: 'Movies (${movies.length})'),
-            Tab(text: 'Series (${series.length})'),
+            Tab(text: 'الكل (${watchlistItems.length})'),
+            Tab(text: 'الأفلام (${movies.length})'),
+            Tab(text: 'المسلسلات (${series.length})'),
           ],
         ),
       ),
@@ -205,7 +205,7 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
           Icon(Icons.bookmark_border, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text(
-            'Your watchlist is empty',
+            'قائمة المشاهدة فارغة',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -214,7 +214,7 @@ class _MaxStreamWatchlistScreenState extends State<MaxStreamWatchlistScreen>
           ),
           SizedBox(height: 8),
           Text(
-            'Add movies and TV shows to keep track of what you want to watch',
+            'أضف الأفلام والمسلسلات التي تريد مشاهدتها لاحقًا',
             style: TextStyle(color: Colors.grey, fontSize: 14),
             textAlign: TextAlign.center,
           ),
