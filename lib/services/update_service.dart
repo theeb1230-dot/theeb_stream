@@ -11,9 +11,9 @@ import 'notification_service.dart';
 
 /// APK variant names matching GitHub release assets.
 const Map<String, String> kApkVariants = {
-  'arm64-v8a': 'theeb-stream-arm64-v8a.apk',
-  'armeabi-v7a': 'theeb-stream-armeabi-v7a.apk',
-  'x86_64': 'theeb-stream-x86_64.apk',
+  'arm64-v8a': 'Theeb-Stream-Android-Mobile-arm64-v8a.apk',
+  'armeabi-v7a': 'Theeb-Stream-Android-Mobile-armeabi-v7a.apk',
+  'x86_64': 'Theeb-Stream-Android-Mobile-x86_64.apk',
 };
 
 /// Get the device's primary ABI (arm64-v8a, armeabi-v7a, x86_64).
@@ -86,7 +86,7 @@ class _DownloadProgressDialogState extends State<DownloadProgressDialog> {
           if (isDone) ...[
             const SizedBox(height: 12),
             const Text(
-              'If the installer doesn’t open, download directly from our website.',
+              'إذا لم يفتح المثبّت، نزّل الملف مباشرة من صفحة الإصدارات.',
               style: TextStyle(fontSize: 12, color: Colors.white70),
               textAlign: TextAlign.center,
             ),
@@ -133,7 +133,7 @@ class DownloadCompleteDialog extends StatelessWidget {
       if (result != 'ok' && context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Failed to launch installer. Try downloading from website.'),
+            content: const Text('تعذر فتح المثبّت. جرّب التنزيل من صفحة الإصدارات.'),
             action: SnackBarAction(label: 'الإصدارات', onPressed: _launchWebsite),
           ),
         );
@@ -142,7 +142,7 @@ class DownloadCompleteDialog extends StatelessWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Install failed: $e'),
+            content: Text('فشل التثبيت'),
             action: SnackBarAction(label: 'الإصدارات', onPressed: _launchWebsite),
           ),
         );
@@ -158,10 +158,10 @@ class DownloadCompleteDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('The update has been downloaded.'),
+          Text('تم تنزيل التحديث.'),
           SizedBox(height: 8),
           Text(
-            'Tap Install to launch the system installer. If nothing happens, use the website fallback.',
+            'اضغط «تثبيت» لفتح مثبّت النظام. إذا لم يحدث شيء، استخدم صفحة الإصدارات.',
             style: TextStyle(fontSize: 12, color: Colors.white70),
           ),
         ],
@@ -227,7 +227,7 @@ class UpdateService {
 
       // Auto-detect device variant and find matching APK asset.
       final deviceArch = await getDeviceArch();
-      final expectedFilename = kApkVariants[deviceArch] ?? 'theeb-stream-arm64-v8a.apk';
+      final expectedFilename = kApkVariants[deviceArch] ?? 'Theeb-Stream-Android-Mobile-arm64-v8a.apk';
 
       final assets = response.data['assets'] as List<dynamic>? ?? [];
 
@@ -246,7 +246,7 @@ class UpdateService {
       // Fallback: find any arm64 APK (most common).
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
-        if (name.endsWith('.apk') && name.contains('theeb-stream-arm64')) {
+        if (name.endsWith('.apk') && name.contains('theeb-stream-android-mobile-arm64')) {
           return UpdateInfo(
             downloadUrl: asset['browser_download_url'] as String,
             version: latestVersion,
@@ -255,11 +255,11 @@ class UpdateService {
         }
       }
 
-      // Last fallback: any maxstream APK (not TV).
+      // Last fallback: any Theeb Stream APK (not TV).
       for (final asset in assets) {
         final name = (asset['name'] as String? ?? '').toLowerCase();
         if (name.endsWith('.apk') &&
-            name.contains('theeb-stream') &&
+            name.contains('theeb-stream-android-mobile') &&
             !name.contains('-tv')) {
           return UpdateInfo(
             downloadUrl: asset['browser_download_url'] as String,
@@ -384,7 +384,7 @@ class UpdateService {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error downloading update: $e'),
+            content: Text('فشل تنزيل التحديث'),
             action: SnackBarAction(
               label: 'الإصدارات',
               onPressed: () async {

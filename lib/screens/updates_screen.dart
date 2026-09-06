@@ -23,9 +23,9 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
 
   // APK variant names matching GitHub release assets
   static const Map<String, String> variantNames = {
-    'arm64-v8a': 'maxstream-arm64-v8a.apk',
-    'armeabi-v7a': 'maxstream-armeabi-v7a.apk',
-    'x86_64': 'maxstream-x86_64.apk',
+    'arm64-v8a': 'Theeb-Stream-Android-Mobile-arm64-v8a.apk',
+    'armeabi-v7a': 'Theeb-Stream-Android-Mobile-armeabi-v7a.apk',
+    'x86_64': 'Theeb-Stream-Android-Mobile-x86_64.apk',
   };
 
   static const Map<String, String> variantLabels = {
@@ -116,7 +116,7 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF1A1A1A),
         title: const Text(
-          'Updates',
+          'التحديثات',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
@@ -126,35 +126,35 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Current version card
-            _buildSectionTitle('Current Installation'),
+            _buildSectionTitle('التثبيت الحالي'),
             const SizedBox(height: 12),
             _buildInfoCard(
               icon: Icons.phone_android,
-              title: 'Version $_currentVersion',
-              subtitle: 'Build $_currentBuild',
+              title: 'الإصدار $_currentVersion',
+              subtitle: 'البناء $_currentBuild',
             ),
             const SizedBox(height: 8),
             _buildInfoCard(
               icon: Icons.architecture,
-              title: 'Installed Variant',
+              title: 'نسخة الجهاز المثبتة',
               subtitle: variantLabels[_installedVariant] ?? _installedVariant,
             ),
             const SizedBox(height: 24),
 
             // Auto-check toggle
-            _buildSectionTitle('Update Settings'),
+            _buildSectionTitle('إعدادات التحديث'),
             const SizedBox(height: 12),
             _buildToggleCard(
               icon: Icons.autorenew,
-              title: 'Auto-check for updates',
-              subtitle: 'Check for new versions on app startup',
+              title: 'البحث التلقائي عن التحديثات',
+              subtitle: 'البحث عن إصدار جديد عند تشغيل التطبيق',
               value: _autoCheckEnabled,
               onChanged: _toggleAutoCheck,
             ),
             const SizedBox(height: 24),
 
             // Check for updates
-            _buildSectionTitle('Check for Updates'),
+            _buildSectionTitle('البحث عن تحديثات'),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -178,7 +178,7 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
                         ),
                       )
                     : const Text(
-                        'Check for Updates',
+                        'البحث عن تحديثات',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                       ),
               ),
@@ -192,14 +192,14 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
             ] else if (!_checking && _availableUpdate == null) ...[
               _buildInfoCard(
                 icon: Icons.check_circle,
-                title: 'Up to Date',
-                subtitle: 'You are running the latest version.',
+                title: 'أحدث إصدار مثبت',
+                subtitle: 'أنت تستخدم أحدث إصدار متاح.',
               ),
               const SizedBox(height: 16),
             ],
 
             // All available variants
-            _buildSectionTitle('Available Variants'),
+            _buildSectionTitle('النسخ المتاحة'),
             const SizedBox(height: 12),
             ...variantNames.entries.map((entry) {
               final isInstalled = _installedVariant.contains(entry.key);
@@ -220,11 +220,11 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
   }
 
   String _getVariantDownloadUrl(String baseDownloadUrl, String variantFilename) {
-    // GitHub release URL pattern:
-    // https://github.com/chila254/maxstream/releases/download/v1.6.0/maxstream-arm64-v8a.apk
-    // The base URL points to the release tag; we construct the variant URL from the tag
-    final tag = baseDownloadUrl.split('/releases/download/').last.split('/').first;
-    return 'https://github.com/chila254/maxstream/releases/download/$tag/$variantFilename';
+    final uri = Uri.tryParse(baseDownloadUrl);
+    if (uri == null || uri.pathSegments.length < 2) return baseDownloadUrl;
+    final segments = [...uri.pathSegments];
+    segments[segments.length - 1] = variantFilename;
+    return uri.replace(pathSegments: segments).toString();
   }
 
   Widget _buildSectionTitle(String title) {
@@ -345,7 +345,7 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
               const Icon(Icons.system_update, color: Colors.red, size: 22),
               const SizedBox(width: 10),
               Text(
-                'Update Available: v${update.version}',
+                'يتوفر تحديث: v${update.version}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 16,
@@ -379,7 +379,7 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
                 ),
               ),
               child: Text(
-                'Download ${variantLabels[_deviceArch] ?? _deviceArch}',
+                'تنزيل ${variantLabels[_deviceArch] ?? _deviceArch}',
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
             ),
@@ -438,7 +438,7 @@ class _UpdatesScreenState extends State<UpdatesScreen> {
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
-                'Installed',
+                'مثبت',
                 style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w600),
               ),
             )
