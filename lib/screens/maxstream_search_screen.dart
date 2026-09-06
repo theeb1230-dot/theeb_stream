@@ -28,7 +28,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
   List<Map<String, dynamic>> searchResults = [];
   List<Map<String, dynamic>> actorResults = [];
 
-  final List<String> _searchTabs = ['All', 'Movies', 'TV Shows', 'Actors'];
+  final List<String> _searchTabs = ['الكل', 'الأفلام', 'المسلسلات', 'الممثلون'];
   int _currentTabIndex = 0;
   int _searchGeneration = 0;
 
@@ -86,7 +86,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
     if (status.isDenied || status.isPermanentlyDenied) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Microphone permission needed for voice search')),
+          const SnackBar(content: Text('يلزم السماح بالوصول إلى الميكروفون للبحث الصوتي')),
         );
       }
       return;
@@ -96,7 +96,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
       if (!_speechEnabled) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Voice search not available on this device')),
+            const SnackBar(content: Text('البحث الصوتي غير متاح على هذا الجهاز')),
           );
         }
         return;
@@ -261,7 +261,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
               child: const Icon(Icons.search_rounded, color: Colors.white, size: 18),
             ),
             const SizedBox(width: 10),
-            const Text('Search', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20, letterSpacing: -0.5)),
+            const Text('البحث', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20, letterSpacing: -0.5)),
           ],
         ),
         actions: const [
@@ -301,12 +301,12 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
             children: [
               Icon(Icons.search, size: 48, color: Colors.grey[700]),
               const SizedBox(height: 12),
-              Text('No recommendations yet', style: TextStyle(color: Colors.grey[500])),
+              Text('لا توجد اقتراحات بعد', style: TextStyle(color: Colors.grey[500])),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: _loadSearchRecommendations,
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Retry', style: TextStyle(color: Colors.white)),
+                child: const Text('إعادة المحاولة', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -320,11 +320,11 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (topSearched.isNotEmpty) ...[
-              _buildSectionHeader('Top Searched'),
+              _buildSectionHeader('الأكثر بحثًا'),
               _buildRecommendationCarousel(topSearched),
             ],
             if (mostWatched.isNotEmpty) ...[
-              _buildSectionHeader('Most Watched'),
+              _buildSectionHeader('الأكثر مشاهدة'),
               _buildRecommendationCarousel(mostWatched),
             ],
             const SizedBox(height: 100),
@@ -444,7 +444,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
                 controller: _searchController,
                 style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
                 decoration: InputDecoration(
-                  hintText: _isListening ? 'Listening… speak now' : 'Search movies, TV shows, actors…',
+                  hintText: _isListening ? 'أستمع الآن… تحدث' : 'ابحث عن أفلام أو مسلسلات أو ممثلين…',
                   hintStyle: TextStyle(color: _isListening ? Colors.red[300] : const Color(0xFF6B7280), fontSize: 14, fontWeight: FontWeight.w400),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -499,7 +499,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
                   size: 18,
                 ),
                 splashRadius: 18,
-                tooltip: _isListening ? 'Stop listening' : 'Voice search',
+                tooltip: _isListening ? 'إيقاف الاستماع' : 'البحث الصوتي',
                 padding: const EdgeInsets.all(8),
                 constraints: const BoxConstraints(),
               ),
@@ -532,11 +532,11 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (movies.isNotEmpty) _buildSectionHeader('Movies'),
+          if (movies.isNotEmpty) _buildSectionHeader('الأفلام'),
           if (movies.isNotEmpty) _buildMovieGrid(movies),
-          if (tvShows.isNotEmpty) _buildSectionHeader('TV Shows'),
+          if (tvShows.isNotEmpty) _buildSectionHeader('المسلسلات'),
           if (tvShows.isNotEmpty) _buildMovieGrid(tvShows),
-          if (actors.isNotEmpty) _buildSectionHeader('Actors'),
+          if (actors.isNotEmpty) _buildSectionHeader('الممثلون'),
           if (actors.isNotEmpty) _buildActorGrid(actors),
           const SizedBox(height: 100),
         ],
@@ -590,13 +590,13 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
   }
 
   Widget _buildSectionHeader(String title) {
-    final icon = title == 'Top Searched'
+    final icon = title == 'الأكثر بحثًا'
         ? Icons.trending_up_rounded
-        : title == 'Most Watched'
+        : title == 'الأكثر مشاهدة'
             ? Icons.local_fire_department_rounded
-            : title == 'Movies'
+            : title == 'الأفلام'
                 ? Icons.movie_rounded
-                : title == 'TV Shows'
+                : title == 'المسلسلات'
                     ? Icons.tv_rounded
                     : Icons.people_rounded;
     return Padding(
@@ -652,7 +652,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
   }
 
   Widget _buildRecommendationComingSoonCard(Map<String, dynamic> item) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final backdropPath = item['backdrop_path'];
     final posterPath = item['poster_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
@@ -710,7 +710,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                   decoration: BoxDecoration(color: isTv ? Colors.teal : Colors.red, borderRadius: BorderRadius.circular(6)),
-                  child: Text(isTv ? 'TV' : 'MOVIE', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
+                  child: Text(isTv ? 'مسلسل' : 'فيلم', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800)),
                 ),
               ),
               if (rating != null && rating > 0)
@@ -906,7 +906,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
           ),
           const SizedBox(height: 4),
           Text(
-            item['title'] ?? item['name'] ?? 'Unknown',
+            item['title'] ?? item['name'] ?? 'غير معروف',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
@@ -984,7 +984,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
           ),
           const SizedBox(height: 8),
           Text(
-            actor['name'] ?? 'Unknown',
+            actor['name'] ?? 'غير معروف',
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,
@@ -1017,7 +1017,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
           Icon(Icons.search_off, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text(
-            'No results found',
+            'لم يتم العثور على نتائج',
             style: TextStyle(
               color: Colors.grey,
               fontSize: 18,
@@ -1026,7 +1026,7 @@ class _MaxStreamSearchScreenState extends State<MaxStreamSearchScreen>
           ),
           SizedBox(height: 8),
           Text(
-            'Try searching with different keywords',
+            'جرّب البحث بكلمات مختلفة',
             style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
         ],

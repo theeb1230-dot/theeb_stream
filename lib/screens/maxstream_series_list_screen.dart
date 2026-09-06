@@ -81,9 +81,9 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
               SliverToBoxAdapter(child: _buildLoadingIndicator())
             else ...[
               if (trendingSeries.isNotEmpty) _buildHeroBannerSection(),
-              _buildSection('Trending TV Shows', trendingSeries, 'tv'),
-              _buildSection('Popular TV Shows', popularSeries, 'tv'),
-              _buildSection('Top Rated TV Shows', topRatedSeries, 'tv'),
+              _buildSection('المسلسلات الرائجة', trendingSeries, 'tv'),
+              _buildSection('المسلسلات الشائعة', popularSeries, 'tv'),
+              _buildSection('الأعلى تقييمًا', topRatedSeries, 'tv'),
               if (onTheAirSeries.isNotEmpty) _buildOnTheAirSection(),
               if (upcomingSeries.isNotEmpty) _buildUpcomingSection(),
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
@@ -110,7 +110,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
           ),
           const SizedBox(width: 8),
           const Text(
-            'TV Series',
+            'المسلسلات',
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,
@@ -229,7 +229,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
                     _showFullList(title, mediaType);
                   },
                   child: const Text(
-                    'See All',
+                    'عرض الكل',
                     style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ),
@@ -283,7 +283,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'On The Air',
+                      'يعرض الآن',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -293,9 +293,9 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
                   ],
                 ),
                 TextButton(
-                  onPressed: () => _showFullList('On The Air', 'tv'),
+                  onPressed: () => _showFullList('يعرض الآن', 'tv'),
                   child: const Text(
-                    'See All',
+                    'عرض الكل',
                     style: TextStyle(color: Colors.red, fontSize: 14),
                   ),
                 ),
@@ -320,7 +320,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
   }
 
   Widget _buildOnTheAirCard(Map<String, dynamic> item) {
-    final name = item['name'] ?? item['title'] ?? 'Unknown';
+    final name = item['name'] ?? item['title'] ?? 'غير معروف';
     final backdropPath = item['backdrop_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
     final firstAirDate = item['first_air_date']?.toString() ?? '';
@@ -406,7 +406,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Text(
-                    'AIRING',
+                    'يعرض الآن',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -543,7 +543,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
   }
 
   Widget _buildSeriesCard(Map<String, dynamic> item, String mediaType) {
-    final name = item['title'] ?? item['name'] ?? 'Unknown';
+    final name = item['title'] ?? item['name'] ?? 'غير معروف';
     final posterPath = item['poster_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
     final year = _getYear(item);
@@ -609,7 +609,7 @@ class _MaxStreamSeriesListScreenState extends State<MaxStreamSeriesListScreen> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
-                        'TV',
+                        'مسلسل',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 9,
@@ -776,7 +776,7 @@ class _AutoScrollingCarouselState extends State<_AutoScrollingCarousel> {
                   ),
                   const SizedBox(width: 8),
                   const Text(
-                    'Coming Soon',
+                    'قريبًا',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -791,14 +791,14 @@ class _AutoScrollingCarouselState extends State<_AutoScrollingCarousel> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => _FullListScreen(
-                        title: 'Coming Soon',
+                        title: 'قريبًا',
                         mediaType: 'tv',
                       ),
                     ),
                   );
                 },
                 child: const Text(
-                  'See All',
+                  'عرض الكل',
                   style: TextStyle(color: Colors.red, fontSize: 14),
                 ),
               ),
@@ -842,7 +842,7 @@ class _AutoScrollingCarouselState extends State<_AutoScrollingCarousel> {
   }
 
   Widget _buildUpcomingCard(Map<String, dynamic> item) {
-    final name = item['name'] ?? item['title'] ?? 'Unknown';
+    final name = item['name'] ?? item['title'] ?? 'غير معروف';
     final backdropPath = item['backdrop_path'];
     final posterPath = item['poster_path'];
     final rating = (item['vote_average'] as num?)?.toDouble();
@@ -922,7 +922,7 @@ class _AutoScrollingCarouselState extends State<_AutoScrollingCarousel> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Text(
-                    'UPCOMING',
+                    'قريبًا',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -1133,17 +1133,17 @@ class _FullListScreenState extends State<_FullListScreen> {
     try {
       List<Map<String, dynamic>> initialItems = [];
 
-      if (widget.title.contains('Trending') && widget.mediaType == 'tv') {
+      if (widget.title.contains('الرائجة') && widget.mediaType == 'tv') {
         initialItems = await TmdbApiService.fetchTrendingSeries(page: 1);
-      } else if (widget.title.contains('Popular') && widget.mediaType == 'tv') {
+      } else if (widget.title.contains('الشائعة') && widget.mediaType == 'tv') {
         initialItems = await TmdbApiService.fetchPopularSeries(page: 1);
-      } else if (widget.title.contains('Top Rated') &&
+      } else if (widget.title.contains('الأعلى تقييمًا') &&
           widget.mediaType == 'tv') {
         initialItems = await TmdbApiService.fetchTopRatedSeries(page: 1);
-      } else if (widget.title.contains('On The Air') &&
+      } else if (widget.title.contains('يعرض الآن') &&
           widget.mediaType == 'tv') {
         initialItems = await TmdbApiService.fetchOnTheAirSeries(page: 1);
-      } else if (widget.title.contains('Coming Soon') &&
+      } else if (widget.title.contains('قريبًا') &&
           widget.mediaType == 'tv') {
         initialItems = await TmdbApiService.fetchUpcomingSeries(page: 1);
       }
@@ -1185,17 +1185,17 @@ class _FullListScreenState extends State<_FullListScreen> {
       final nextPage = _currentPage + 1;
       List<Map<String, dynamic>> newItems = [];
 
-      if (widget.title.contains('Trending') && widget.mediaType == 'tv') {
+      if (widget.title.contains('الرائجة') && widget.mediaType == 'tv') {
         newItems = await TmdbApiService.fetchTrendingSeries(page: nextPage);
-      } else if (widget.title.contains('Popular') && widget.mediaType == 'tv') {
+      } else if (widget.title.contains('الشائعة') && widget.mediaType == 'tv') {
         newItems = await TmdbApiService.fetchPopularSeries(page: nextPage);
-      } else if (widget.title.contains('Top Rated') &&
+      } else if (widget.title.contains('الأعلى تقييمًا') &&
           widget.mediaType == 'tv') {
         newItems = await TmdbApiService.fetchTopRatedSeries(page: nextPage);
-      } else if (widget.title.contains('On The Air') &&
+      } else if (widget.title.contains('يعرض الآن') &&
           widget.mediaType == 'tv') {
         newItems = await TmdbApiService.fetchOnTheAirSeries(page: nextPage);
-      } else if (widget.title.contains('Coming Soon') &&
+      } else if (widget.title.contains('قريبًا') &&
           widget.mediaType == 'tv') {
         newItems = await TmdbApiService.fetchUpcomingSeries(page: nextPage);
       }
@@ -1317,7 +1317,7 @@ class _FullListScreenState extends State<_FullListScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          item['name'] ?? 'Unknown',
+                          item['name'] ?? 'غير معروف',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,

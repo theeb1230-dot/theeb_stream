@@ -215,7 +215,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  wasAdded ? 'Added to Watchlist' : 'Removed from Watchlist',
+                  wasAdded ? 'تمت الإضافة إلى قائمة المشاهدة' : 'تمت الإزالة من قائمة المشاهدة',
                 ),
               ],
             ),
@@ -239,7 +239,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
               children: [
                 const Icon(Icons.error, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
-                Text('Error updating watchlist: $e'),
+                Text('تعذر تحديث قائمة المشاهدة'),
               ],
             ),
             backgroundColor: Colors.red.shade600,
@@ -330,8 +330,8 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
         SnackBar(
           content: Text(
             found
-                ? '${widget.item.title} download started'
-                : 'No downloadable stream was found',
+                ? 'بدأ تنزيل ${widget.item.title}'
+                : 'لم يتم العثور على رابط قابل للتنزيل',
           ),
         ),
       );
@@ -339,7 +339,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Download failed: $error')));
+        ).showSnackBar(SnackBar(content: Text('فشل التنزيل')));
       }
     } finally {
       if (mounted) setState(() => _downloadingMovie = false);
@@ -531,7 +531,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                               Icon(Icons.star, color: Colors.amber, size: 20),
                               const SizedBox(width: 4),
                               Text(
-                                '${details?['vote_average']?.toStringAsFixed(1) ?? 'N/A'}/10',
+                                '${details?['vote_average']?.toStringAsFixed(1) ?? 'غير متاح'}/10',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
@@ -568,7 +568,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                                 size: 18,
                               ),
                               label: const Text(
-                                'Play',
+                                'تشغيل',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
@@ -598,7 +598,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                                     color: Colors.green,
                                   ),
                                   label: const Text(
-                                    'Downloaded',
+                                    'تم التنزيل',
                                     style: TextStyle(color: Colors.green),
                                   ),
                                   style: OutlinedButton.styleFrom(
@@ -615,7 +615,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                                   icon: const Icon(
                                     Icons.download_for_offline_outlined,
                                   ),
-                                  label: const Text('Download'),
+                                  label: const Text('تنزيل'),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.white,
                                     side: const BorderSide(
@@ -669,8 +669,8 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
         const SizedBox(height: 4),
         Text(
           task.isPaused
-              ? 'Paused — ${task.sizeLabel}'
-              : 'Downloading — ${task.sizeLabel}',
+              ? 'متوقف مؤقتًا — ${task.sizeLabel}'
+              : 'جارٍ التنزيل — ${task.sizeLabel}',
           style: TextStyle(
             color: task.isPaused ? Colors.orange : Colors.white70,
             fontSize: 11,
@@ -718,7 +718,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                 const Icon(Icons.play_circle_fill, color: Colors.red, size: 20),
                 const SizedBox(width: 8),
                 const Text(
-                  'Continue Watching',
+                  'متابعة المشاهدة',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -744,7 +744,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '$remainingMin min remaining',
+              'متبقي $remainingMin دقيقة',
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],
@@ -761,7 +761,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
         children: [
           if (_youtubeController != null) ...[
             const Text(
-              'Trailer',
+              'الإعلان',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -791,7 +791,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
           ],
 
           const Text(
-            'Overview',
+            'الملخص',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -803,7 +803,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
             details?['overview'] ??
                 widget.item.overview ??
                 widget.item.description ??
-                'No overview available.',
+                'لا يوجد ملخص متاح.',
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
@@ -836,18 +836,18 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
     return Column(
       children: [
         if (releaseDate != null)
-          buildInfoRow('Release Date', formatDate(releaseDate)),
-        if (runtime != null) buildInfoRow('Runtime', '$runtime minutes'),
-        if (genres != null) buildInfoRow('Genres', genres),
+          buildInfoRow('تاريخ الإصدار', formatDate(releaseDate)),
+        if (runtime != null) buildInfoRow('المدة', '$runtime دقيقة'),
+        if (genres != null) buildInfoRow('التصنيفات', genres),
         buildInfoRow(
-          'Language',
-          details?['original_language']?.toUpperCase() ?? 'N/A',
+          'اللغة',
+          details?['original_language']?.toUpperCase() ?? 'غير متاح',
         ),
         if (productionCompanies != null && productionCompanies.isNotEmpty)
-          buildInfoRow('Production', productionCompanies),
+          buildInfoRow('الإنتاج', productionCompanies),
         if (productionCountries != null && productionCountries.isNotEmpty)
-          buildInfoRow('Country', productionCountries),
-        buildInfoRow('Status', details?['status'] ?? 'Unknown'),
+          buildInfoRow('الدولة', productionCountries),
+        buildInfoRow('الحالة', details?['status'] ?? 'غير معروف'),
         const SizedBox(height: 24),
         buildWatchProvidersSection(),
       ],
@@ -891,7 +891,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Where to Watch',
+          'أماكن المشاهدة',
           style: TextStyle(
             color: Colors.white,
             fontSize: 18,
@@ -998,7 +998,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
         const Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
-            'Cast',
+            'طاقم التمثيل',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -1042,7 +1042,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      actor['name'] ?? 'Unknown',
+                      actor['name'] ?? 'غير معروف',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -1076,7 +1076,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
         const Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
-            'More Like This',
+            'محتوى مشابه',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -1150,7 +1150,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        item['title'] ?? item['name'] ?? 'Unknown',
+                        item['title'] ?? item['name'] ?? 'غير معروف',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -1176,7 +1176,7 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
     if (date != null && date.length >= 4) {
       return date.substring(0, 4);
     }
-    return 'N/A';
+    return 'غير متاح';
   }
 
   String formatDate(String date) {
@@ -1281,29 +1281,29 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
         if (isM3u8 && height > 0) {
           return {
             'url': serverUrl,
-            'source': server['source']?.toString() ?? 'Server',
+            'source': server['source']?.toString() ?? 'الخادم',
             'headers': server['headers'],
             'referer': server['referer']?.toString(),
             'type': server['type']?.toString() ?? '',
             'subtitles': server['subtitles'],
-            'label': q['label']?.toString() ?? 'Auto',
+            'label': q['label']?.toString() ?? 'تلقائي',
             'maxVariantHeight': height,
           };
         }
         return {
           'url': qUrl.isNotEmpty ? qUrl : serverUrl,
-          'source': server['source']?.toString() ?? 'Server',
+          'source': server['source']?.toString() ?? 'الخادم',
           'headers': server['headers'],
           'referer': server['referer']?.toString(),
           'type': server['type']?.toString() ?? '',
           'subtitles': server['subtitles'],
-          'label': q['label']?.toString() ?? 'Auto',
+          'label': q['label']?.toString() ?? 'تلقائي',
         };
       }
     }
     return {
       'url': serverUrl,
-      'source': server['source']?.toString() ?? 'Server',
+      'source': server['source']?.toString() ?? 'الخادم',
       'headers': server['headers'],
       'referer': server['referer']?.toString(),
       'type': server['type']?.toString() ?? '',
@@ -1334,7 +1334,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Download',
+            'تنزيل',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -1369,7 +1369,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Could not fetch servers',
+                      'تعذر جلب الخوادم',
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
@@ -1391,7 +1391,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'No servers available',
+                      'لا توجد خوادم متاحة',
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
@@ -1404,7 +1404,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
             _buildAutoOption(),
             const SizedBox(height: 12),
             const Text(
-              'Servers',
+              'الخوادم',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
@@ -1419,7 +1419,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                 itemBuilder: (context, serverIdx) {
                   final server = _availableStreams[serverIdx];
                   final source =
-                      server['source']?.toString() ?? 'Server';
+                      server['source']?.toString() ?? 'الخادم';
                   final qualities = server['qualities'];
                   final hasQualities =
                       qualities is List && qualities.isNotEmpty;
@@ -1480,7 +1480,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                                       if (hasQualities) ...[
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${qualities.length} quality option(s)',
+                                          '${qualities.length} خيارات جودة',
                                           style: TextStyle(
                                             color: isServerSelected
                                                 ? Colors.white60
@@ -1516,7 +1516,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                                 ? raw.map((k, v) => MapEntry(k.toString(), v))
                                 : <String, dynamic>{};
                             final label =
-                                q['label']?.toString() ?? 'Auto';
+                                q['label']?.toString() ?? 'تلقائي';
                             final height =
                                 int.tryParse(q['height']?.toString() ?? '') ??
                                 0;
@@ -1524,7 +1524,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                                 (_selectedQualityIndex ?? 0) == qIdx;
                             final subtitle = height > 0
                                 ? '${height}p'
-                                : 'Adaptive bitrate';
+                                : 'جودة تلقائية متكيفة';
 
                             return Padding(
                               padding: const EdgeInsets.only(
@@ -1617,7 +1617,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                 ),
               ),
               child: const Text(
-                'Start Download',
+                'بدء التنزيل',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
@@ -1660,7 +1660,7 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Auto',
+                    'تلقائي',
                     style: TextStyle(
                       color: isSelected ? Colors.white : Colors.white70,
                       fontSize: 15,
@@ -1670,8 +1670,8 @@ class _QualitySelectionSheetState extends State<_QualitySelectionSheet> {
                   const SizedBox(height: 2),
                   Text(
                     _availableStreams.isNotEmpty
-                        ? 'Best available from ${_availableStreams.length} server(s)'
-                        : 'Let the app choose the best server',
+                        ? 'أفضل خيار متاح من ${_availableStreams.length} خوادم'
+                        : 'دع التطبيق يختار أفضل خادم',
                     style: TextStyle(
                       color: isSelected ? Colors.white60 : Colors.grey,
                       fontSize: 12,

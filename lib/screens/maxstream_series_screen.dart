@@ -228,7 +228,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  wasAdded ? 'Added to Watchlist' : 'Removed from Watchlist',
+                  wasAdded ? 'تمت الإضافة إلى قائمة المشاهدة' : 'تمت الإزالة من قائمة المشاهدة',
                 ),
               ],
             ),
@@ -252,7 +252,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
               children: [
                 const Icon(Icons.error, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
-                Text('Error updating watchlist: $e'),
+                Text('تعذر تحديث قائمة المشاهدة'),
               ],
             ),
             backgroundColor: Colors.red.shade600,
@@ -389,7 +389,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'No downloadable stream found for episode ${episode.episodeNumber}',
+              'لم يتم العثور على رابط تنزيل للحلقة ${episode.episodeNumber}',
             ),
           ),
         );
@@ -398,7 +398,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
     } catch (error) {
       if (showResult && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Episode download failed: $error')),
+          SnackBar(content: Text('فشل تنزيل الحلقة')),
         );
       }
       return false;
@@ -418,20 +418,20 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Download Season $season?'),
+        title: Text('تنزيل الموسم $season؟'),
         content: Text(
-          '${releasedEpisodes.length} released episodes will be downloaded one at a time.'
+          'سيتم تنزيل ${releasedEpisodes.length} حلقة متاحة واحدة تلو الأخرى.'
           '${unreleasedCount > 0 ? '\n\n$unreleasedCount unreleased episodes will be skipped.' : ''}'
           '\n\nQuality: the lowest available on the chosen server, and every episode continues using that same server.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('إلغاء'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Continue'),
+            child: const Text('متابعة'),
           ),
         ],
       ),
@@ -566,7 +566,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                     color: Colors.red, size: 20),
                 const SizedBox(width: 8),
                 const Text(
-                  'Continue Watching',
+                  'متابعة المشاهدة',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -602,7 +602,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              '$remainingMin min remaining',
+              'متبقي $remainingMin دقيقة',
               style:
                   const TextStyle(color: Colors.grey, fontSize: 12),
             ),
@@ -910,7 +910,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                               color: Colors.white,
                             ),
                             label: const Text(
-                              'Watch Now',
+                              'شاهد الآن',
                               style: TextStyle(color: Colors.white),
                             ),
                             style: ElevatedButton.styleFrom(
@@ -940,7 +940,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         children: [
           if (_youtubeController != null) ...[
             const Text(
-              'Trailer',
+              'الإعلان',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -967,7 +967,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
           ],
 
           const Text(
-            'Overview',
+            'الملخص',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -978,7 +978,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
           Text(
             seriesDetails?['overview'] ??
                 widget.seriesItem.overview ??
-                'No overview available.',
+                'لا يوجد ملخص متاح.',
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
@@ -1003,19 +1003,19 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
     return Column(
       children: [
         if (firstAirDate != null)
-          buildInfoRow('First Air Date', formatDate(firstAirDate)),
+          buildInfoRow('تاريخ العرض الأول', formatDate(firstAirDate)),
         if (lastAirDate != null && lastAirDate != firstAirDate)
-          buildInfoRow('Last Air Date', formatDate(lastAirDate)),
-        if (genres != null) buildInfoRow('Genres', genres),
+          buildInfoRow('تاريخ آخر عرض', formatDate(lastAirDate)),
+        if (genres != null) buildInfoRow('التصنيفات', genres),
         buildInfoRow(
-          'Language',
+          'اللغة',
           seriesDetails?['original_language']?.toUpperCase() ?? 'N/A',
         ),
-        buildInfoRow('Status', seriesDetails?['status'] ?? 'Unknown'),
+        buildInfoRow('الحالة', seriesDetails?['status'] ?? 'غير معروف'),
         if (seriesDetails?['episode_run_time'] != null &&
             (seriesDetails!['episode_run_time'] as List).isNotEmpty)
           buildInfoRow(
-            'Episode Runtime',
+            'مدة الحلقة',
             '~${seriesDetails!['episode_run_time'][0]} minutes',
           ),
       ],
@@ -1057,7 +1057,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         const Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
-            'Cast',
+            'طاقم التمثيل',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -1101,7 +1101,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      actor['name'] ?? 'Unknown',
+                      actor['name'] ?? 'غير معروف',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -1142,7 +1142,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
             children: [
               const Expanded(
                 child: Text(
-                  'Seasons & Episodes',
+                  'المواسم والحلقات',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -1165,7 +1165,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                 label: Text(
                   seasonActive
                       ? '${_downloadManager.seasonDownloadCurrent}/${_downloadManager.seasonDownloadTotal}'
-                      : 'Download Season',
+                      : 'تنزيل الموسم',
                 ),
                 style: TextButton.styleFrom(foregroundColor: Colors.white),
               ),
@@ -1262,7 +1262,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
             child: Padding(
               padding: EdgeInsets.all(20),
               child: Text(
-                'No episodes available',
+                'لا توجد حلقات متاحة',
                 style: TextStyle(color: Colors.grey),
               ),
             ),
@@ -1398,10 +1398,10 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                   padding: const EdgeInsets.only(right: 4),
                   child: IconButton(
                     tooltip: isDownloaded
-                        ? 'Downloaded'
+                        ? 'تم التنزيل'
                         : isCurrentlyDownloading
-                        ? 'Downloading'
-                        : 'Download episode',
+                        ? 'جارٍ التنزيل'
+                        : 'تنزيل الحلقة',
                     onPressed: isDownloading || isCurrentlyDownloading
                         ? null
                         : isDownloaded
@@ -1457,7 +1457,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         ),
         const SizedBox(height: 2),
         Text(
-          task.isPaused ? 'Paused' : task.sizeLabel,
+          task.isPaused ? 'متوقف مؤقتًا' : task.sizeLabel,
           style: TextStyle(
             color: task.isPaused ? Colors.orange : Colors.white54,
             fontSize: 10,
@@ -1474,7 +1474,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         const Padding(
           padding: EdgeInsets.all(16.0),
           child: Text(
-            'More Like This',
+            'محتوى مشابه',
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -1544,7 +1544,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        item['name'] ?? 'Unknown',
+                        item['name'] ?? 'غير معروف',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
@@ -1651,29 +1651,29 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
         if (isM3u8 && height > 0) {
           return {
             'url': serverUrl,
-            'source': server['source']?.toString() ?? 'Server',
+            'source': server['source']?.toString() ?? 'الخادم',
             'headers': server['headers'],
             'referer': server['referer']?.toString(),
             'type': server['type']?.toString() ?? '',
             'subtitles': server['subtitles'],
-            'label': q['label']?.toString() ?? 'Auto',
+            'label': q['label']?.toString() ?? 'تلقائي',
             'maxVariantHeight': height,
           };
         }
         return {
           'url': qUrl.isNotEmpty ? qUrl : serverUrl,
-          'source': server['source']?.toString() ?? 'Server',
+          'source': server['source']?.toString() ?? 'الخادم',
           'headers': server['headers'],
           'referer': server['referer']?.toString(),
           'type': server['type']?.toString() ?? '',
           'subtitles': server['subtitles'],
-          'label': q['label']?.toString() ?? 'Auto',
+          'label': q['label']?.toString() ?? 'تلقائي',
         };
       }
     }
     return {
       'url': serverUrl,
-      'source': server['source']?.toString() ?? 'Server',
+      'source': server['source']?.toString() ?? 'الخادم',
       'headers': server['headers'],
       'referer': server['referer']?.toString(),
       'type': server['type']?.toString() ?? '',
@@ -1704,7 +1704,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Download',
+            'تنزيل',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -1739,7 +1739,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Could not fetch servers',
+                      'تعذر جلب الخوادم',
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
@@ -1761,7 +1761,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'No servers available',
+                      'لا توجد خوادم متاحة',
                       style: TextStyle(color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
@@ -1774,7 +1774,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
             _buildAutoOption(),
             const SizedBox(height: 12),
             const Text(
-              'Servers',
+              'الخوادم',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 12,
@@ -1788,7 +1788,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                 itemCount: _availableStreams.length,
                 itemBuilder: (context, serverIdx) {
                   final server = _availableStreams[serverIdx];
-                  final source = server['source']?.toString() ?? 'Server';
+                  final source = server['source']?.toString() ?? 'الخادم';
                   final qualities = server['qualities'];
                   final hasQualities = qualities is List && qualities.isNotEmpty;
                   final isServerSelected = _selectedServerIndex == serverIdx;
@@ -1847,7 +1847,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                                       if (hasQualities) ...[
                                         const SizedBox(height: 2),
                                         Text(
-                                          '${qualities.length} quality option(s)',
+                                          '${qualities.length} خيارات جودة',
                                           style: TextStyle(
                                             color: isServerSelected
                                                 ? Colors.white60
@@ -1882,14 +1882,14 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                             final q = raw is Map
                                 ? raw.map((k, v) => MapEntry(k.toString(), v))
                                 : <String, dynamic>{};
-                            final label = q['label']?.toString() ?? 'Auto';
+                            final label = q['label']?.toString() ?? 'تلقائي';
                             final height =
                                 int.tryParse(q['height']?.toString() ?? '') ??
                                 0;
                             final isQSelected =
                                 (_selectedQualityIndex ?? 0) == qIdx;
                             final subtitle =
-                                height > 0 ? '${height}p' : 'Adaptive bitrate';
+                                height > 0 ? '${height}p' : 'جودة تلقائية متكيفة';
 
                             return Padding(
                               padding: const EdgeInsets.only(left: 12, bottom: 4),
@@ -1979,7 +1979,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                 ),
               ),
               child: const Text(
-                'Start Download',
+                'بدء التنزيل',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
@@ -2022,7 +2022,7 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Auto',
+                    'تلقائي',
                     style: TextStyle(
                       color: isSelected ? Colors.white : Colors.white70,
                       fontSize: 15,
@@ -2032,8 +2032,8 @@ class _EpisodeQualitySheetState extends State<_EpisodeQualitySheet> {
                   const SizedBox(height: 2),
                   Text(
                     _availableStreams.isNotEmpty
-                        ? 'Best available from ${_availableStreams.length} server(s)'
-                        : 'Let the app choose the best server',
+                        ? 'أفضل خيار متاح من ${_availableStreams.length} خوادم'
+                        : 'دع التطبيق يختار أفضل خادم',
                     style: TextStyle(
                       color: isSelected ? Colors.white60 : Colors.grey,
                       fontSize: 12,
@@ -2157,7 +2157,7 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'Download Season',
+            'تنزيل الموسم',
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -2185,7 +2185,7 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  'Could not fetch servers. Auto will still work.',
+                  'تعذر جلب الخوادم. سيبقى الوضع التلقائي متاحًا.',
                   style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
@@ -2221,7 +2221,7 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Auto',
+                            'تلقائي',
                             style: TextStyle(
                               color: _selectedServerIndex == null
                                   ? Colors.white
@@ -2233,8 +2233,8 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
                           const SizedBox(height: 2),
                           Text(
                             _availableStreams.isNotEmpty
-                                ? 'App picks the first working server'
-                                : 'Let the app choose the best server',
+                                ? 'يختار التطبيق أول خادم يعمل'
+                                : 'دع التطبيق يختار أفضل خادم',
                             style: TextStyle(
                               color: _selectedServerIndex == null
                                   ? Colors.white60
@@ -2259,7 +2259,7 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
             if (_availableStreams.isNotEmpty) ...[
               const SizedBox(height: 12),
               const Text(
-                'Server',
+                'الخادم',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 12,
@@ -2274,7 +2274,7 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
                   itemBuilder: (context, index) {
                     final source =
                         _availableStreams[index]['source']?.toString() ??
-                        'Server';
+                        'الخادم';
                     final isSelected = _selectedServerIndex == index;
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 8),
@@ -2347,7 +2347,7 @@ class _SeasonQualitySheetState extends State<_SeasonQualitySheet> {
                 ),
               ),
               child: const Text(
-                'Start Season Download',
+                'بدء تنزيل الموسم',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
               ),
             ),
