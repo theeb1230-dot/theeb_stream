@@ -1,0 +1,42 @@
+name: Bootstrap Android Signing Key
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Theeb Stream Android release keystore
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p signing
+          password="$(openssl rand -hex 24)"
+          alias="theebstream"
+          keytool -genkeypair -v             -keystore signing/theeb-stream-release.jks             -storepass "$password"             -keypass "$password"             -alias "$alias"             -keyalg RSA             -keysize 4096             -validity 10000             -dname "CN=Theeb Stream, OU=Mobile, O=Theeb Stream, L=Riyadh, ST=Riyadh, C=SA"
+          keytool -list -v -keystore signing/theeb-stream-release.jks -storepass "$password" -alias "$alias"             | grep -E 'Alias name:|SHA256:'
+          base64 -w 0 signing/theeb-stream-release.jks > signing/KEYSTORE_BASE64.txt
+          printf '%s' "$password" > signing/KEYSTORE_PASSWORD.txt
+          printf '%s' "$alias" > signing/KEY_ALIAS.txt
+          printf '%s' "$password" > signing/KEY_PASSWORD.txt
+          cat > signing/README.txt <<'EOF'
+          Keep this archive private and permanent.
+          Add the four TXT values as GitHub Repository secrets with matching names:
+          KEYSTORE_BASE64
+          KEYSTORE_PASSWORD
+          KEY_ALIAS
+          KEY_PASSWORD
+          Never commit the JKS or TXT values to the repository.
+          EOF
+
+      - name: Upload private signing bootstrap bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: theeb-stream-android-signing-bootstrap
+          path: signing/
+          retention-days: 1
+          if-no-files-found: error
