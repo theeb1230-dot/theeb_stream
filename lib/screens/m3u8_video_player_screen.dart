@@ -923,10 +923,10 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       }
     } catch (e) {
       debugPrint('M3U8VideoPlayer: Error loading stream: $e');
-      _showStatus('Error: $e');
+      _showStatus('تعذر تحميل البث');
       if (mounted) {
         setState(() {
-          _error = 'Failed to load stream: $e';
+          _error = 'تعذر تحميل البث. حاول مجددًا أو اختر خادمًا آخر.';
         });
       }
     }
@@ -941,7 +941,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   }) async {
     final fallbackUrl = server['url']?.toString() ?? '';
     if (fallbackUrl.isEmpty || fallbackUrl == primaryUrl) return false;
-    final fallbackSource = server['source']?.toString() ?? 'Server';
+    final fallbackSource = server['source']?.toString() ?? 'خادم';
     final fallbackQualities = _parseQualities(server['qualities']);
     _subtitleTracks = _unionSubtitleTracks();
     _selectedSubtitle.value = 'إيقاف';
@@ -3354,7 +3354,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             if (_error != null && _error!.isNotEmpty)
               GestureDetector(
                 onTap: () {
-                  Clipboard.setData(ClipboardData(text: 'Error: $_error\nStatus: $_statusMessage'));
+                  Clipboard.setData(ClipboardData(text: 'الخطأ: $_error\nالحالة: $_statusMessage'));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('تم نسخ تفاصيل الخطأ'), duration: Duration(seconds: 1)),
                   );
@@ -3368,7 +3368,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     border: Border.all(color: Colors.white24),
                   ),
                   child: Text(
-                    '$_error\nStatus: $_statusMessage',
+                    '$_error\nالحالة: $_statusMessage',
                     style: TextStyle(color: Colors.grey[400], fontSize: 11, fontFamily: 'monospace'),
                     textAlign: TextAlign.left,
                   ),
