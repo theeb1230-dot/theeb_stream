@@ -1,7 +1,7 @@
 name: theeb_stream
 description: ذيب ستريم - تطبيق Flutter وAndroid TV للمشاهدة والاستكشاف
 publish_to: 'none'
-version: 1.6.3+11
+version: 1.6.4+12
 
 environment:
   sdk: '>=3.8.0 <4.0.0'
@@ -30,7 +30,6 @@ dependencies:
   shimmer: ^3.0.0
   shared_preferences: ^2.2.2
   dio: ^5.4.0
-  encrypt: ^5.0.3
   lottie: ^3.1.0
   path_provider: ^2.1.1
   flutter_local_notifications: ^19.4.2
@@ -42,8 +41,6 @@ dependencies:
   permission_handler: ^12.0.1
   image_picker: ^1.0.8
   image: ^4.1.0
-  local_auth: ^2.3.0
-  flutter_secure_storage: ^9.0.0
   google_fonts: ^6.1.0
   wakelock_plus: ^1.2.1
   web: ^1.1.1
