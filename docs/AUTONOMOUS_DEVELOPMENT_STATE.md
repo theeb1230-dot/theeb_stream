@@ -6,20 +6,23 @@
 ## الحالة الفعلية
 
 - الفرع المرجعي: `main`
-- آخر دفعة release-worthy: PR #38 `Cleanup 1.6.4: remove obsolete auth runtime dependencies`
+- آخر main/release commit: `342c09e66973e51a5bd2f2143ffc90969ea4377f`
+- آخر PR منجز: `#38 Cleanup 1.6.4: remove obsolete auth runtime dependencies`
+- الإصدار المنشور الحالي: `v1.6.4`
+- رابط الإصدار: https://github.com/theeb1230-dot/theeb_stream/releases/tag/v1.6.4
 - نسخة المشروع الموحدة: `1.6.4+12`
 - Android TV: `versionName 1.6.4` و`versionCode 12`
-- iOS المستهدف: `UNSIGNED/no-codesign` ويحتاج توقيعًا وprovisioning صالحين خارجيًا قبل التثبيت.
-- Release المستهدف لهذه الجولة: `v1.6.4`.
+- iOS IPA الحالية `UNSIGNED/no-codesign` وليست قابلة للتثبيت المباشر دون توقيع وprovisioning صالحين خارجيًا.
 
 ## ما فُحص في هذه الجولة
 
-- main وجميع الفروع والـPRs وأحدث commits.
-- GitHub Actions والـruns والـlogs.
-- أهداف handoff السابقة.
-- مسارات Search / Details / Playback fallback الحالية.
-- بقايا auth/login runtime dependencies بعد إزالة تسجيل الدخول.
+- main وجميع branches والـPRs وأحدث commits.
+- GitHub Actions والـruns وحالة required checks.
+- handoff السابق وأهداف التشغيل التالي.
+- Search / Details / Playback fallback الحالية بحثًا عن regressions ظاهرة.
+- بقايا auth/login runtime dependencies.
 - `pubspec.yaml` وAndroid TV version parity.
+- حالة GitHub Releases والأصول المنشورة.
 
 ## المشكلة المكتشفة والإصلاح
 
@@ -38,19 +41,37 @@
 ## CI / Build Evidence
 
 PR #38:
-- Theeb Stream branch CI: success.
+- CI run: `34158896476` — success.
+- Build run: `34158896463` — success.
 - release-facing identity/login audit: success.
 - flutter analyze: success.
 - flutter tests: success.
 - Android Mobile APK build: success.
 - Android TV APK build: success.
 - iOS unsigned/no-codesign IPA build: success.
-- GitHub build run: `34158896463`.
-- CI run: `34158896476`.
+
+دورة الإصدار على main:
+- Release build run: `34159610978` — success.
+- Commit/tag source: `342c09e66973e51a5bd2f2143ffc90969ea4377f` / `v1.6.4`.
+- Version parity validation: success.
+- Required release assets verification: success.
+- GitHub Release publish: success.
+- Published release asset verification: success.
 
 ملاحظة توقيع:
 - خطوات Android keystore/signing كانت skipped لأن Secrets التوقيع غير متوفرة في هذه الجولة؛ لذلك لا يُدّعى أن Android artifacts موقعة بتوقيع release مُثبت.
 - iOS IPA غير موقعة صراحة.
+
+## GitHub Release v1.6.4
+
+الرابط: https://github.com/theeb1230-dot/theeb_stream/releases/tag/v1.6.4
+
+الأصول:
+- `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
+- `Theeb-Stream-Android-TV.apk`
+- `Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa`
+- `SHA256SUMS.txt`
+- `BUILD_PROVENANCE.txt`
 
 ## Release Readiness
 
@@ -59,19 +80,21 @@ PR #38:
 المثبت:
 - analyze/tests خضراء.
 - Mobile/TV/iOS no-codesign builds ناجحة.
-- version parity بين Flutter وTV.
+- version/build parity موحدة.
+- triplet منشور من نفس release commit/tag.
+- checksums + provenance منشورة ومتحقق من ظهورها.
 
-غير مثبت لـ Golden:
-- Android release signature موثق.
+غير مثبت بما يكفي لـ Golden:
+- Android release signature موثق عبر apksigner أو ما يعادله.
 - iOS signed/provisioned installable IPA.
-- device E2E شامل على الهاتف وTV وiPhone.
-- soak/stress/recovery واسع لمسارات البحث والمشاهدة.
+- device E2E شامل على Android Mobile وAndroid TV وiPhone.
+- soak/stress/recovery أوسع لمسارات البحث والمشاهدة.
 
 ## أهداف التشغيل التالي
 
-1. فحص runtime حقيقي لمسار Search → Details → Playback fallback بعد إصدارات 1.6.2–1.6.4 وإضافة regression tests عند أي فجوة مثبتة.
-2. فحص Android TV D-Pad/focus والعودة من Details/Player وحالات lifecycle.
-3. مراجعة بقية dependencies المباشرة غير المستخدمة بحذر، خصوصًا plugins الأصلية، دون حذف أي اعتماد مستخدم فعليًا.
-4. تحسين تعريب رسائل التنزيل المتبقية وحالات الخطأ الثانوية.
+1. فحص runtime لمسار Search → Details → Playback fallback وإضافة regression tests عند أي فجوة مثبتة، خصوصًا cancellation/timeouts وإعادة المحاولة.
+2. فحص Android TV D-Pad/focus والعودة من Details/Player وحالات lifecycle/reconnect.
+3. مراجعة بقية dependencies المباشرة غير المستخدمة بحذر، خصوصًا plugins الأصلية، دون حذف اعتماد مستخدم فعليًا.
+4. تحسين تعريب رسائل التنزيل وحالات الخطأ الثانوية المتبقية.
 5. التحقق من Android signing عندما تتوفر Secrets وعدم وصف APK بأنه signed دون apksigner evidence.
-6. الاستمرار في triplet + GitHub Release لكل دفعة release-worthy.
+6. الحفاظ على triplet + GitHub Release لكل دفعة release-worthy لاحقة.
