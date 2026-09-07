@@ -493,9 +493,9 @@ class StreamExtractor(private val context: Context) {
             when (result) {
                 is ExtractionResult.Final -> {
                     val stream = result.stream.copy(server = initialServer.name)
-                    if (stream.source == "VidLink" || stream.source == "2Embed") {
-                        return stream
-                    }
+                    // A resolver response is not proof that playback works.
+                    // Validate every final URL before selecting it, including
+                    // VidLink and 2Embed, so dead/expired links cannot win.
                     return try {
                         validateStream(stream)
                     } catch (error: Throwable) {
