@@ -98,3 +98,16 @@ PR #38:
 4. تحسين تعريب رسائل التنزيل وحالات الخطأ الثانوية المتبقية.
 5. التحقق من Android signing عندما تتوفر Secrets وعدم وصف APK بأنه signed دون apksigner evidence.
 6. الحفاظ على triplet + GitHub Release لكل دفعة release-worthy لاحقة.
+
+
+## تحديث الجولة الحالية
+- فرع العمل: localization/arabic-native-cleanup-1.6.5
+- تم تعريب بقايا شاشة التنزيل ونص التحميل الافتراضي، وضبط iOS developmentRegion إلى ar مع إضافة ar إلى knownRegions.
+- الفرع أمام main باثنين commits وخلفه بصفر.
+- فتح PR محجوب حاليًا، لذلك لم يبدأ PR CI ولم يحصل merge أو Release جديد.
+
+## أهداف التشغيل التالي
+1. فتح PR واحد للفرع الحالي.
+2. تشغيل CI وفحص analyze/tests وMobile/TV/iOS.
+3. توحيد version إلى 1.6.5+13 قبل الدمج.
+4. بعد الدمج إنتاج triplet ونشر v1.6.5 فقط إذا نجحت الحزم الثلاث.
