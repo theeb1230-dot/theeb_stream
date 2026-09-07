@@ -237,6 +237,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate release version parity
+        shell: bash
+        run: |
+          set -euo pipefail
+          app_full="$(awk '/^version:/{print $2}' pubspec.yaml)"
+          app_version="${app_full%%+*}"
+          app_build="${app_full##*+}"
+          tv_version="$(sed -n 's/.*versionName = "\([^"]*\)".*/\1/p' android/tvapp/build.gradle.kts | head -n1)"
+          tv_build="$(sed -n 's/.*versionCode = \([0-9][0-9]*\).*/\1/p' android/tvapp/build.gradle.kts | head -n1)"
+          test "$app_version" = "$tv_version"
+          test "$app_build" = "$tv_build"
+          echo "Version parity verified: $app_version+$app_build"
+
       - name: Download final build artifacts
         uses: actions/download-artifact@v4
         with:
@@ -266,6 +279,16 @@ jobs:
             cd release-files
             sha256sum               Theeb-Stream-Android-Mobile-arm64-v8a.apk               Theeb-Stream-Android-TV.apk               Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa               > SHA256SUMS.txt
           )
+          cat > release-files/BUILD_PROVENANCE.txt <<EOF
+          repository=theeb1230-dot/theeb_stream
+          commit=$GITHUB_SHA
+          tag=$tag
+          version=$version
+          android_mobile=Theeb-Stream-Android-Mobile-arm64-v8a.apk
+          android_tv=Theeb-Stream-Android-TV.apk
+          ios=Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa
+          ios_signing=UNSIGNED/no-codesign
+          EOF
           cat > release-notes.md <<EOF
           # Theeb Stream $tag
 
@@ -297,7 +320,7 @@ jobs:
             echo "::error::Release $tag already exists; refusing to overwrite a published release."
             exit 1
           fi
-          gh release create "$tag"             --target "$GITHUB_SHA"             --title "Theeb Stream $tag"             --notes-file release-notes.md             release-files/Theeb-Stream-Android-Mobile-arm64-v8a.apk             release-files/Theeb-Stream-Android-TV.apk             release-files/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa             release-files/SHA256SUMS.txt
+          gh release create "$tag"             --target "$GITHUB_SHA"             --title "Theeb Stream $tag"             --notes-file release-notes.md             release-files/Theeb-Stream-Android-Mobile-arm64-v8a.apk             release-files/Theeb-Stream-Android-TV.apk             release-files/Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa             release-files/SHA256SUMS.txt             release-files/BUILD_PROVENANCE.txt
 
       - name: Verify published release assets
         env:
@@ -311,3 +334,5 @@ jobs:
           grep -Fx 'Theeb-Stream-Android-Mobile-arm64-v8a.apk' <<<"$names"
           grep -Fx 'Theeb-Stream-Android-TV.apk' <<<"$names"
           grep -Fx 'Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa' <<<"$names"
+          grep -Fx 'SHA256SUMS.txt' <<<"$names"
+          grep -Fx 'BUILD_PROVENANCE.txt' <<<"$names"
