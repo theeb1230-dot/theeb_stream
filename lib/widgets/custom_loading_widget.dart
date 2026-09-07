@@ -281,7 +281,7 @@ class MovieLoadingWidget extends StatelessWidget {
       child: CustomLoadingWidget(
         size: 60,
         color: const Color(0xFFE50914),
-        text: text ?? 'Loading...',
+        text: text ?? 'جارٍ التحميل...',
         style: LoadingStyle.circular,
       ),
     );
