@@ -563,9 +563,10 @@ class StreamExtractor(private val context: Context) {
             when (result) {
                 is ExtractionResult.Final -> {
                     val stream = result.stream.copy(server = initialServer.name)
-                    if (stream.source == "VidLink" || stream.source == "2Embed") {
-                        return stream
-                    }
+                    // Never trust extraction success alone. A provider homepage or
+                    // resolver can be reachable while returning an expired/dead
+                    // media URL. Validate every final stream, including VidLink
+                    // and 2Embed, before it can win the race and reach ExoPlayer.
                     return try {
                         validateStream(stream)
                     } catch (error: Throwable) {
