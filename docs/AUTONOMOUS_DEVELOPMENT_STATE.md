@@ -6,57 +6,79 @@
 ## الحالة الفعلية
 
 - الفرع المرجعي: `main`
-- آخر main قبل هذه الجولة: `3a35c5cae83a513386e533f37e119728eaf948ed`
-- الإصدار المنشور الحالي قبل هذه الجولة: `v1.6.2`
-- `v1.6.2` يشير إلى نفس commit أعلاه ويحتوي Android Mobile APK وAndroid TV APK وiOS unsigned IPA.
-- iOS IPA الحالية غير موقعة/no-codesign ولا تُعد قابلة للتثبيت المباشر دون توقيع وprovisioning صالحين خارجيًا.
-- لم يكن ملف handoff موجودًا على `main` عند بداية الجولة، ولذلك أُعيد إنشاؤه هنا.
+- آخر main: `2a6337c88b5b07ad4b47682fae388df7df2aabc5`
+- آخر PR منجز: `#37 [release] Theeb Stream 1.6.3 parity and provenance`
+- الإصدار المنشور الحالي: `v1.6.3`
+- `v1.6.3` يشير إلى نفس commit `2a6337c...`.
+- نسخة المشروع الموحدة: `1.6.3+11`.
+- Android TV: `versionName 1.6.3` و`versionCode 11`.
+- iOS IPA الحالية `UNSIGNED/no-codesign` وليست قابلة للتثبيت المباشر دون توقيع وprovisioning صالحين خارجيًا.
 
-## ما اكتُشف في الجولة الحالية
+## ما اكتُشف وأُصلح في هذه الجولة
 
-1. `pubspec.yaml` كان عند `1.6.2+10` بينما Android TV بقي عند `1.6.0` و`versionCode 8`، وهو خرق لـ version/build parity.
-2. `README.md` كان ما يزال يوثق `1.6.0+8`.
-3. يوجد مساران أوتوماتيكيان للإصدار:
-   - `.github/workflows/release.yml` ينشر عند تغيير `pubspec.yaml`.
-   - `.github/workflows/build.yml` ينشر عند commit على main يحتوي `[release]`.
-   هذا يسمح بسباق على نفس tag وإصدار ناقص أو فشل أحد الناشرين.
-4. Release `v1.6.2` يحتوي الحزم الثلاث لكنه لا يحتوي `SHA256SUMS.txt` أو ملف provenance مستقل.
+1. كان `pubspec.yaml` عند `1.6.2+10` بينما Android TV بقي عند `1.6.0 / 8`. تم توحيد version/build parity على `1.6.3+11`.
+2. كان README يوثق إصدارًا قديمًا، وتمت مزامنته.
+3. كان هناك ناشران آليان يمكن أن يتسابقا على نفس tag:
+   - `.github/workflows/release.yml`
+   - `.github/workflows/build.yml`
+   تم جعل `release.yml` manual-dispatch فقط، واعتماد `build.yml` كالمسار الآلي الصارم للـrelease.
+4. أضيف فحص version parity قبل النشر.
+5. أضيف `BUILD_PROVENANCE.txt` مع `SHA256SUMS.txt` إلى Release والتحقق من ظهورهما.
+6. أُعيد إنشاء ملف handoff على `main` بعد أن كان مفقودًا.
 
-## التغييرات قيد التنفيذ
+## CI / Build Evidence
 
-الفرع: `release/1.6.3-parity-and-provenance`
+PR #37:
+- Theeb Stream branch CI: success.
+- Android Mobile build: success.
+- Android TV build: success.
+- iOS unsigned/no-codesign build: success.
+- Release publish job داخل PR: skipped كما هو متوقع لأنه ينشر فقط بعد push إلى main.
 
-- رفع النسخة الموحدة إلى `1.6.3+11`.
-- ضبط Android TV على `versionName 1.6.3` و`versionCode 11`.
-- تحديث README إلى `1.6.3+11`.
-- تحويل `release.yml` إلى manual dispatch فقط لمنع ازدواج النشر الآلي.
-- تشديد `build.yml` لفحص version parity قبل النشر.
-- إضافة `BUILD_PROVENANCE.txt` إلى GitHub Release والتحقق منه مع `SHA256SUMS.txt`.
+دورة main النهائية:
+- Workflow run: `34157869465`
+- Commit: `2a6337c88b5b07ad4b47682fae388df7df2aabc5`
+- Android Mobile: success.
+- Android TV: success.
+- iOS unsigned IPA: success.
+- Publish GitHub Release: success.
+
+## GitHub Release v1.6.3
+
+الرابط: https://github.com/theeb1230-dot/theeb_stream/releases/tag/v1.6.3
+
+الأصول:
+- `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
+  - SHA-256: `fe5840c5dd8e91802b4528075ad5b3fd6d88ffd9e56d627895ef56ed96085932`
+- `Theeb-Stream-Android-TV.apk`
+  - SHA-256: `ecf1057a76728604bcb86dcfac2fb69b26d719949846dc61b8b754b3a5b41379`
+- `Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa`
+  - SHA-256: `2083c2d21cd16193ea5cb3829b43b387b024a9bf582713bd2a92542d96c73847`
+- `SHA256SUMS.txt`
+- `BUILD_PROVENANCE.txt`
 
 ## Release Readiness
 
 الحالة: **Developer/Experimental متقدم، وليست Golden مثبتة بالكامل**.
 
-المثبت بالأدلة حتى بداية هذه الجولة:
-- `v1.6.2` منشور من commit `3a35c5c...`.
-- Android Mobile/TV/iOS builds نجحت في GitHub Actions لذلك commit.
-- iOS artifact unsigned/no-codesign.
+المثبت:
+- analyze/tests على PR أخضر.
+- الحزم الثلاث من نفس commit/version.
+- tag `v1.6.3` يطابق نفس commit.
+- Android Mobile وTV وiOS no-codesign builds ناجحة.
+- checksums + provenance منشورة.
 
-غير مثبت بما يكفي لوصف Golden:
-- توقيع/تثبيت iOS فعلي.
-- device E2E شامل على الأجهزة المستهدفة.
-- تحقق نهائي من الإصدار الجديد 1.6.3 بعد الدمج والنشر.
+غير مثبت بما يكفي لـ Golden:
+- iOS signed/provisioned installable IPA.
+- device E2E شامل على Android Mobile وAndroid TV وiPhone.
+- تثبيت وتشغيل فعلي موثق للحزم النهائية على الأجهزة المستهدفة.
+- soak/stress/recovery أوسع لمسارات البحث والمشاهدة.
 
 ## أهداف التشغيل التالي
 
-1. إكمال CI على PR الخاص بـ 1.6.3 وإصلاح أي failure على نفس الفرع.
-2. دمج PR فقط بعد نجاح branch CI والبناء الثلاثي.
-3. بعد الدمج التحقق من تشغيل دورة triplet على نفس commit الجديد.
-4. التحقق من نشر `v1.6.3` مع:
-   - Android Mobile APK
-   - Android TV APK
-   - iOS UNSIGNED/no-codesign IPA
-   - `SHA256SUMS.txt`
-   - `BUILD_PROVENANCE.txt`
-5. التحقق أن tag يشير إلى نفس commit وأن version/build parity صحيحة.
-6. بعد نجاح الإصدار، فحص أعلى فجوة runtime حقيقية في البحث/المشاهدة/TV focus بدل تغييرات تجميلية.
+1. فحص runtime للبحث والمشاهدة بعد hotfix 1.6.2/1.6.3 بحثًا عن regressions حقيقية بدل تغييرات تجميلية.
+2. فحص Android TV focus/D-Pad والـplayer lifecycle مع العودة من التفاصيل والمشغل.
+3. مراجعة TODO/FIXME/dead code والاعتماديات غير المستخدمة بعد إزالة login/auth remnants.
+4. إضافة اختبارات regression لمسار Search → Details → Playback fallback حيث توجد فجوات مثبتة.
+5. فحص التوقيع الفعلي لـAndroid artifacts إن توفرت secrets في run، وعدم ادعاء signed بدون دليل.
+6. الحفاظ على دورة triplet + Release لكل دفعة release-worthy لاحقة، مع version/tag جديدين.
