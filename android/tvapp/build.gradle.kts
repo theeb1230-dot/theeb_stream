@@ -13,6 +13,16 @@ if (keystoreFile.exists()) {
     keystoreProps.load(FileInputStream(keystoreFile))
 }
 
+val pubspecVersion = rootProject.file("../pubspec.yaml")
+    .readLines()
+    .first { it.trimStart().startsWith("version:") }
+    .substringAfter("version:")
+    .trim()
+val versionParts = pubspecVersion.split("+", limit = 2)
+val theebVersionName = versionParts[0]
+val theebVersionCode = versionParts.getOrNull(1)?.toIntOrNull()
+    ?: error("pubspec.yaml version must include a numeric build number, for example 1.6.2+10")
+
 @Suppress("Deprecation")
 android {
     namespace = "com.maxstream.app"
@@ -22,8 +32,8 @@ android {
         applicationId = "com.theebstream.tv"
         minSdk = 23
         targetSdk = 34
-        versionCode = 8
-        versionName = "1.6.0"
+        versionCode = theebVersionCode
+        versionName = theebVersionName
         vectorDrawables.useSupportLibrary = true
     }
 
