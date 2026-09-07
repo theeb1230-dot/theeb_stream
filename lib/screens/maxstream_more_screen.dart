@@ -67,8 +67,14 @@ class MaxStreamMoreScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: Color(0xFFE50914),
-            child: Icon(Icons.play_arrow_rounded, color: Colors.white, size: 34),
+            backgroundColor: Color(0xFF0F172A),
+            child: Padding(
+              padding: EdgeInsets.all(6),
+              child: Image(
+                image: AssetImage('assets/images/theeb_stream_logo.png'),
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
           SizedBox(width: 14),
           Expanded(
