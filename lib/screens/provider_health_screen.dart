@@ -192,7 +192,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
             final provider = _serverResults[i];
             final attempts = streams.where((stream) {
               final server = stream['server']?.toString() ?? '';
-              return _matchesName(provider.name, server);
+              final source = stream['source']?.toString() ?? '';
+              return _matchesName(provider.name, server) ||
+                  _matchesName(provider.name, source);
             }).toList();
             if (attempts.isEmpty) continue;
             final success = attempts.any((stream) =>
