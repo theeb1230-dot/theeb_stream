@@ -101,21 +101,26 @@ class _MaxStreamRecommendationsScreenState
       }
     }
     try {
+      final history = await WatchHistoryService.getWatchHistory()
+          .catchError((_) => <Map<String, dynamic>>[]);
       final topGenres = await RecommendationService.getTopGenres(limit: 4)
           .catchError((_) => <int>[]);
-      _hasHistory = topGenres.isNotEmpty;
+      _hasHistory = history.isNotEmpty;
 
       final results = await Future.wait([
+        // Always load "For You". RecommendationService intentionally falls
+        // back to global trending when there is no watch history, so a fresh
+        // install must never show an empty recommendations screen.
         _safeRec(() => RecommendationService.getForYou()),
         _safeRec(() => RecommendationService.getBecauseYouWatched()),
-        if (_hasHistory)
+        if (topGenres.isNotEmpty)
           ...topGenres.map((g) => _safeRec(() => RecommendationService.getByGenre(g))),
       ]);
 
       _forYou = results[0];
       _becauseYouWatched = results[1];
 
-      if (_hasHistory) {
+      if (topGenres.isNotEmpty) {
         Map<int, String> allGenres = {};
         try {
           final genreNames = await TmdbApiService.fetchGenres('movie');
@@ -125,11 +130,14 @@ class _MaxStreamRecommendationsScreenState
         _byGenre = {};
         _genreIdByName = {};
         for (int i = 0; i < topGenres.length; i++) {
-          final name = allGenres[topGenres[i]] ?? 'Genre ${topGenres[i]}';
+          final name = allGenres[topGenres[i]] ?? 'تصنيف ${topGenres[i]}';
           _byGenre[name] = (2 + i < results.length) ? results[2 + i] : [];
           _genreIdByName[topGenres[i]] = name;
           _genrePage[name] = 1;
         }
+      } else {
+        _byGenre = {};
+        _genreIdByName = {};
       }
     } catch (e) {
       debugPrint('Error loading recommendations: $e');
@@ -216,35 +224,36 @@ class _MaxStreamRecommendationsScreenState
               child: CustomScrollView(
                 slivers: [
                   _buildAppBar(),
-                  if (!_hasHistory) ...[
+                  if (_becauseYouWatched.isNotEmpty)
+                    _buildSection(
+                      'لأنك شاهدت',
+                      _becauseYouWatched.first['recommendedFrom'] ?? '',
+                      _becauseYouWatched,
+                    ),
+                  if (_forYou.isNotEmpty)
+                    _buildSection(
+                      _hasHistory ? 'مختارة لك' : 'مقترحات رائجة',
+                      _hasHistory
+                          ? 'بناءً على مشاهداتك'
+                          : 'ابدأ من هنا، وستتحسن الاقتراحات مع المشاهدة',
+                      _forYou,
+                      onLoadMore: _loadMoreForYou,
+                      loadingMore: _loadingMoreForYou,
+                    ),
+                  for (final entry in _byGenre.entries)
+                    if (entry.value.isNotEmpty)
+                      _buildSection(
+                        'الأفضل في ${entry.key}',
+                        entry.key,
+                        entry.value,
+                        onLoadMore: () => _loadMoreGenre(entry.key),
+                        loadingMore: _loadingMoreGenre[entry.key] == true,
+                      ),
+                  if (_forYou.isEmpty &&
+                      _becauseYouWatched.isEmpty &&
+                      _byGenre.values.every((items) => items.isEmpty))
                     const SliverToBoxAdapter(child: _EmptyState()),
-                  ] else ...[
-                    if (_becauseYouWatched.isNotEmpty)
-                      _buildSection(
-                        'Because You Watched',
-                        _becauseYouWatched.first['recommendedFrom'] ?? '',
-                        _becauseYouWatched,
-                      ),
-                    if (_forYou.isNotEmpty)
-                      _buildSection(
-                        'For You',
-                        'Picked for you',
-                        _forYou,
-                        onLoadMore: _loadMoreForYou,
-                        loadingMore: _loadingMoreForYou,
-                      ),
-                    for (final entry in _byGenre.entries)
-                      if (entry.value.isNotEmpty)
-                        _buildSection(
-                          'Top in ${entry.key}',
-                          entry.key,
-                          entry.value,
-                          onLoadMore: () => _loadMoreGenre(entry.key),
-                          loadingMore:
-                              _loadingMoreGenre[entry.key] == true,
-                        ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                  ],
+                  const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 ],
               ),
             ),
@@ -382,7 +391,7 @@ class _MaxStreamRecommendationsScreenState
                         color: Colors.grey[500], size: 28),
                     const SizedBox(height: 8),
                     Text(
-                      'More',
+                      'المزيد',
                       style: TextStyle(
                         color: Colors.grey[500],
                         fontSize: 12,
