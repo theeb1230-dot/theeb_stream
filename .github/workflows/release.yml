@@ -1,4 +1,4 @@
-name: Publish Theeb Stream Release
+name: Manual Legacy Release (dispatch only)
 
 on:
   workflow_dispatch:
@@ -7,13 +7,6 @@ on:
         description: "Release version without v prefix (leave empty to use pubspec.yaml)"
         required: false
         type: string
-  push:
-    branches:
-      - main
-    paths:
-      - "pubspec.yaml"
-      - ".github/workflows/release.yml"
-
 permissions:
   contents: write
 
