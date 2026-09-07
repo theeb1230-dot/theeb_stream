@@ -87,7 +87,7 @@ class RecommendationService {
   static Future<List<Map<String, dynamic>>> getForYou({int page = 1}) async {
     final topGenres = await getTopGenres(limit: 3);
     if (topGenres.isEmpty) {
-      return _fetchAndCache('forYou_global', () async {
+      return _fetchAndCache('forYou_global_page_$page', () async {
         final movies = await TmdbApiService.fetchTrendingMovies(page: page);
         final series = await TmdbApiService.fetchTrendingSeries(page: page);
         return _mergeAndShuffle(movies, series, 'movie', 'tv');
@@ -95,7 +95,7 @@ class RecommendationService {
     }
 
     final genreParam = topGenres.join(',');
-    return _fetchAndCache('forYou_$genreParam', () async {
+    return _fetchAndCache('forYou_${genreParam}_page_$page', () async {
       final movies = await TmdbApiService.getMoviesByGenre(
         topGenres.first,
         page: page,
