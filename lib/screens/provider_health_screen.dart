@@ -101,18 +101,11 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     ProviderStatus(name: 'Vtube', domain: 'vtbe.to', type: 'extractor-native'),
     ProviderStatus(name: 'Okru', domain: 'ok.ru', type: 'extractor-native'),
     ProviderStatus(name: 'Dailymotion', domain: 'dailymotion.com', type: 'extractor-native'),
-    ProviderStatus(name: 'Worker', domain: 'maxstream123.workers.dev', type: 'extractor-api'),
-    ProviderStatus(name: 'GenericMedia', domain: '-', type: 'extractor-native'),
-    // Inactive / defined but not registered
     ProviderStatus(name: 'Moflix', domain: 'moflix-stream.xyz', type: 'extractor-native'),
-    ProviderStatus(name: 'Vidflix', domain: '-', type: 'extractor-native'),
     ProviderStatus(name: 'Community', domain: 'streamingunity.dog', type: 'extractor-native'),
-    ProviderStatus(name: 'Vixcloud', domain: '-', type: 'extractor-native'),
-    ProviderStatus(name: 'VidsrcTo', domain: 'vidsrc.to', type: 'extractor-native'),
     ProviderStatus(name: 'Frembed', domain: 'frembed.click', type: 'extractor-native'),
     ProviderStatus(name: 'Vidrock', domain: 'vidrock.net', type: 'extractor-native'),
-    ProviderStatus(name: 'Vidzee', domain: 'vidzee.space', type: 'extractor-native'),
-    ProviderStatus(name: 'MaxstreamVideo', domain: '-', type: 'extractor-api'),
+    ProviderStatus(name: 'GenericMedia', domain: '-', type: 'extractor-native'),
   ];
 
   List<ProviderStatus> _serverResults = [];
