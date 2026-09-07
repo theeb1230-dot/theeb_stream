@@ -6,79 +6,72 @@
 ## الحالة الفعلية
 
 - الفرع المرجعي: `main`
-- آخر main: `2a6337c88b5b07ad4b47682fae388df7df2aabc5`
-- آخر PR منجز: `#37 [release] Theeb Stream 1.6.3 parity and provenance`
-- الإصدار المنشور الحالي: `v1.6.3`
-- `v1.6.3` يشير إلى نفس commit `2a6337c...`.
-- نسخة المشروع الموحدة: `1.6.3+11`.
-- Android TV: `versionName 1.6.3` و`versionCode 11`.
-- iOS IPA الحالية `UNSIGNED/no-codesign` وليست قابلة للتثبيت المباشر دون توقيع وprovisioning صالحين خارجيًا.
+- آخر دفعة release-worthy: PR #38 `Cleanup 1.6.4: remove obsolete auth runtime dependencies`
+- نسخة المشروع الموحدة: `1.6.4+12`
+- Android TV: `versionName 1.6.4` و`versionCode 12`
+- iOS المستهدف: `UNSIGNED/no-codesign` ويحتاج توقيعًا وprovisioning صالحين خارجيًا قبل التثبيت.
+- Release المستهدف لهذه الجولة: `v1.6.4`.
 
-## ما اكتُشف وأُصلح في هذه الجولة
+## ما فُحص في هذه الجولة
 
-1. كان `pubspec.yaml` عند `1.6.2+10` بينما Android TV بقي عند `1.6.0 / 8`. تم توحيد version/build parity على `1.6.3+11`.
-2. كان README يوثق إصدارًا قديمًا، وتمت مزامنته.
-3. كان هناك ناشران آليان يمكن أن يتسابقا على نفس tag:
-   - `.github/workflows/release.yml`
-   - `.github/workflows/build.yml`
-   تم جعل `release.yml` manual-dispatch فقط، واعتماد `build.yml` كالمسار الآلي الصارم للـrelease.
-4. أضيف فحص version parity قبل النشر.
-5. أضيف `BUILD_PROVENANCE.txt` مع `SHA256SUMS.txt` إلى Release والتحقق من ظهورهما.
-6. أُعيد إنشاء ملف handoff على `main` بعد أن كان مفقودًا.
+- main وجميع الفروع والـPRs وأحدث commits.
+- GitHub Actions والـruns والـlogs.
+- أهداف handoff السابقة.
+- مسارات Search / Details / Playback fallback الحالية.
+- بقايا auth/login runtime dependencies بعد إزالة تسجيل الدخول.
+- `pubspec.yaml` وAndroid TV version parity.
+
+## المشكلة المكتشفة والإصلاح
+
+كانت هناك بقايا مصادقة ميتة بعد إلغاء تسجيل الدخول:
+- `lib/services/biometric_service.dart` ما زال موجودًا ويستورد `local_auth`.
+- `local_auth` و`flutter_secure_storage` و`encrypt` بقيت dependencies مباشرة بلا استخدام فعلي في الكود الحالي.
+
+تم في PR #38:
+- حذف `lib/services/biometric_service.dart`.
+- إزالة `local_auth`.
+- إزالة `flutter_secure_storage`.
+- إزالة `encrypt`.
+- رفع Flutter version إلى `1.6.4+12`.
+- توحيد Android TV إلى `1.6.4 / 12`.
 
 ## CI / Build Evidence
 
-PR #37:
+PR #38:
 - Theeb Stream branch CI: success.
-- Android Mobile build: success.
-- Android TV build: success.
-- iOS unsigned/no-codesign build: success.
-- Release publish job داخل PR: skipped كما هو متوقع لأنه ينشر فقط بعد push إلى main.
+- release-facing identity/login audit: success.
+- flutter analyze: success.
+- flutter tests: success.
+- Android Mobile APK build: success.
+- Android TV APK build: success.
+- iOS unsigned/no-codesign IPA build: success.
+- GitHub build run: `34158896463`.
+- CI run: `34158896476`.
 
-دورة main النهائية:
-- Workflow run: `34157869465`
-- Commit: `2a6337c88b5b07ad4b47682fae388df7df2aabc5`
-- Android Mobile: success.
-- Android TV: success.
-- iOS unsigned IPA: success.
-- Publish GitHub Release: success.
-
-## GitHub Release v1.6.3
-
-الرابط: https://github.com/theeb1230-dot/theeb_stream/releases/tag/v1.6.3
-
-الأصول:
-- `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
-  - SHA-256: `fe5840c5dd8e91802b4528075ad5b3fd6d88ffd9e56d627895ef56ed96085932`
-- `Theeb-Stream-Android-TV.apk`
-  - SHA-256: `ecf1057a76728604bcb86dcfac2fb69b26d719949846dc61b8b754b3a5b41379`
-- `Theeb-Stream-iOS-UNSIGNED-no-codesign.ipa`
-  - SHA-256: `2083c2d21cd16193ea5cb3829b43b387b024a9bf582713bd2a92542d96c73847`
-- `SHA256SUMS.txt`
-- `BUILD_PROVENANCE.txt`
+ملاحظة توقيع:
+- خطوات Android keystore/signing كانت skipped لأن Secrets التوقيع غير متوفرة في هذه الجولة؛ لذلك لا يُدّعى أن Android artifacts موقعة بتوقيع release مُثبت.
+- iOS IPA غير موقعة صراحة.
 
 ## Release Readiness
 
 الحالة: **Developer/Experimental متقدم، وليست Golden مثبتة بالكامل**.
 
 المثبت:
-- analyze/tests على PR أخضر.
-- الحزم الثلاث من نفس commit/version.
-- tag `v1.6.3` يطابق نفس commit.
-- Android Mobile وTV وiOS no-codesign builds ناجحة.
-- checksums + provenance منشورة.
+- analyze/tests خضراء.
+- Mobile/TV/iOS no-codesign builds ناجحة.
+- version parity بين Flutter وTV.
 
-غير مثبت بما يكفي لـ Golden:
+غير مثبت لـ Golden:
+- Android release signature موثق.
 - iOS signed/provisioned installable IPA.
-- device E2E شامل على Android Mobile وAndroid TV وiPhone.
-- تثبيت وتشغيل فعلي موثق للحزم النهائية على الأجهزة المستهدفة.
-- soak/stress/recovery أوسع لمسارات البحث والمشاهدة.
+- device E2E شامل على الهاتف وTV وiPhone.
+- soak/stress/recovery واسع لمسارات البحث والمشاهدة.
 
 ## أهداف التشغيل التالي
 
-1. فحص runtime للبحث والمشاهدة بعد hotfix 1.6.2/1.6.3 بحثًا عن regressions حقيقية بدل تغييرات تجميلية.
-2. فحص Android TV focus/D-Pad والـplayer lifecycle مع العودة من التفاصيل والمشغل.
-3. مراجعة TODO/FIXME/dead code والاعتماديات غير المستخدمة بعد إزالة login/auth remnants.
-4. إضافة اختبارات regression لمسار Search → Details → Playback fallback حيث توجد فجوات مثبتة.
-5. فحص التوقيع الفعلي لـAndroid artifacts إن توفرت secrets في run، وعدم ادعاء signed بدون دليل.
-6. الحفاظ على دورة triplet + Release لكل دفعة release-worthy لاحقة، مع version/tag جديدين.
+1. فحص runtime حقيقي لمسار Search → Details → Playback fallback بعد إصدارات 1.6.2–1.6.4 وإضافة regression tests عند أي فجوة مثبتة.
+2. فحص Android TV D-Pad/focus والعودة من Details/Player وحالات lifecycle.
+3. مراجعة بقية dependencies المباشرة غير المستخدمة بحذر، خصوصًا plugins الأصلية، دون حذف أي اعتماد مستخدم فعليًا.
+4. تحسين تعريب رسائل التنزيل المتبقية وحالات الخطأ الثانوية.
+5. التحقق من Android signing عندما تتوفر Secrets وعدم وصف APK بأنه signed دون apksigner evidence.
+6. الاستمرار في triplet + GitHub Release لكل دفعة release-worthy.
