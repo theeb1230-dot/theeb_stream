@@ -114,7 +114,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       builder: (context) => AlertDialog(
         title: const Text('حذف التنزيل؟'),
         content: Text(
-          '${download['title'] ?? 'هذا الفيديو'} will be removed from this device.',
+          'سيتم حذف ${download['title'] ?? 'هذا الفيديو'} من هذا الجهاز.',
         ),
         actions: [
           TextButton(
@@ -154,7 +154,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       builder: (context) => AlertDialog(
         title: const Text('إلغاء التنزيل؟'),
         content: Text(
-          '${download.label} and its partial files will be removed.',
+          'سيتم حذف ${download.label} وملفاته الجزئية.',
         ),
         actions: [
           TextButton(
@@ -439,7 +439,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         leading: _thumbnail(first['thumbnail']?.toString() ?? ''),
         title: Text(title, style: const TextStyle(color: Colors.white)),
         subtitle: Text(
-          '${episodes.length} downloaded episode${episodes.length == 1 ? '' : 's'}${seriesTotal()}',
+          '${episodes.length} حلقة مُنزّلة${seriesTotal()}',
           style: const TextStyle(color: Colors.white54),
         ),
         iconColor: Colors.white,
@@ -447,7 +447,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
         children: seasons.entries.map((entry) {
           return ExpansionTile(
             title: Text(
-              'Season ${entry.key}',
+              'الموسم ${entry.key}',
               style: const TextStyle(color: Colors.white70),
             ),
             iconColor: Colors.white,
@@ -463,7 +463,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
     final isEpisode = download['mediaType'] == 'episode';
     final episodeLabel = isEpisode
         ? 'S${download['seasonNumber']}E${download['episodeNumber']}'
-        : 'Movie';
+        : 'فيلم';
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       leading: _thumbnail(download['thumbnail']?.toString() ?? ''),
@@ -479,7 +479,7 @@ class _DownloadsScreenState extends State<DownloadsScreen> {
       ),
       onTap: () => _play(download),
       trailing: IconButton(
-        tooltip: 'Delete download',
+        tooltip: 'حذف التنزيل',
         onPressed: () => _delete(download),
         icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
       ),
