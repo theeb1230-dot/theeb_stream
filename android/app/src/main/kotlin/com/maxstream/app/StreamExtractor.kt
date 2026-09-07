@@ -278,6 +278,14 @@ class StreamExtractor(private val context: Context) {
             OkruExtractor(),
             DailymotionExtractor(),
             WorkerExtractor(),
+            // Dedicated handlers for the server providers above. These were
+            // previously defined but not registered, forcing provider URLs
+            // through GenericMedia and causing false "server healthy" results
+            // followed by playback failures.
+            MoflixExtractor(),
+            CommunityExtractor(),
+            VidrockExtractor(),
+            FrembedExtractor(),
             GenericMediaExtractor(),
         )
     }
