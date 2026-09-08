@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 import '../services/native_stream_extractor.dart';
+import '../services/direct_m3u8_service.dart';
 
 class ProviderStatus {
   final String name;
@@ -176,15 +177,22 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     await Future.wait(checks);
     dio.close();
 
-    // On Android we can run the exact same native resolver used by playback
-    // against a known TMDB movie. Only a URL that survives extractor-level
-    // validation is allowed to become green.
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      final streams = await NativeStreamExtractor.resolveStreams(
-        tmdbId: _probeTmdbId,
-        isMovie: true,
-        title: _probeTitle,
-      );
+    // Run the same resolver path used by actual playback. Android uses the
+    // native Kotlin extractor; iOS uses the direct-only Worker resolver.
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS)) {
+      final streams = defaultTargetPlatform == TargetPlatform.android
+          ? await NativeStreamExtractor.resolveStreams(
+              tmdbId: _probeTmdbId,
+              isMovie: true,
+              title: _probeTitle,
+            )
+          : await DirectM3u8Service.fetchAvailableStreams(
+              title: _probeTitle,
+              tmdbId: _probeTmdbId,
+              isMovie: true,
+            );
 
       if (mounted) {
         setState(() {
