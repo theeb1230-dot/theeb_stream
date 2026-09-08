@@ -6,14 +6,27 @@ import 'package:flutter/foundation.dart';
 class NativeStreamExtractor {
   static const _channel = MethodChannel('com.maxstream.app/extractor');
 
+  static bool get _isAndroid =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
   static Future<double> getBrightness() async {
-    return await _channel.invokeMethod<double>('getBrightness') ?? 0.5;
+    if (!_isAndroid) return 0.5;
+    try {
+      return await _channel.invokeMethod<double>('getBrightness') ?? 0.5;
+    } on PlatformException {
+      return 0.5;
+    }
   }
 
   static Future<void> setBrightness(double value) async {
-    await _channel.invokeMethod<void>('setBrightness', {
-      'value': value.clamp(0.01, 1.0),
-    });
+    if (!_isAndroid) return;
+    try {
+      await _channel.invokeMethod<void>('setBrightness', {
+        'value': value.clamp(0.01, 1.0),
+      });
+    } on PlatformException {
+      // Brightness adjustment is an Android enhancement, not a playback gate.
+    }
   }
 
   static Map<String, dynamic> _normalizeStream(Map result) {

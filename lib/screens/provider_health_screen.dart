@@ -1,6 +1,10 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+
+import '../services/native_stream_extractor.dart';
+import '../services/direct_m3u8_service.dart';
 
 class ProviderStatus {
   final String name;
@@ -98,18 +102,11 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     ProviderStatus(name: 'Vtube', domain: 'vtbe.to', type: 'extractor-native'),
     ProviderStatus(name: 'Okru', domain: 'ok.ru', type: 'extractor-native'),
     ProviderStatus(name: 'Dailymotion', domain: 'dailymotion.com', type: 'extractor-native'),
-    ProviderStatus(name: 'Worker', domain: 'maxstream123.workers.dev', type: 'extractor-api'),
-    ProviderStatus(name: 'GenericMedia', domain: '-', type: 'extractor-native'),
-    // Inactive / defined but not registered
     ProviderStatus(name: 'Moflix', domain: 'moflix-stream.xyz', type: 'extractor-native'),
-    ProviderStatus(name: 'Vidflix', domain: '-', type: 'extractor-native'),
     ProviderStatus(name: 'Community', domain: 'streamingunity.dog', type: 'extractor-native'),
-    ProviderStatus(name: 'Vixcloud', domain: '-', type: 'extractor-native'),
-    ProviderStatus(name: 'VidsrcTo', domain: 'vidsrc.to', type: 'extractor-native'),
     ProviderStatus(name: 'Frembed', domain: 'frembed.click', type: 'extractor-native'),
     ProviderStatus(name: 'Vidrock', domain: 'vidrock.net', type: 'extractor-native'),
-    ProviderStatus(name: 'Vidzee', domain: 'vidzee.space', type: 'extractor-native'),
-    ProviderStatus(name: 'MaxstreamVideo', domain: '-', type: 'extractor-api'),
+    ProviderStatus(name: 'GenericMedia', domain: '-', type: 'extractor-native'),
   ];
 
   List<ProviderStatus> _serverResults = [];
@@ -133,132 +130,180 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     super.dispose();
   }
 
-  // ── Server testing ──
+  // ── Runtime health testing ──
 
-  Future<void> _testAllServers() async {
-    if (_testingServers) return;
-    setState(() {
-      _testingServers = true;
-      _serversComplete = false;
-      _serverResults = _servers.map((s) => s.copyWith()).toList();
-    });
+  static const String _probeTmdbId = '550';
+  static const String _probeTitle = 'اختبار تشغيل المصادر';
 
-    final dio = Dio();
-    dio.options.connectTimeout = const Duration(seconds: 8);
-    dio.options.receiveTimeout = const Duration(seconds: 8);
+  String _normalizeName(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
 
-    final futures = <Future<void>>[];
-    for (int i = 0; i < _serverResults.length; i++) {
-      futures.add(_testProvider(dio, i, isServer: true));
-    }
-    await Future.wait(futures);
-
-    dio.close();
-    if (mounted) {
-      setState(() {
-        _testingServers = false;
-        _serversComplete = true;
-      });
-    }
+  bool _matchesName(String provider, String value) {
+    final a = _normalizeName(provider);
+    final b = _normalizeName(value);
+    if (a.isEmpty || b.isEmpty) return false;
+    return a == b || a.contains(b) || b.contains(a);
   }
 
-  // ── Extractor testing ──
+  Future<void> _testAllServers() => _testRuntimePipeline();
 
-  Future<void> _testAllExtractors() async {
-    if (_testingExtractors) return;
+  Future<void> _testAllExtractors() => _testRuntimePipeline();
+
+  Future<void> _testRuntimePipeline() async {
+    if (_testingServers || _testingExtractors) return;
     setState(() {
+      _testingServers = true;
       _testingExtractors = true;
+      _serversComplete = false;
       _extractorsComplete = false;
+      _serverResults = _servers.map((s) => s.copyWith()).toList();
       _extractorResults = _extractors.map((s) => s.copyWith()).toList();
     });
 
-    final dio = Dio();
-    dio.options.connectTimeout = const Duration(seconds: 8);
-    dio.options.receiveTimeout = const Duration(seconds: 8);
+    // First check only basic network reachability. A reachable homepage is
+    // deliberately NOT marked healthy: the old screen treated any HTTP < 500
+    // as "سليم", which is why it looked green while playback still failed.
+    final dio = Dio()
+      ..options.connectTimeout = const Duration(seconds: 8)
+      ..options.receiveTimeout = const Duration(seconds: 8);
 
-    final futures = <Future<void>>[];
-    for (int i = 0; i < _extractorResults.length; i++) {
-      futures.add(_testProvider(dio, i, isServer: false));
+    final checks = <Future<void>>[];
+    for (int i = 0; i < _serverResults.length; i++) {
+      checks.add(_testDomainReachability(dio, i, isServer: true));
     }
-    await Future.wait(futures);
-
+    for (int i = 0; i < _extractorResults.length; i++) {
+      checks.add(_testDomainReachability(dio, i, isServer: false));
+    }
+    await Future.wait(checks);
     dio.close();
+
+    // Run the same resolver path used by actual playback. Android uses the
+    // native Kotlin extractor; iOS uses the direct-only Worker resolver.
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.android ||
+            defaultTargetPlatform == TargetPlatform.iOS)) {
+      final streams = defaultTargetPlatform == TargetPlatform.android
+          ? await NativeStreamExtractor.resolveStreams(
+              tmdbId: _probeTmdbId,
+              isMovie: true,
+              title: _probeTitle,
+            )
+          : await DirectM3u8Service.fetchAvailableStreams(
+              title: _probeTitle,
+              tmdbId: _probeTmdbId,
+              isMovie: true,
+            );
+
+      if (mounted) {
+        setState(() {
+          for (int i = 0; i < _serverResults.length; i++) {
+            final provider = _serverResults[i];
+            final attempts = streams.where((stream) {
+              final server = stream['server']?.toString() ?? '';
+              final source = stream['source']?.toString() ?? '';
+              return _matchesName(provider.name, server) ||
+                  _matchesName(provider.name, source);
+            }).toList();
+            if (attempts.isEmpty) continue;
+            final success = attempts.any((stream) =>
+                stream['available'] == true &&
+                (stream['url']?.toString().isNotEmpty ?? false));
+            _serverResults[i] = provider.copyWith(
+              healthy: success,
+              error: success ? null : 'لم ينتج بثًا صالحًا في اختبار التشغيل',
+            );
+          }
+
+          for (int i = 0; i < _extractorResults.length; i++) {
+            final provider = _extractorResults[i];
+            final success = streams.any((stream) {
+              if (stream['available'] != true ||
+                  !(stream['url']?.toString().isNotEmpty ?? false)) {
+                return false;
+              }
+              final source = stream['source']?.toString() ?? '';
+              return _matchesName(provider.name, source);
+            });
+            if (success) {
+              _extractorResults[i] = provider.copyWith(
+                healthy: true,
+                error: null,
+              );
+            }
+          }
+        });
+      }
+    }
+
     if (mounted) {
       setState(() {
+        _testingServers = false;
         _testingExtractors = false;
+        _serversComplete = true;
         _extractorsComplete = true;
       });
     }
   }
 
-  // ── Generic provider test ──
-
-  Future<void> _testProvider(Dio dio, int index, {required bool isServer}) async {
+  Future<void> _testDomainReachability(
+    Dio dio,
+    int index, {
+    required bool isServer,
+  }) async {
     final results = isServer ? _serverResults : _extractorResults;
     final provider = results[index];
     final domain = provider.domain;
 
-    // Skip providers without a real domain
     if (domain == '-' || domain.isEmpty) {
       if (mounted) {
         setState(() {
           final list = isServer ? _serverResults : _extractorResults;
           list[index] = provider.copyWith(
             healthy: null,
-            error: 'لا يوجد نطاق مهيأ',
+            error: 'لا يوجد نطاق مباشر للاختبار',
           );
         });
       }
       return;
     }
 
-    final url = 'https://$domain';
     final sw = Stopwatch()..start();
     try {
       final response = await dio.get(
-        url,
+        'https://$domain',
         options: Options(
-          headers: {
+          headers: const {
             'User-Agent':
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/124 Mobile Safari/537.36',
           },
           followRedirects: true,
-          validateStatus: (_) => true, // Accept any status code
+          validateStatus: (_) => true,
         ),
       );
       sw.stop();
+      final code = response.statusCode ?? 0;
+      final reachable = code > 0 && code < 500;
       if (mounted) {
         setState(() {
           final list = isServer ? _serverResults : _extractorResults;
-          final code = response.statusCode ?? 0;
           list[index] = provider.copyWith(
-            healthy: code > 0 && code < 500,
+            // Reachability alone is intentionally "unknown", not green.
+            healthy: reachable ? null : false,
+            error: reachable
+                ? 'النطاق متاح؛ لم يُثبت بث فعلي بعد'
+                : 'تعذر الوصول إلى النطاق',
             responseMs: sw.elapsedMilliseconds,
           );
         });
       }
-    } on DioException catch (e) {
-      sw.stop();
-      if (mounted) {
-        setState(() {
-          final list = isServer ? _serverResults : _extractorResults;
-          final code = e.response?.statusCode;
-          final isHealthy = code != null && code > 0 && code < 500;
-          list[index] = provider.copyWith(
-            healthy: isHealthy,
-            error: isHealthy ? null : (e.message ?? 'فشل الاتصال'),
-            responseMs: sw.elapsedMilliseconds,
-          );
-        });
-      }
-    } catch (e) {
+    } catch (_) {
       sw.stop();
       if (mounted) {
         setState(() {
           final list = isServer ? _serverResults : _extractorResults;
           list[index] = provider.copyWith(
             healthy: false,
-            error: e.toString(),
+            error: 'تعذر الوصول إلى النطاق',
             responseMs: sw.elapsedMilliseconds,
           );
         });
@@ -339,7 +384,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           ),
         ),
         if (!_serversComplete && !_testingServers)
-          _buildTestButton('اختبار جميع الخوادم', _testAllServers),
+          _buildTestButton('اختبار تشغيل فعلي', _testAllServers),
       ],
     );
   }
@@ -380,7 +425,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           ),
         ),
         if (!_extractorsComplete && !_testingExtractors)
-          _buildTestButton('اختبار جميع المستخرجات', _testAllExtractors),
+          _buildTestButton('اختبار تشغيل فعلي', _testAllExtractors),
       ],
     );
   }
@@ -398,9 +443,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildSummaryItem('سليم', healthy, Colors.green),
-          _buildSummaryItem('غير سليم', unhealthy, Colors.red),
-          _buildSummaryItem('غير معروف', pending, Colors.grey),
+          _buildSummaryItem('بث صالح', healthy, Colors.green),
+          _buildSummaryItem('فشل', unhealthy, Colors.red),
+          _buildSummaryItem('غير مؤكد', pending, Colors.grey),
         ],
       ),
     );
@@ -460,7 +505,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     if (provider.healthy == true) {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
-      statusText = provider.responseMs != null ? '${provider.responseMs}ms' : 'OK';
+      statusText = provider.responseMs != null
+          ? 'بث صالح • ${provider.responseMs}ms'
+          : 'بث صالح';
     } else if (provider.healthy == false) {
       statusColor = Colors.red;
       statusIcon = Icons.error;
@@ -468,7 +515,8 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     } else {
       statusColor = Colors.grey;
       statusIcon = Icons.help_outline;
-      statusText = provider.domain == '-' ? 'لا يوجد نطاق' : 'لم يُختبر';
+      statusText = provider.error ??
+          (provider.domain == '-' ? 'لا يوجد نطاق' : 'لم يُختبر');
     }
 
     return Container(

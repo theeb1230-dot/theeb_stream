@@ -816,7 +816,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             : 'إيقاف';
         _selectedSubtitleUrl = initialSubtitle?.url;
 
-        _showStatus('Stream found from $source! Initializing player...');
+        _showStatus('تم العثور على بث من $source، جارٍ تشغيله...');
         var discoveredServers = false;
         // The native extractor already validated this exact stream with
         // OkHttp. Hand it straight to ExoPlayer instead of letting the
@@ -846,7 +846,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
               )
               .toList();
           for (final server in candidates) {
-            _showStatus('Trying ${server['source']}...');
+            _showStatus('جارٍ تجربة ${server['source'] ?? 'خادم'}...');
             initialized = await _tryPlayServer(
               server,
               position: resumePosition,
@@ -859,7 +859,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
           if (mounted) {
             setState(() {
               _error =
-                  'None of the available servers could start playback. '
+                  'تعذر بدء التشغيل من جميع الخوادم المتاحة. '
                   'Please try again later.';
             });
           }
@@ -923,10 +923,10 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       }
     } catch (e) {
       debugPrint('M3U8VideoPlayer: Error loading stream: $e');
-      _showStatus('Error: $e');
+      _showStatus('تعذر تحميل البث');
       if (mounted) {
         setState(() {
-          _error = 'Failed to load stream: $e';
+          _error = 'تعذر تحميل البث. حاول مجددًا أو اختر خادمًا آخر.';
         });
       }
     }
@@ -941,7 +941,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   }) async {
     final fallbackUrl = server['url']?.toString() ?? '';
     if (fallbackUrl.isEmpty || fallbackUrl == primaryUrl) return false;
-    final fallbackSource = server['source']?.toString() ?? 'Server';
+    final fallbackSource = server['source']?.toString() ?? 'خادم';
     final fallbackQualities = _parseQualities(server['qualities']);
     _subtitleTracks = _unionSubtitleTracks();
     _selectedSubtitle.value = 'إيقاف';
@@ -1259,18 +1259,18 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         position: position,
         shouldPlay: true,
       );
-      _showStatus('Playing from $source');
+      _showStatus('يتم التشغيل من $source');
       return true;
     } catch (e) {
       debugPrint('M3U8VideoPlayer: Error initializing player: $e');
       final msg = e.toString();
       String userMsg;
       if (msg.contains('h265') || msg.contains('hevc') || msg.contains('H.265') || msg.contains('HEVC')) {
-        userMsg = 'This device does not support H.265/HEVC video. The source only provides HEVC encoding.';
+        userMsg = 'هذا الجهاز لا يدعم ترميز H.265/HEVC لهذا المصدر.';
       } else if (msg.contains('PlatformException')) {
-        userMsg = 'Video codec not supported on this device: ${msg.length > 120 ? msg.substring(0, 120) + '...' : msg}';
+        userMsg = 'ترميز الفيديو غير مدعوم على هذا الجهاز.';
       } else {
-        userMsg = 'Server failed: $e';
+        userMsg = 'فشل الخادم الحالي، جارٍ تجربة بديل.';
       }
       _showStatus(userMsg);
       return false;
@@ -3354,7 +3354,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             if (_error != null && _error!.isNotEmpty)
               GestureDetector(
                 onTap: () {
-                  Clipboard.setData(ClipboardData(text: 'Error: $_error\nStatus: $_statusMessage'));
+                  Clipboard.setData(ClipboardData(text: 'الخطأ: $_error\nالحالة: $_statusMessage'));
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('تم نسخ تفاصيل الخطأ'), duration: Duration(seconds: 1)),
                   );
@@ -3368,7 +3368,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     border: Border.all(color: Colors.white24),
                   ),
                   child: Text(
-                    '$_error\nStatus: $_statusMessage',
+                    '$_error\nالحالة: $_statusMessage',
                     style: TextStyle(color: Colors.grey[400], fontSize: 11, fontFamily: 'monospace'),
                     textAlign: TextAlign.left,
                   ),

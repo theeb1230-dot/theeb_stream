@@ -180,7 +180,7 @@ The app checks GitHub Releases on startup for newer versions:
 
 To release an update:
 1. استخدم نفس commit/tag لبناء Android Mobile وAndroid TV وiOS.
-2. يجب أن يطابق tag نسخة `pubspec.yaml` الحالية، مثل `v1.6.3`.
+2. يجب أن يطابق tag نسخة `pubspec.yaml` الحالية، مثل `v2.0.0`.
 3. ارفع الأصول النهائية إلى قسم GitHub Releases في هذا المستودع:
    - `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
    - `Theeb-Stream-Android-TV.apk`
@@ -207,7 +207,7 @@ GitHub Actions يبني المسارات الثلاثة بصورة مستقلة.
 
 ## Version
 
-- **Current**: 1.6.3+11
+- **Current**: 2.0.0+14
 - **Min SDK**: 3.8.0
 
 ## Contributing

@@ -45,6 +45,7 @@ class WebStreamService {
     required bool isMovie,
     int season = 1,
     int episode = 1,
+    bool directOnly = false,
   }) async {
     debugPrint('$_tag: Resolving from $serverId for TMDB $tmdbId');
 
@@ -81,6 +82,10 @@ class WebStreamService {
           });
         }
         if (data['type'] == 'embed') {
+          if (directOnly) {
+            debugPrint('$_tag: Skipping embed-only result for native playback');
+            return null;
+          }
           final embed = _sanitizeEmbedUrl(streamUrl);
           if (embed != null) {
             return StreamSecurity.sanitizeResolverResult({
@@ -111,6 +116,7 @@ class WebStreamService {
     int season = 1,
     int episode = 1,
     String title = '',
+    bool directOnly = false,
   }) async {
     // Try each server in order
     for (final server in servers) {
@@ -120,6 +126,7 @@ class WebStreamService {
         isMovie: isMovie,
         season: season,
         episode: episode,
+        directOnly: directOnly,
       );
       if (result != null) {
         debugPrint('$_tag: Success with ${server['name']}');

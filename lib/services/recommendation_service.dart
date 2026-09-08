@@ -68,6 +68,16 @@ class RecommendationService {
     return sorted.take(limit).map((e) => e.key).toList();
   }
 
+  static Future<List<Map<String, dynamic>>> _safeList(
+    Future<List<Map<String, dynamic>>> Function() fetcher,
+  ) async {
+    try {
+      return await fetcher();
+    } catch (_) {
+      return const [];
+    }
+  }
+
   static bool _isStale() =>
       _cacheTime == null || DateTime.now().difference(_cacheTime!) > _cacheTtl;
 
@@ -87,24 +97,40 @@ class RecommendationService {
   static Future<List<Map<String, dynamic>>> getForYou({int page = 1}) async {
     final topGenres = await getTopGenres(limit: 3);
     if (topGenres.isEmpty) {
-      return _fetchAndCache('forYou_global', () async {
-        final movies = await TmdbApiService.fetchTrendingMovies(page: page);
-        final series = await TmdbApiService.fetchTrendingSeries(page: page);
-        return _mergeAndShuffle(movies, series, 'movie', 'tv');
+      return _fetchAndCache('forYou_global_page_$page', () async {
+        final trending = await Future.wait([
+          _safeList(() => TmdbApiService.fetchTrendingMovies(page: page)),
+          _safeList(() => TmdbApiService.fetchTrendingSeries(page: page)),
+        ]);
+        final mergedTrending =
+            _mergeAndShuffle(trending[0], trending[1], 'movie', 'tv');
+        if (mergedTrending.isNotEmpty) return mergedTrending;
+
+        // Secondary fallback: some TMDB edge/proxy responses can fail only
+        // on /trending while /popular still works. Never leave a fresh
+        // install with a blank recommendations tab just because one endpoint
+        // family is unavailable.
+        final popular = await Future.wait([
+          _safeList(() => TmdbApiService.fetchPopularMovies(page: page)),
+          _safeList(() => TmdbApiService.fetchPopularSeries(page: page)),
+        ]);
+        return _mergeAndShuffle(popular[0], popular[1], 'movie', 'tv');
       });
     }
 
     final genreParam = topGenres.join(',');
-    return _fetchAndCache('forYou_$genreParam', () async {
-      final movies = await TmdbApiService.getMoviesByGenre(
-        topGenres.first,
-        page: page,
-      );
-      final series = await TmdbApiService.getSeriesByGenre(
-        topGenres.first,
-        page: page,
-      );
-      return _mergeAndShuffle(movies, series, 'movie', 'tv');
+    return _fetchAndCache('forYou_${genreParam}_page_$page', () async {
+      final results = await Future.wait([
+        _safeList(() => TmdbApiService.getMoviesByGenre(
+              topGenres.first,
+              page: page,
+            )),
+        _safeList(() => TmdbApiService.getSeriesByGenre(
+              topGenres.first,
+              page: page,
+            )),
+      ]);
+      return _mergeAndShuffle(results[0], results[1], 'movie', 'tv');
     });
   }
 

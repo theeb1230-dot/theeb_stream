@@ -98,3 +98,67 @@ PR #38:
 4. تحسين تعريب رسائل التنزيل وحالات الخطأ الثانوية المتبقية.
 5. التحقق من Android signing عندما تتوفر Secrets وعدم وصف APK بأنه signed دون apksigner evidence.
 6. الحفاظ على triplet + GitHub Release لكل دفعة release-worthy لاحقة.
+
+
+## تشغيل 2026-09-08 — فيدباك جهاز فعلي / 1.6.5
+
+المستخدم اختبر النسخة على جهاز فعلي وقدم صورًا تثبت فجوة بين شاشة "حالة المصادر" والتشغيل الحقيقي:
+- شاشة الصحة كانت تعتبر أي استجابة HTTP أقل من 500 نجاحًا، لذلك كانت الدومينات تظهر خضراء رغم فشل استخراج/تشغيل الفيديو.
+- VidLink و2Embed كانا يتجاوزان `validateStream` في مسار Android/TV، ما يسمح لرابط منتهي/غير قابل للتشغيل بالفوز قبل ExoPlayer.
+- Moflix/Community/Vidrock/Frembed كانت لها مستخرجات متخصصة موجودة في الكود لكن غير مسجلة في `extractorRegistry`.
+- شاشة التوصيات كانت تخفي fallback الرائج عندما لا يوجد سجل مشاهدة، رغم أن `RecommendationService.getForYou()` يدعمه.
+- cache التوصيات لم يكن يفصل الصفحات.
+- زر الملف الشخصي/الأفاتار كان خطوة وسيطة غير لازمة في تطبيق بلا تسجيل دخول.
+- شاشة المشغل كانت ما تزال تسرب `Status:` و`Failed to load stream` للمستخدم.
+
+الفرع الحالي: `runtime/playback-recommendations-settings-1.6.5`
+PR الحالي: `#39 [release] 1.6.5 runtime playback and recommendations reliability`
+
+التغييرات المنفذة:
+- زر ترس مباشر إلى الإعدادات بدل الأفاتار/القائمة الوسيطة.
+- health check أصبح fail-closed: وصول الدومين وحده = "غير مؤكد"، والأخضر على Android يحتاج resolver فعلي ورابط بث صالح.
+- تنظيف شاشة التشخيص من المستخرجات القديمة/غير المسجلة.
+- تسجيل Moflix/Community/Vidrock/Frembed extractors على Android Mobile وAndroid TV.
+- إلزام كل stream نهائي، بما في ذلك VidLink/2Embed، بفحص `validateStream`.
+- إصلاح التوصيات كي تعرض trending fallback على التثبيت الجديد وتتحمل فشل TMDB جزئيًا وتفصل cache حسب الصفحة.
+- تعريب رسائل فشل المشغل وعدم عرض raw exceptions للمستخدم.
+- إضافة مولد هوية ذيب ستريم هندسية (ذئب + play/stream) وتوليد أصول الهاتف/TV/iOS أثناء CI.
+- رفع النسخة إلى `1.6.5+13` ومزامنة Android TV.
+
+### أهداف التشغيل التالي
+
+1. انتظار CI/build لـ PR #39 على آخر head وإصلاح أي failure على نفس الفرع.
+2. عند خضرة branch CI + Android Mobile + Android TV + iOS، دمج #39 بعنوان يحتوي `[release]`.
+3. التحقق من triplet النهائي على main ونشر `v1.6.5` مع SHA256SUMS وBUILD_PROVENANCE.
+4. اختبار فيدباك المستخدم التالي تحديدًا على محتوى كان يفشل: Health runtime result → resolver → player init → fallback server switching.
+5. إذا بقي فشل تشغيل رغم أن health runtime أخضر، أضف playback-start confirmation/blacklist مؤقتة على مستوى media URL وليس domain فقط.
+6. متابعة تحسين الشعار فقط إذا أثبتت معاينة المستخدم أن الهوية الجديدة تحتاج تعديل، دون لمس منطق التشغيل.
+
+
+## اعتماد إصدار 2.0.0 — 2026-09-08
+
+بناءً على اختبار الجهاز الفعلي وطلب المستخدم، تم تحويل دفعة runtime الحالية من 1.6.5 إلى الإصدار الرئيسي **2.0.0+14** بدل نشر 1.6.5.
+
+الإضافات النهائية على نفس PR:
+- version parity: Flutter `2.0.0+14` وAndroid TV `2.0.0 / 14`.
+- اعتماد هوية ذئب/Play بلون Electric Cyan بدل الأحمر في مولد أصول الهاتف وTV وiOS.
+- تعريب ما تبقى من رسائل تشغيل داخل المشغل وعدم تسريب أخطاء codec/server الخام للمستخدم.
+- توصيات fresh-install أصبحت تملك fallback ثانوي من Trending إلى Popular عند تعطل عائلة endpoints الأولى.
+- يبقى شرط الإصدار: branch CI + Mobile APK + TV APK + iOS UNSIGNED IPA كلها خضراء على آخر head، ثم الدمج برسالة [release] ونشر v2.0.0 من نفس commit.
+
+### أهداف التشغيل التالي بعد دمج 2.0.0
+1. التحقق من GitHub Release v2.0.0 والأصول الثلاثة وSHA256SUMS/BUILD_PROVENANCE.
+2. إعادة اختبار المستخدم لمسار Health → resolver → player على نفس المحتوى الذي كان يفشل.
+3. إذا استمر فشل runtime مع health أخضر، إضافة playback-start confirmation وblacklist مؤقتة على مستوى media URL.
+4. اختبار التوصيات على تثبيت جديد وسجل مشاهدة فعلي.
+
+
+### اكتشاف إضافي من اختبار iPhone — إصلاح قبل v2.0.0
+
+تم اكتشاف أن `DirectM3u8Service` كان يرسل كل منصة غير Web إلى `NativeStreamExtractor`، بينما MethodChannel الخاص بالاستخراج موجود على Android فقط ولا يوجد له implementation في iOS. هذا يفسر حالة "فحص سليم ثم التشغيل يفشل" على iPhone.
+
+تم الإصلاح:
+- iOS يستخدم الآن `WebStreamService` عبر Cloudflare Worker بدل Android MethodChannel.
+- iOS يقبل direct HLS فقط ويرفض embed-only URLs داخل native player.
+- قائمة الخوادم على iOS تُبنى من محاولات resolver فعلية لكل server.
+- شاشة حالة المصادر على iOS تستخدم نفس resolver الفعلي الذي يستخدمه التشغيل، لذلك الأخضر يعني بثًا مباشرًا قابلًا للاستخدام في مسار iOS وليس مجرد HTTP reachability.
