@@ -162,3 +162,33 @@ PR الحالي: `#39 [release] 1.6.5 runtime playback and recommendations relia
 - iOS يقبل direct HLS فقط ويرفض embed-only URLs داخل native player.
 - قائمة الخوادم على iOS تُبنى من محاولات resolver فعلية لكل server.
 - شاشة حالة المصادر على iOS تستخدم نفس resolver الفعلي الذي يستخدمه التشغيل، لذلك الأخضر يعني بثًا مباشرًا قابلًا للاستخدام في مسار iOS وليس مجرد HTTP reachability.
+
+
+## Hotfix 2.0.1 — restore original extracted playback core
+
+User device test on v2.0.0 still showed:
+- no playable source
+- status stuck/retrying around VixSrc
+- health diagnostics had more green providers than the actual runtime core.
+
+Forensic reference:
+- exact extraction-only commit: `30753308c417393587f1db805c7899e463ea11f5`
+- current v2.0.0 main before this hotfix: `311ca08b337531693d47088e5b0e8381227ea55c`
+
+Confirmed regression versus extraction-only source:
+1. Original `extractServer()` explicitly bypassed strict `validateStream()` for `VidLink` and `2Embed`; v2.0.0 removed that exception and validated every final stream. This can reject browser/WebView-backed sources before the player gets a chance to initialize them.
+2. Original active `serverProviders` contained only `StaticTmdbProvider`, `VidrockServerProvider`, and `PrimeSrcServerProvider`. v2.0.0 promoted Moflix/Community/Frembed into the primary discovery path, increasing pre-resolution work and coupling playback startup to extra providers that were only defined but inactive in the extracted source.
+3. The core player load/initialize flow is otherwise substantially the same as the extracted source; the regression is concentrated in resolver/provider policy rather than the UI.
+
+Hotfix actions:
+- Restore original primary provider set.
+- Restore VidLink/2Embed validation bypass.
+- Keep optional provider implementations available in code but outside the primary resolver.
+- Provider-health "servers" count now lists only providers used by the active primary path.
+- Version bump to `2.0.1+15`; Android TV parity `2.0.1 / 15`.
+
+### Next goals
+1. Run branch CI + Android Mobile + Android TV + iOS unsigned builds.
+2. Merge only when all green with [release] title.
+3. Publish v2.0.1 triplet from the same main commit.
+4. Re-test the exact failing title on device and inspect runtime logs if fallback still fails.

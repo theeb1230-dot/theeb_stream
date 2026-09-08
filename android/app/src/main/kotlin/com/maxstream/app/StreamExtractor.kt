@@ -229,13 +229,13 @@ class StreamExtractor(private val context: Context) {
         .build()
 
     private val serverProviders: List<ServerProvider> by lazy {
+        // Keep the primary resolver aligned with the original extracted app.
+        // Optional providers remain implemented below but must not delay or
+        // destabilize the proven core discovery path.
         listOf(
             StaticTmdbProvider(),
             VidrockServerProvider(),
             PrimeSrcServerProvider(),
-            MoflixProvider(),
-            CommunityServerProvider(),
-            FrembedServerProvider(),
         )
     }
 
@@ -571,10 +571,14 @@ class StreamExtractor(private val context: Context) {
             when (result) {
                 is ExtractionResult.Final -> {
                     val stream = result.stream.copy(server = initialServer.name)
-                    // Never trust extraction success alone. A provider homepage or
-                    // resolver can be reachable while returning an expired/dead
-                    // media URL. Validate every final stream, including VidLink
-                    // and 2Embed, before it can win the race and reach ExoPlayer.
+                    // Restore the original extracted-app behaviour for embed/
+                    // WebView-backed fallbacks. Their media requests can require
+                    // browser state that the OkHttp preflight does not reproduce,
+                    // so rejecting them here creates false negatives even though
+                    // the player can start them successfully.
+                    if (stream.source == "VidLink" || stream.source == "2Embed") {
+                        return stream
+                    }
                     return try {
                         validateStream(stream)
                     } catch (error: Throwable) {
