@@ -51,8 +51,7 @@ StreamExtractor.resolveStream()  [Kotlin, OkHttp]
 ┌─────────────────────────────────────────┐
 │  Server Providers (parallel discovery)  │
 │  StaticTmdbProvider, VidrockProvider,   │
-│  VidzeeProvider, PrimeSrcProvider,      │
-│  FrembedProvider                        │
+│  PrimeSrcProvider                       │
 └─────────────────────────────────────────┘
     ↓  (20+ servers per movie)
 ┌─────────────────────────────────────────┐
@@ -180,7 +179,7 @@ The app checks GitHub Releases on startup for newer versions:
 
 To release an update:
 1. استخدم نفس commit/tag لبناء Android Mobile وAndroid TV وiOS.
-2. يجب أن يطابق tag نسخة `pubspec.yaml` الحالية، مثل `v2.0.0`.
+2. يجب أن يطابق tag نسخة `pubspec.yaml` الحالية، مثل `v2.0.1`.
 3. ارفع الأصول النهائية إلى قسم GitHub Releases في هذا المستودع:
    - `Theeb-Stream-Android-Mobile-arm64-v8a.apk`
    - `Theeb-Stream-Android-TV.apk`
@@ -207,7 +206,7 @@ GitHub Actions يبني المسارات الثلاثة بصورة مستقلة.
 
 ## Version
 
-- **Current**: 2.0.0+14
+- **Current**: 2.0.1+15
 - **Min SDK**: 3.8.0
 
 ## Contributing
