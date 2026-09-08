@@ -98,11 +98,23 @@ class RecommendationService {
     final topGenres = await getTopGenres(limit: 3);
     if (topGenres.isEmpty) {
       return _fetchAndCache('forYou_global_page_$page', () async {
-        final results = await Future.wait([
+        final trending = await Future.wait([
           _safeList(() => TmdbApiService.fetchTrendingMovies(page: page)),
           _safeList(() => TmdbApiService.fetchTrendingSeries(page: page)),
         ]);
-        return _mergeAndShuffle(results[0], results[1], 'movie', 'tv');
+        final mergedTrending =
+            _mergeAndShuffle(trending[0], trending[1], 'movie', 'tv');
+        if (mergedTrending.isNotEmpty) return mergedTrending;
+
+        // Secondary fallback: some TMDB edge/proxy responses can fail only
+        // on /trending while /popular still works. Never leave a fresh
+        // install with a blank recommendations tab just because one endpoint
+        // family is unavailable.
+        final popular = await Future.wait([
+          _safeList(() => TmdbApiService.fetchPopularMovies(page: page)),
+          _safeList(() => TmdbApiService.fetchPopularSeries(page: page)),
+        ]);
+        return _mergeAndShuffle(popular[0], popular[1], 'movie', 'tv');
       });
     }
 
