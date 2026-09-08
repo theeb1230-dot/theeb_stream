@@ -151,3 +151,14 @@ PR الحالي: `#39 [release] 1.6.5 runtime playback and recommendations relia
 2. إعادة اختبار المستخدم لمسار Health → resolver → player على نفس المحتوى الذي كان يفشل.
 3. إذا استمر فشل runtime مع health أخضر، إضافة playback-start confirmation وblacklist مؤقتة على مستوى media URL.
 4. اختبار التوصيات على تثبيت جديد وسجل مشاهدة فعلي.
+
+
+### اكتشاف إضافي من اختبار iPhone — إصلاح قبل v2.0.0
+
+تم اكتشاف أن `DirectM3u8Service` كان يرسل كل منصة غير Web إلى `NativeStreamExtractor`، بينما MethodChannel الخاص بالاستخراج موجود على Android فقط ولا يوجد له implementation في iOS. هذا يفسر حالة "فحص سليم ثم التشغيل يفشل" على iPhone.
+
+تم الإصلاح:
+- iOS يستخدم الآن `WebStreamService` عبر Cloudflare Worker بدل Android MethodChannel.
+- iOS يقبل direct HLS فقط ويرفض embed-only URLs داخل native player.
+- قائمة الخوادم على iOS تُبنى من محاولات resolver فعلية لكل server.
+- شاشة حالة المصادر على iOS تستخدم نفس resolver الفعلي الذي يستخدمه التشغيل، لذلك الأخضر يعني بثًا مباشرًا قابلًا للاستخدام في مسار iOS وليس مجرد HTTP reachability.
