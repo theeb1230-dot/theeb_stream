@@ -133,3 +133,21 @@ PR الحالي: `#39 [release] 1.6.5 runtime playback and recommendations relia
 4. اختبار فيدباك المستخدم التالي تحديدًا على محتوى كان يفشل: Health runtime result → resolver → player init → fallback server switching.
 5. إذا بقي فشل تشغيل رغم أن health runtime أخضر، أضف playback-start confirmation/blacklist مؤقتة على مستوى media URL وليس domain فقط.
 6. متابعة تحسين الشعار فقط إذا أثبتت معاينة المستخدم أن الهوية الجديدة تحتاج تعديل، دون لمس منطق التشغيل.
+
+
+## اعتماد إصدار 2.0.0 — 2026-09-08
+
+بناءً على اختبار الجهاز الفعلي وطلب المستخدم، تم تحويل دفعة runtime الحالية من 1.6.5 إلى الإصدار الرئيسي **2.0.0+14** بدل نشر 1.6.5.
+
+الإضافات النهائية على نفس PR:
+- version parity: Flutter `2.0.0+14` وAndroid TV `2.0.0 / 14`.
+- اعتماد هوية ذئب/Play بلون Electric Cyan بدل الأحمر في مولد أصول الهاتف وTV وiOS.
+- تعريب ما تبقى من رسائل تشغيل داخل المشغل وعدم تسريب أخطاء codec/server الخام للمستخدم.
+- توصيات fresh-install أصبحت تملك fallback ثانوي من Trending إلى Popular عند تعطل عائلة endpoints الأولى.
+- يبقى شرط الإصدار: branch CI + Mobile APK + TV APK + iOS UNSIGNED IPA كلها خضراء على آخر head، ثم الدمج برسالة [release] ونشر v2.0.0 من نفس commit.
+
+### أهداف التشغيل التالي بعد دمج 2.0.0
+1. التحقق من GitHub Release v2.0.0 والأصول الثلاثة وSHA256SUMS/BUILD_PROVENANCE.
+2. إعادة اختبار المستخدم لمسار Health → resolver → player على نفس المحتوى الذي كان يفشل.
+3. إذا استمر فشل runtime مع health أخضر، إضافة playback-start confirmation وblacklist مؤقتة على مستوى media URL.
+4. اختبار التوصيات على تثبيت جديد وسجل مشاهدة فعلي.
