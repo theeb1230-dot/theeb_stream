@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 S = 2048
 BG = (15, 23, 42, 255)
 PANEL = (12, 18, 32, 255)
-RED = (239, 68, 68, 255)
+CYAN = (0, 242, 254, 255)
 SILVER = (232, 238, 245, 255)
 MUTED = (148, 163, 184, 255)
 
@@ -37,10 +37,10 @@ def draw_mark(transparent: bool) -> Image.Image:
     ]:
         d.polygon(poly, fill=cut)
 
-    d.polygon([(cx - 275, 790), (cx - 85, 835), (cx - 220, 900)], fill=RED)
-    d.polygon([(cx + 275, 790), (cx + 85, 835), (cx + 220, 900)], fill=RED)
+    d.polygon([(cx - 275, 790), (cx - 85, 835), (cx - 220, 900)], fill=CYAN)
+    d.polygon([(cx + 275, 790), (cx + 85, 835), (cx + 220, 900)], fill=CYAN)
     d.polygon([(cx - 80, 1115), (cx + 80, 1115), (cx, 1200)], fill=(45, 55, 72, 255))
-    d.polygon([(cx - 72, 1250), (cx - 72, 1425), (cx + 100, 1338)], fill=RED)
+    d.polygon([(cx - 72, 1250), (cx - 72, 1425), (cx + 100, 1338)], fill=CYAN)
 
     # Two streaming arcs complete the "Stream" part of the mark.
     for radius, width in ((350, 20), (420, 16)):
@@ -62,7 +62,7 @@ save_png(mark, ROOT / "android/tvapp/src/main/res/drawable-nodpi/ic_launcher_for
 
 banner = Image.new("RGBA", (1280, 720), BG)
 bd = ImageDraw.Draw(banner)
-bd.polygon([(0, 610), (1280, 460), (1280, 540), (0, 690)], fill=(239, 68, 68, 40))
+bd.polygon([(0, 610), (1280, 460), (1280, 540), (0, 690)], fill=(0, 242, 254, 44))
 banner.alpha_composite(mark.resize((420, 420), Image.Resampling.LANCZOS), (110, 150))
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 if Path(font_path).exists():
@@ -75,4 +75,4 @@ bd.text((560, 250), "THEEB STREAM", font=title_font, fill=SILVER)
 bd.text((566, 365), "STREAM. DISCOVER. WATCH.", font=sub_font, fill=MUTED)
 save_png(banner, ROOT / "android/tvapp/src/main/res/drawable-nodpi/tv_banner_bg.png", (1280, 720))
 
-print("Generated Theeb Stream wolf/play brand assets.")
+print("Generated Theeb Stream cyan wolf/play brand assets.")
