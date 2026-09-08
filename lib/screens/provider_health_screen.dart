@@ -47,6 +47,10 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
   late TabController _tabController;
 
   // ── Servers ──
+  // Only list providers that participate in the active primary playback
+  // path. Defined/experimental providers belong in diagnostics, not in the
+  // "servers" success count where they can make health look better than the
+  // resolver that playback actually uses.
   final List<ProviderStatus> _servers = const [
     ProviderStatus(name: 'VixSrc', domain: 'vixsrc.to', type: 'server'),
     ProviderStatus(name: 'VidLink', domain: 'vidlink.pro', type: 'server'),
@@ -54,12 +58,8 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     ProviderStatus(name: 'Videasy', domain: 'player.videasy.to', type: 'server'),
     ProviderStatus(name: 'VidFast', domain: 'vidfast.vc', type: 'server'),
     ProviderStatus(name: 'VidsrcRu', domain: 'vidsrc.ru', type: 'server'),
-    ProviderStatus(name: 'Moflix', domain: 'moflix-stream.xyz', type: 'server'),
-    ProviderStatus(name: 'Community', domain: 'streamingunity.dog', type: 'server'),
     ProviderStatus(name: 'Vidrock', domain: 'vidrock.net', type: 'server'),
-    ProviderStatus(name: 'Vidzee', domain: 'vidzee.space', type: 'server'),
     ProviderStatus(name: 'PrimeSrc', domain: 'primesrc.me', type: 'server'),
-    ProviderStatus(name: 'Frembed', domain: 'frembed.click', type: 'server'),
   ];
 
   // ── Extractors (active registry + inactive/defined ones) ──
