@@ -11,6 +11,12 @@ import 'web_stream_service.dart';
 class DirectM3u8Service {
   static const String _tag = 'DirectM3u8Service';
 
+  static bool get _useAndroidNative =>
+      !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  static bool get _useWorkerResolver =>
+      kIsWeb || defaultTargetPlatform == TargetPlatform.iOS;
+
   static Future<Map<String, dynamic>?> fetchMovieStreamUrl(
     String title,
     int? year,
@@ -20,13 +26,15 @@ class DirectM3u8Service {
     if (id == null || id.isEmpty) return null;
     debugPrint('$_tag: Resolving movie $title (TMDB: $id)');
 
-    if (kIsWeb) {
+    if (_useWorkerResolver) {
       return WebStreamService.resolveStream(
         tmdbId: id,
         isMovie: true,
         title: title,
+        directOnly: !kIsWeb,
       );
     }
+    if (!_useAndroidNative) return null;
 
     final result = await NativeStreamExtractor.resolveStream(
       tmdbId: id,
@@ -62,15 +70,17 @@ class DirectM3u8Service {
     if (id == null || id.isEmpty) return null;
     debugPrint('$_tag: Resolving $title S${season}E$episode (TMDB: $id)');
 
-    if (kIsWeb) {
+    if (_useWorkerResolver) {
       return WebStreamService.resolveStream(
         tmdbId: id,
         isMovie: false,
         season: season,
         episode: episode,
         title: title,
+        directOnly: !kIsWeb,
       );
     }
+    if (!_useAndroidNative) return null;
 
     final result = await NativeStreamExtractor.resolveStream(
       tmdbId: id,
@@ -108,7 +118,7 @@ class DirectM3u8Service {
     int episode = 1,
   }) async {
     if (kIsWeb) {
-      // On web, return embed sources as available servers
+      // On web, return embed sources as available servers.
       final sources = WebStreamService.servers;
       return sources.map((source) {
         final url = isMovie
@@ -122,9 +132,35 @@ class DirectM3u8Service {
           'source': source['name'],
           'type': 'embed',
           'isEmbed': true,
+          'available': true,
         };
       }).toList();
     }
+
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final attempts = await Future.wait(
+        WebStreamService.servers.map((source) async {
+          final result = await WebStreamService.resolveFromServer(
+            serverId: source['id']!,
+            tmdbId: tmdbId,
+            isMovie: isMovie,
+            season: season,
+            episode: episode,
+            directOnly: true,
+          );
+          return result ??
+              <String, dynamic>{
+                'url': '',
+                'source': source['name'],
+                'type': 'unavailable',
+                'available': false,
+              };
+        }),
+      );
+      return attempts;
+    }
+
+    if (!_useAndroidNative) return const [];
 
     final streams = await NativeStreamExtractor.resolveStreams(
       tmdbId: tmdbId,
@@ -160,6 +196,21 @@ class DirectM3u8Service {
     int episode = 1,
   }) async {
     if (kIsWeb) return null;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final server = WebStreamService.servers.where(
+        (entry) => entry['name']?.toLowerCase() == serverName.toLowerCase(),
+      );
+      if (server.isEmpty) return null;
+      return WebStreamService.resolveFromServer(
+        serverId: server.first['id']!,
+        tmdbId: tmdbId,
+        isMovie: isMovie,
+        season: season,
+        episode: episode,
+        directOnly: true,
+      );
+    }
+    if (!_useAndroidNative) return null;
     final result = await NativeStreamExtractor.resolveServer(
       serverName: serverName,
       tmdbId: tmdbId,
