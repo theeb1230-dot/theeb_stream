@@ -192,3 +192,18 @@ Hotfix actions:
 2. Merge only when all green with [release] title.
 3. Publish v2.0.1 triplet from the same main commit.
 4. Re-test the exact failing title on device and inspect runtime logs if fallback still fails.
+
+
+## Release 2.1.0 — 2026-09-08
+
+- Version bump: Flutter `2.1.0+16`.
+- Android TV parity: `versionName 2.1.0`, `versionCode 16`.
+- Basis: restored original playback core from v2.0.1 hotfix.
+- No additional playback-behavior changes are introduced in this version bump itself.
+- Release must be built and published from one green commit with Android Mobile APK + Android TV APK + iOS UNSIGNED/no-codesign IPA + SHA256SUMS + BUILD_PROVENANCE.
+
+### أهداف التشغيل التالي
+1. إكمال CI والبناء الثلاثي على PR 2.1.0.
+2. دمج PR فقط بعد خضرة كل required checks.
+3. نشر v2.1.0 من نفس commit إلى GitHub Releases.
+4. إعادة اختبار نفس المحتوى الذي كان يفشل على الجهاز للتأكد من أن restore-original-playback-core هو المرجع الفعلي للتشغيل.
