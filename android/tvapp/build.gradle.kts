@@ -15,7 +15,7 @@ if (keystoreFile.exists()) {
 
 @Suppress("Deprecation")
 android {
-    namespace = "com.maxstream.app"
+    namespace = "com.theebstream.tv"
     compileSdk = 36
 
     defaultConfig {
@@ -119,9 +119,6 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    // LiveData <-> Compose bridging: screens observe ViewModels with
-    // observeAsState() (Home/Details/Series). Version pinned explicitly so the
-    // artifact never depends on BOM constraint resolution.
     implementation("androidx.compose.runtime:runtime-livedata:1.7.6")
     implementation("androidx.navigation:navigation-compose:2.8.0")
     implementation("androidx.media3:media3-exoplayer:1.10.1")
@@ -130,7 +127,6 @@ dependencies {
     implementation("androidx.media3:media3-common:1.10.1")
     implementation("androidx.media3:media3-session:1.10.1")
     implementation("androidx.media3:media3-datasource-okhttp:1.10.1")
-    // FFmpeg software decoders for HEVC/H264/VP9 fallback on TV boxes without HEVC HW decoder (Maven Central)
     implementation("io.github.anilbeesetti:nextlib-media3ext:1.10.1-0.13.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
