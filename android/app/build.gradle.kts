@@ -14,7 +14,7 @@ if (keystoreFile.exists()) {
 }
 
 android {
-    namespace = "com.maxstream.app"
+    namespace = "com.theebstream.app"
     compileSdk = 36
     ndkVersion = "28.2.13676358"
 
