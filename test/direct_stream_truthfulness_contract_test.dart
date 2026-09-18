@@ -16,12 +16,20 @@ void main() {
     final source = File('lib/services/direct_m3u8_service.dart').readAsStringSync();
 
     expect(
-      RegExp(r'WebStreamService\.resolveStream\([\s\S]*?StreamSecurity\.sanitizeResolverResult\(result\)'),
-      hasMatch(source),
+      source,
+      matches(
+        RegExp(
+          r'WebStreamService\.resolveStream\([\s\S]*?StreamSecurity\.sanitizeResolverResult\(result\)',
+        ),
+      ),
     );
     expect(
-      RegExp(r'WebStreamService\.resolveFromServer\([\s\S]*?StreamSecurity\.sanitizeResolverResult\(result\)'),
-      hasMatch(source),
+      source,
+      matches(
+        RegExp(
+          r'WebStreamService\.resolveFromServer\([\s\S]*?StreamSecurity\.sanitizeResolverResult\(result\)',
+        ),
+      ),
     );
   });
 
