@@ -60,18 +60,24 @@ class _MaxStreamMoreScreenState extends State<MaxStreamMoreScreen> {
               title: 'خدمات البث',
               page: const StreamingProviderSettingsScreen(),
             ),
-            SwitchListTile(
-              secondary: const Icon(Icons.developer_mode, color: Colors.white),
-              title: const Text(
-                'وضع المطور',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+            Focus(
+              child: SwitchListTile(
+                autofocus: false,
+                secondary: const Icon(Icons.developer_mode, color: Colors.white),
+                title: const Text(
+                  'وضع المطور',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                subtitle: const Text(
+                  'يعرض أدوات التشخيص التقنية المتقدمة',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                value: _developerMode,
+                onChanged: _setDeveloperMode,
               ),
-              subtitle: const Text(
-                'يعرض أدوات التشخيص التقنية المتقدمة',
-                style: TextStyle(color: Colors.grey),
-              ),
-              value: _developerMode,
-              onChanged: _setDeveloperMode,
             ),
             if (_developerMode)
               _buildMenuItem(
