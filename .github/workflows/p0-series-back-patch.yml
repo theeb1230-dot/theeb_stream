@@ -1,0 +1,51 @@
+name: P0 series back patch
+
+on:
+  push:
+    branches:
+      - p0/source-health-back-search-registry-2.1.3
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: p0/source-health-back-search-registry-2.1.3
+          fetch-depth: 0
+      - name: Patch series navigation and Arabic text
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('lib/screens/maxstream_series_screen.dart')
+          t = p.read_text()
+          reps = [
+            ("SliverAppBar(\n            expandedHeight: 350,", "SliverAppBar(\n            leading: BackButton(\n              color: Colors.white,\n              onPressed: () {\n                _youtubeController?.pause();\n                Navigator.of(context).maybePop();\n              },\n            ),\n            expandedHeight: 350,"),
+            ("return SliverAppBar(\n      expandedHeight: 350,", "return SliverAppBar(\n      leading: BackButton(\n        color: Colors.white,\n        onPressed: () {\n          _youtubeController?.pause();\n          Navigator.of(context).maybePop();\n        },\n      ),\n      expandedHeight: 350,"),
+            ("'\\n\\n$unreleasedCount unreleased episodes will be skipped.'", "'\\n\\nسيتم تخطي $unreleasedCount حلقة لم تُعرض بعد.'"),
+            ("'\\n\\nQuality: the lowest available on the chosen server, and every episode continues using that same server.'", "'\\n\\nالجودة: أقل جودة متاحة على الخادم المختار، وستستمر حلقات الموسم على الخادم نفسه.'"),
+            ("'${seriesDetails!['number_of_seasons']} Seasons'", "'${seriesDetails!['number_of_seasons']} موسم'"),
+          ]
+          for old, new in reps:
+            if old not in t:
+              raise SystemExit(f'anchor missing: {old!r}')
+            t = t.replace(old, new, 1)
+          p.write_text(t)
+          PY
+      - name: Verify
+        run: |
+          test "$(grep -c "Navigator.of(context).maybePop" lib/screens/maxstream_series_screen.dart)" -ge 2
+          ! grep -q "unreleased episodes will be skipped" lib/screens/maxstream_series_screen.dart
+          ! grep -q "Quality: the lowest available" lib/screens/maxstream_series_screen.dart
+      - name: Commit
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/screens/maxstream_series_screen.dart
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "fix(navigation): guarantee series back controls and Arabic copy [p0-series-back]"
+          git push origin HEAD:p0/source-health-back-search-registry-2.1.3
