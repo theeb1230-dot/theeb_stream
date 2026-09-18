@@ -22,7 +22,9 @@ void main() {
       source,
       contains("playbackStarted: stream['playbackStarted'] == true"),
     );
-    expect(source, contains("statusText = 'بدأ فعليًا';"));
+    expect(source, contains('state.arabicLabel'));
+    expect(source, contains('SourceHealthState.playbackStarted => Colors.green'));
+    expect(source, contains("'بدأ فعليًا'"));
   });
 
   test('extractor group counters describe every displayed item', () {
