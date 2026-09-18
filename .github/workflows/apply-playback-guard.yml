@@ -1,0 +1,61 @@
+name: Apply playback guard patch
+
+on:
+  push:
+    branches:
+      - reliability/playback-start-confirmation-2.1.2b
+    paths:
+      - .github/workflows/apply-playback-guard.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: reliability/playback-start-confirmation-2.1.2b
+          fetch-depth: 0
+      - name: Patch player atomically
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('lib/screens/m3u8_video_player_screen.dart')
+          s = p.read_text()
+          replacements = [
+            ("import '../services/native_stream_extractor.dart';\n", "import '../services/native_stream_extractor.dart';\nimport '../services/playback_start_guard.dart';\n"),
+            ("        if (shouldPlay) await controller.play();\n\n        if (!mounted) {", "        if (shouldPlay) {\n          await controller.play();\n          final started = await const PlaybackStartGuard().confirm(\n            position: () => controller.value.position,\n            hasError: () => controller.value.hasError,\n            isPlaying: () => controller.value.isPlaying,\n            isDisposed: () => !mounted,\n          );\n          if (!started) {\n            throw TimeoutException('Playback did not advance after play()');\n          }\n        }\n\n        if (!mounted) {"),
+            ("              : 'Switching to $selectedQuality...',", "              : 'جارٍ التبديل إلى جودة $selectedQuality...',"),
+            ("                  'Please try again later.';", "                  'حاول مرة أخرى بعد قليل.';"),
+            ("            'This downloaded video is incomplete or damaged and cannot continue. '\n            'احذفه ثم أعد تنزيله.';", "            'الفيديو المُنزّل غير مكتمل أو تالف ولا يمكن متابعة تشغيله. '\n            'احذفه ثم أعد تنزيله.';"),
+            ("          _showStatus('Loading a working stream from ${server['source']}...');", "          _showStatus('جارٍ تحميل بث يعمل من ${server['source'] ?? 'الخادم'}...');"),
+            ("                    : '${_availableServers.length} server${_availableServers.length == 1 ? '' : 's'}',", "                    : '${_availableServers.length} خادم',"),
+            ("              final source = stream['source']?.toString() ?? 'Server';", "              final source = stream['source']?.toString() ?? 'خادم';"),
+            ("                          ? 'Server ${entry.key + 1}'\n                          : 'Via $server · Server ${entry.key + 1}')", "                          ? 'الخادم ${entry.key + 1}'\n                          : 'عبر $server · الخادم ${entry.key + 1}')"),
+            ("        SnackBar(content: Text('Could not switch server: $error')),", "        SnackBar(content: Text('تعذر التبديل إلى الخادم: $error')),"),
+            ("    _showStatus('Fetching $identity...');", "    _showStatus('جارٍ جلب $identity...');"),
+            ("          SnackBar(content: Text('$identity is still unavailable')),", "          SnackBar(content: Text('$identity ما يزال غير متاح')),"),
+            ("        SnackBar(content: Text('Could not switch quality: $error')),", "        SnackBar(content: Text('تعذر تغيير جودة الفيديو: $error')),"),
+            ("                      'Preparing video...',", "                      'جارٍ تجهيز الفيديو...',"),
+            ("                      'Changing video quality...',", "                      'جارٍ تغيير جودة الفيديو...',"),
+            ("                          'Next episode in $_nextEpisodeCountdown seconds',", "                          'الحلقة التالية خلال $_nextEpisodeCountdown ثانية',"),
+            ("                              child: const Text('Play now'),", "                              child: const Text('تشغيل الآن'),"),
+            ("                                'Cancel',", "                                'إلغاء',"),
+            ("            'Loading ${widget.title}...',", "            'جارٍ تحميل ${widget.title}...',"),
+            ("                        available ? source : '$source · retry',", "                        available ? source : '$source · إعادة المحاولة',"),
+          ]
+          for old, new in replacements:
+            if old not in s:
+              raise SystemExit(f'Expected anchor not found: {old[:100]!r}')
+            s = s.replace(old, new, 1)
+          p.write_text(s)
+      - name: Commit patch and remove one-shot workflow
+        run: |
+          rm .github/workflows/apply-playback-guard.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/screens/m3u8_video_player_screen.dart .github/workflows/apply-playback-guard.yml
+          git commit -m "fix(player): confirm real playback before server success"
+          git push origin HEAD:reliability/playback-start-confirmation-2.1.2b
