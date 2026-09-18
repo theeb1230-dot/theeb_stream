@@ -1976,17 +1976,22 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
               final server = stream['server']?.toString() ?? source;
               final selected = _serverIdentity(stream) == _selectedServerKey;
               final url = stream['url']?.toString() ?? '';
-              final available = url.isNotEmpty;
+              final hasResolvedUrl = url.isNotEmpty;
+              final playbackStarted =
+                  selected &&
+                  (_videoPlayerController?.value.isInitialized ?? false) &&
+                  (_videoPlayerController?.value.position ?? Duration.zero) >
+                      Duration.zero;
               return ListTile(
                 leading: Icon(
-                  selected
+                  playbackStarted
                       ? Icons.check_circle
-                      : available
-                          ? Icons.play_circle_outline
+                      : hasResolvedUrl
+                          ? Icons.link
                           : Icons.refresh,
-                  color: selected
-                      ? Colors.red
-                      : available
+                  color: playbackStarted
+                      ? Colors.greenAccent
+                      : hasResolvedUrl
                           ? Colors.white70
                           : Colors.orangeAccent,
                 ),
@@ -1995,13 +2000,19 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 subtitle: Text(
-                  available
-                      ? (server == source
-                          ? 'الخادم ${entry.key + 1}'
-                          : 'عبر $server · الخادم ${entry.key + 1}')
-                      : 'غير متاح · اضغط لإعادة المحاولة',
+                  playbackStarted
+                      ? 'بدأ فعليًا · الخادم ${entry.key + 1}'
+                      : hasResolvedUrl
+                          ? (server == source
+                              ? 'رابط مستخرج · لم يبدأ التشغيل بعد'
+                              : 'رابط مستخرج عبر $server · لم يبدأ التشغيل بعد')
+                          : 'فشل/غير مؤكد · اضغط لإعادة المحاولة',
                   style: TextStyle(
-                    color: available ? Colors.white54 : Colors.orangeAccent,
+                    color: playbackStarted
+                        ? Colors.greenAccent
+                        : hasResolvedUrl
+                            ? Colors.white54
+                            : Colors.orangeAccent,
                   ),
                 ),
                 enabled: !selected && !_isSwitchingServer && !_isRetryingServer,
@@ -2009,7 +2020,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     ? null
                     : () {
                         Navigator.of(sheetContext).pop();
-                        if (available) {
+                        if (hasResolvedUrl) {
                           _switchServer(stream);
                         } else {
                           _retryServer(stream);
@@ -2136,7 +2147,10 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         );
         return;
       }
-      resolved['available'] = true;
+      // A resolved URL is not playback success. Keep health fail-closed until
+      // the player confirms initialization and actual position progress.
+      resolved['available'] = false;
+      resolved['playbackStatus'] = 'url_extracted';
       setState(() {
         final idx = _availableServers.indexWhere(
           (s) => _serverIdentity(s) == identity,
