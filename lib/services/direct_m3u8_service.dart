@@ -27,12 +27,13 @@ class DirectM3u8Service {
     debugPrint('$_tag: Resolving movie $title (TMDB: $id)');
 
     if (_useWorkerResolver) {
-      return WebStreamService.resolveStream(
+      final result = await WebStreamService.resolveStream(
         tmdbId: id,
         isMovie: true,
         title: title,
         directOnly: !kIsWeb,
       );
+      return StreamSecurity.sanitizeResolverResult(result);
     }
     if (!_useAndroidNative) return null;
 
@@ -71,7 +72,7 @@ class DirectM3u8Service {
     debugPrint('$_tag: Resolving $title S${season}E$episode (TMDB: $id)');
 
     if (_useWorkerResolver) {
-      return WebStreamService.resolveStream(
+      final result = await WebStreamService.resolveStream(
         tmdbId: id,
         isMovie: false,
         season: season,
@@ -79,6 +80,7 @@ class DirectM3u8Service {
         title: title,
         directOnly: !kIsWeb,
       );
+      return StreamSecurity.sanitizeResolverResult(result);
     }
     if (!_useAndroidNative) return null;
 
@@ -118,7 +120,9 @@ class DirectM3u8Service {
     int episode = 1,
   }) async {
     if (kIsWeb) {
-      // On web, return embed sources as available servers.
+      // Embed templates are inventory, not proof of a playable stream. Keep
+      // them selectable for the web fallback but never label them as a
+      // player-start-confirmed source merely because a URL can be constructed.
       final sources = WebStreamService.servers;
       return sources.map((source) {
         final url = isMovie
@@ -132,7 +136,8 @@ class DirectM3u8Service {
           'source': source['name'],
           'type': 'embed',
           'isEmbed': true,
-          'available': true,
+          'available': false,
+          'playbackStatus': 'uncertain_webview',
         };
       }).toList();
     }
@@ -148,12 +153,14 @@ class DirectM3u8Service {
             episode: episode,
             directOnly: true,
           );
-          return result ??
+          final sanitized = StreamSecurity.sanitizeResolverResult(result);
+          return sanitized ??
               <String, dynamic>{
                 'url': '',
                 'source': source['name'],
                 'type': 'unavailable',
                 'available': false,
+                'playbackStatus': 'unconfirmed',
               };
         }),
       );
@@ -169,24 +176,20 @@ class DirectM3u8Service {
       episode: episode,
       title: title,
     );
-    // Keep every entry, including servers whose extraction failed (empty
-    // URL, available: false) so the picker can list them and offer re-fetch.
     return streams.map((stream) {
       final url = stream['url']?.toString() ?? '';
       if (url.isEmpty) {
         return {
           ...stream,
-          'headers':
-              StreamSecurity.sanitizeHeaders(stream['headers'] is Map ? stream['headers'] as Map : null),
+          'headers': StreamSecurity.sanitizeHeaders(
+            stream['headers'] is Map ? stream['headers'] as Map : null,
+          ),
         };
       }
       return StreamSecurity.sanitizeResolverResult(stream);
     }).whereType<Map<String, dynamic>>().toList();
   }
 
-  /// Re-resolves a single named server on demand (used when the user taps a
-  /// server that failed during discovery). Returns the sanitized stream map,
-  /// or null if the server is still unavailable.
   static Future<Map<String, dynamic>?> resolveServer({
     required String serverName,
     required String title,
@@ -201,7 +204,7 @@ class DirectM3u8Service {
         (entry) => entry['name']?.toLowerCase() == serverName.toLowerCase(),
       );
       if (server.isEmpty) return null;
-      return WebStreamService.resolveFromServer(
+      final result = await WebStreamService.resolveFromServer(
         serverId: server.first['id']!,
         tmdbId: tmdbId,
         isMovie: isMovie,
@@ -209,6 +212,7 @@ class DirectM3u8Service {
         episode: episode,
         directOnly: true,
       );
+      return StreamSecurity.sanitizeResolverResult(result);
     }
     if (!_useAndroidNative) return null;
     final result = await NativeStreamExtractor.resolveServer(
@@ -222,20 +226,17 @@ class DirectM3u8Service {
     return StreamSecurity.sanitizeResolverResult(result);
   }
 
-  /// Pre-flight check that a resolved stream URL will actually play before we
-  /// hand it to ExoPlayer. Downloads only the head of the resource (the HLS
-  /// manifest is small; a direct file is capped at 64KB) so it is fast, and
-  /// rejects only URLs that are definitively dead (unreachable, non-2xx, or
-  /// empty body). It deliberately errs on the side of passing: CDNs often
-  /// behave differently for different clients, so a stream that merely looks
-  /// odd is still handed to the player, which is the final arbiter. The caller
-  /// uses this to prefer working servers, never to block every server.
+  /// Lightweight transport pre-flight only. A true result means the resource
+  /// is readable, not that playback has started. Player-start confirmation is
+  /// deliberately owned by PlaybackStartGuard in the player runtime.
   static Future<bool> validateStream(
     String url, {
     Map<String, String> headers = const {},
     Duration timeout = const Duration(seconds: 10),
   }) async {
-    if (kIsWeb) return true;
+    // Browser/embed reachability cannot prove media playback. Fail closed so
+    // diagnostics cannot turn a constructed embed URL green.
+    if (kIsWeb) return false;
     if (url.isEmpty) return false;
     final uri = Uri.tryParse(url);
     if (uri == null || uri.host.isEmpty) return false;
@@ -272,7 +273,6 @@ class DirectM3u8Service {
     }
   }
 
-  /// Embed URLs for VidLinkExtractor fallback.
   static const List<Map<String, String>> _embedSources = [
     {
       'name': 'VidLink',
@@ -281,8 +281,7 @@ class DirectM3u8Service {
     },
   ];
 
-  static List<Map<String, String>> getEmbedSources() =>
-      List.from(_embedSources);
+  static List<Map<String, String>> getEmbedSources() => List.from(_embedSources);
 
   static String generateMovieEmbedUrl(String tmdbId, String sourceName) {
     final s = _embedSources.firstWhere(
