@@ -1,5 +1,30 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — دمج #56 وبدء #57 Developer Mode gating
+
+- exact main بعد إعادة التحقق والدمج: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`.
+- PR #56 exact head `fd233c321d396283555615c8557db035db3abf9b`: Branch CI #245 success (identity audit + analyze + tests) وBuild #245 success على نفس SHA: Mobile APKs arm64/armeabi-v7a/x86_64، TV APK، iOS unsigned IPA. artifacts non-zero وبـhead SHA نفسه. Android keystore/signing steps skipped لغياب secrets؛ iOS no-codesign.
+- لا reviews/threads حاجبة و#56 كان ahead 14 / behind 0، فتم squash merge باستخدام expected head SHA.
+- بعد إعادة قراءة main بدأ PR #57 فقط على `p0/developer-diagnostics-gate-2.1.3`.
+- #57 يجعل شاشة diagnostics التفصيلية مخفية افتراضيًا خلف `وضع المطور`، مع حفظ الاختيار عبر shared_preferences الموجودة أصلًا. المستخدم العادي لا يرى route «تشخيص المصادر» إلا بعد تفعيل الوضع.
+- أضيف `test/developer_diagnostics_gate_test.dart` لمنع رجوع exposure غير المشروط.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت ميدانيًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB contract ثابت؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- Back/player وwatchdog ~12s قائم؛ device/TV runtime evidence ما زال مطلوبًا.
+- version/tag/release: `2.1.3+19` / `v2.1.3`. لا Release جديد لهذه الدفعة حتى exact-head #57 gates.
+
+### أهداف التشغيل التالي
+
+1. فحص exact-head Branch CI + Mobile/TV/iOS لـ#57 وإصلاح أي failure من logs.
+2. تدقيق UX وضع المطور على TV D-Pad/focus وعدم جعل SwitchListTile trap.
+3. دمج #57 فور خضرة exact-head والـmergeability بلا blocker، ثم إعادة قراءة main.
+4. تقوية Back/TV focus للحالات loading/error/dialog/server picker/fullscreen.
+5. إبقاء 22 net-new pending حتى resolver/template مسموح + player-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #56: إصلاح ثاني regression contract على exact head
 
 - exact main: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 هو المفتوح الوحيد، behind=0 ولا reviews/threads حاجبة.
