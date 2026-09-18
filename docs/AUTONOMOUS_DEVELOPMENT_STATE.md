@@ -1,5 +1,29 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #57: إصلاح TEST_DEFECT على Developer Mode gate
+
+- exact main: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، branch `p0/developer-diagnostics-gate-2.1.3`.
+- exact head المفحوص `68173165f565bdc99cfc61bd35908de203d4c189`: Branch CI #250 نجح identity audit وflutter analyze ثم فشل Flutter tests بنتيجة 48 passed / 1 failed. Build #251 كان ما يزال in-progress وقت الفحص ولا يُورث بعد تغيير head.
+- root cause من logs: `developer_diagnostics_gate_test.dart` ربط وجود النص «وضع المطور» بمسافات indentation قديمة قبل إضافة Focus لـTV. السلوك الإنتاجي صحيح؛ هذا TEST_DEFECT هش.
+- تم إصلاح الاختبار ليقفل وجود النص والعقد السلوكي `if (_developerMode)` وroute التشخيص وFocus دون الاعتماد على whitespace. لا تخفيف للـDeveloper Mode gate.
+- TV focus: مفتاح وضع المطور ملفوف بـFocus ويبقى SwitchListTile قابلًا للـkeyboard/D-Pad؛ أضيف contract test لذلك، لكن device runtime proof ما زال مطلوبًا.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت ميدانيًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB ثابت؛ Theeb Engine غير مربوط دون production HTTPS مثبت ومصرح.
+- Back/player وwatchdog ~12s قائم؛ runtime TV/device evidence وAndroid signing secrets blockers.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد.
+
+### أهداف التشغيل التالي
+
+1. اعتماد CI/Build الخاصة بالـexact head الجديد فقط وإصلاح أي failure من logs.
+2. دمج #57 فور خضرة analyze/tests + Mobile/TV/iOS على SHA واحد والـmergeability بلا blocker.
+3. بعد الدمج إعادة قراءة main وبدء Back/TV focus للحالات loading/error/dialog/server picker/fullscreen.
+4. مراجعة التعريب المرئي المتبقي، خصوصًا رسائل خدمات البث.
+5. إبقاء 22 net-new pending بلا ادعاء تشغيل حتى resolver مسموح + player-start progress فعلي.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #57: Developer Mode + TV focus
 
 - exact main المعاد التحقق منه: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، base متزامن (behind=0).
