@@ -11,6 +11,7 @@ import '../database/db_helper.dart';
 import '../services/direct_m3u8_service.dart';
 import '../services/media_download_manager.dart';
 import '../services/native_stream_extractor.dart';
+import '../services/playback_start_guard.dart';
 import '../services/tmdb_api_service.dart';
 import '../services/watch_history_service.dart';
 import '../services/miniplayer_service.dart';
@@ -860,7 +861,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             setState(() {
               _error =
                   'تعذر بدء التشغيل من جميع الخوادم المتاحة. '
-                  'Please try again later.';
+                  'حاول مرة أخرى بعد قليل.';
             });
           }
           return;
@@ -1535,14 +1536,25 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         _showStatus(
           position == Duration.zero
               ? (isFallback ? 'جارٍ تجربة ترميز متوافق...' : 'جارٍ تحميل الفيديو...')
-              : 'Switching to $selectedQuality...',
+              : 'جارٍ التبديل إلى جودة $selectedQuality...',
         );
         // Timeout after 30s - HLS playlists on slow/CDN can take >15s, and
         // 15s was causing working servers to be marked as failed with
         // TimeoutException after 0:00:15.000000
         await controller.initialize().timeout(const Duration(seconds: 30));
         if (position > Duration.zero) await controller.seekTo(position);
-        if (shouldPlay) await controller.play();
+        if (shouldPlay) {
+          await controller.play();
+          final started = await const PlaybackStartGuard().confirm(
+            position: () => controller.value.position,
+            hasError: () => controller.value.hasError,
+            isPlaying: () => controller.value.isPlaying,
+            isDisposed: () => !mounted,
+          );
+          if (!started) {
+            throw TimeoutException('Playback did not advance after play()');
+          }
+        }
 
         if (!mounted) {
           await controller.dispose();
@@ -1594,7 +1606,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       controller.pause();
       setState(() {
         _error =
-            'This downloaded video is incomplete or damaged and cannot continue. '
+            'الفيديو المُنزّل غير مكتمل أو تالف ولا يمكن متابعة تشغيله. '
             'احذفه ثم أعد تنزيله.';
       });
       return;
@@ -1688,7 +1700,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         // causing stuck at "Switching to Auto" (6x 15s validates).
         var switched = false;
         for (final server in candidates) {
-          _showStatus('Loading a working stream from ${server['source']}...');
+          _showStatus('جارٍ تحميل بث يعمل من ${server['source'] ?? 'الخادم'}...');
           switched = await _tryPlayServer(
             server,
             position: _lastStablePosition,
@@ -1896,7 +1908,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
               subtitle: Text(
                 _serversLoading
                     ? 'جارٍ فحص خوادم أخرى...'
-                    : '${_availableServers.length} server${_availableServers.length == 1 ? '' : 's'}',
+                    : '${_availableServers.length} خادم',
                 style: const TextStyle(color: Colors.white60),
               ),
               trailing: _serversLoading
@@ -1912,7 +1924,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             ),
             ..._availableServers.asMap().entries.map((entry) {
               final stream = entry.value;
-              final source = stream['source']?.toString() ?? 'Server';
+              final source = stream['source']?.toString() ?? 'خادم';
               final server = stream['server']?.toString() ?? source;
               final selected = _serverIdentity(stream) == _selectedServerKey;
               final url = stream['url']?.toString() ?? '';
@@ -1937,8 +1949,8 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                 subtitle: Text(
                   available
                       ? (server == source
-                          ? 'Server ${entry.key + 1}'
-                          : 'Via $server · Server ${entry.key + 1}')
+                          ? 'الخادم ${entry.key + 1}'
+                          : 'عبر $server · الخادم ${entry.key + 1}')
                       : 'غير متاح · اضغط لإعادة المحاولة',
                   style: TextStyle(
                     color: available ? Colors.white54 : Colors.orangeAccent,
@@ -2044,7 +2056,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         _activeSubtitles.value = oldSubtitles;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not switch server: $error')),
+        SnackBar(content: Text('تعذر التبديل إلى الخادم: $error')),
       );
     } finally {
       _isSwitchingServer = false;
@@ -2059,7 +2071,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     final identity = _serverIdentity(stream);
     if (identity.isEmpty) return;
     setState(() => _isRetryingServer = true);
-    _showStatus('Fetching $identity...');
+    _showStatus('جارٍ جلب $identity...');
     try {
       final resolved = await DirectM3u8Service.resolveServer(
         serverName: identity,
@@ -2072,7 +2084,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       if (!mounted) return;
       if (resolved == null || (resolved['url']?.toString() ?? '').isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('$identity is still unavailable')),
+          SnackBar(content: Text('$identity ما يزال غير متاح')),
         );
         return;
       }
@@ -2977,7 +2989,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       if (!mounted) return;
       setState(() => _isSwitchingQuality = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not switch quality: $error')),
+        SnackBar(content: Text('تعذر تغيير جودة الفيديو: $error')),
       );
     }
   }
@@ -3087,7 +3099,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                   Transform.translate(
                     offset: Offset(0, 58),
                     child: Text(
-                      'Preparing video...',
+                      'جارٍ تجهيز الفيديو...',
                       style: TextStyle(color: Colors.white70, fontSize: 14),
                     ),
                   ),
@@ -3190,7 +3202,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                     CircularProgressIndicator(color: Colors.red),
                     SizedBox(height: 12),
                     Text(
-                      'Changing video quality...',
+                      'جارٍ تغيير جودة الفيديو...',
                       style: TextStyle(color: Colors.white),
                     ),
                   ],
@@ -3238,7 +3250,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Next episode in $_nextEpisodeCountdown seconds',
+                          'الحلقة التالية خلال $_nextEpisodeCountdown ثانية',
                           style: const TextStyle(
                             color: Colors.white70,
                             fontSize: 12,
@@ -3258,12 +3270,12 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                           children: [
                             TextButton(
                               onPressed: _playNextEpisode,
-                              child: const Text('Play now'),
+                              child: const Text('تشغيل الآن'),
                             ),
                             TextButton(
                               onPressed: _cancelNextEpisode,
                               child: const Text(
-                                'Cancel',
+                                'إلغاء',
                                 style: TextStyle(color: Colors.white70),
                               ),
                             ),
@@ -3304,7 +3316,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
           const CircularProgressIndicator(color: Colors.red),
           const SizedBox(height: 16),
           Text(
-            'Loading ${widget.title}...',
+            'جارٍ تحميل ${widget.title}...',
             style: const TextStyle(color: Colors.white, fontSize: 16),
             textAlign: TextAlign.center,
           ),
@@ -3417,7 +3429,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
                                 : Colors.orangeAccent,
                       ),
                       label: Text(
-                        available ? source : '$source · retry',
+                        available ? source : '$source · إعادة المحاولة',
                         style: TextStyle(
                           color: selected ? Colors.red : Colors.white,
                           fontSize: 13,
