@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maxstream/services/theeb_arab_server_registry.dart';
+import 'package:theeb_stream/services/theeb_arab_server_registry.dart';
 
 void main() {
   test('Theeb Arab migration inventory contains exactly 27 unique servers', () {
