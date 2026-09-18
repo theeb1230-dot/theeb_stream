@@ -20,7 +20,7 @@ void main() {
     );
     expect(
       source,
-      contains("stream['playbackStarted'] != true"),
+      contains("playbackStarted: stream['playbackStarted'] == true"),
     );
     expect(source, contains("statusText = 'بدأ فعليًا';"));
   });
