@@ -1,5 +1,30 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #56: ربط الحالات الصريحة بالواجهة
+
+- exact main عند بداية الجولة: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`. PR #56 هو المفتوح الوحيد، وكل العمل بقي على `p0/source-health-explicit-states-2.1.3`.
+- head السابق `a25c9eb6e93cbedcfac1d12828ee8710e37fe577` اجتاز Branch CI #234 وBuild #234، لكن هذه الخضرة لا تُورث بعد تغييرات الجولة.
+- تم استبدال `ProviderStatus.healthy bool?` فعليًا بـ `SourceHealthState` داخل `ProviderHealthScreen`. العدادات تعتمد الآن `isPlaybackConfirmed/isFailure`، والبطاقات تعرض الحالات الصريحة.
+- WebView reachability لا يصبح أخضر؛ يظهر `غير مؤكد / يتطلب WebView`. المصدر بلا نطاق قابل للاختبار يصنف WebView أو `غير مدعوم` حسب نوعه. reachability العادي يبقى `لم يُختبر` حتى runtime proof.
+- أزيل `TextOverflow.ellipsis` من حالة المصدر وأصبحت الحالة سطرًا قابلًا للالتفاف، لمنع قص النصوص المطلوبة.
+- أضيف `test/provider_health_explicit_state_ui_test.dart` لقفل استخدام model الصريح والحالات الخمس وعدم truncation.
+- صور المستخدم ما زالت baseline ميداني: 0 Server و0 Extractor مثبتان player-start فعليًا. Canonical registry: 27 total / 5 runtime overlaps / 22 net-new pending؛ runtime-working المؤكد للـ22 = 0.
+- direct-search لم يتغير: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- navigation/back المدمج عبر #55 قائم؛ device/TV runtime focus/back evidence ما زال مطلوبًا.
+- buffering watchdog ~12s + last stable position + failed server/media URL guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد قبل exact-head gates لهذه الدفعة.
+
+### أهداف التشغيل التالي
+
+1. فحص exact head الناتج عن هذا التوثيق وBranch CI + Mobile/TV/iOS الخاصة به فقط؛ إصلاح أي failure من logs على #56.
+2. تدقيق أن resolver/runtime maps يمكنها إنتاج `urlExtracted` صراحة في health screen، لا فقط failed/notTested، وربط metadata المطلوبة دون false positives.
+3. دمج #56 فور خضرة exact-head والـmergeability بلا blocker باستخدام expected head SHA، ثم إعادة قراءة main.
+4. بعد الدمج توسيع Back/TV focus widget/runtime coverage للحالات loading/error/dialog/fullscreen.
+5. إبقاء 22 net-new pending حتى resolver/template مسموح + player-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — دمج #55 وبدء #56
 
 - exact main بعد التحقق والدمج: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`.
