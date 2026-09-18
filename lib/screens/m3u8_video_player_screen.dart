@@ -611,6 +611,9 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   // signed URL, so URL-keyed entries would never match the fresh list and a
   // dead server would keep getting retried (or the current one never skipped).
   final Set<String> _failedServerKeys = {};
+  // Session-scoped media URL blacklist. A dead URL may be returned by more
+  // than one provider identity, so server-key blacklisting alone can loop.
+  final Set<String> _failedMediaUrls = {};
   // Identity of the server currently playing, so the sheet can keep the
   // highlight on it even after its URL is re-extracted fresh.
   String? _selectedServerKey;
@@ -765,6 +768,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
         _separateAudio = result['separateAudio'] == true;
         _playbackRetryCount = 0;
         _failedServerKeys.clear();
+        _failedMediaUrls.clear();
         _availableServers = [result];
         _serversLoading = true;
         _selectedServerKey = _serverIdentity(result);
@@ -943,7 +947,11 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     required String primaryUrl,
   }) async {
     final fallbackUrl = server['url']?.toString() ?? '';
-    if (fallbackUrl.isEmpty || fallbackUrl == primaryUrl) return false;
+    if (fallbackUrl.isEmpty ||
+        fallbackUrl == primaryUrl ||
+        _failedMediaUrls.contains(fallbackUrl)) {
+      return false;
+    }
     final fallbackSource = server['source']?.toString() ?? 'خادم';
     final fallbackQualities = _parseQualities(server['qualities']);
     _subtitleTracks = _unionSubtitleTracks();
@@ -962,6 +970,10 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     );
     if (ok) {
       _selectedServerKey = _serverIdentity(server);
+    } else {
+      _failedMediaUrls.add(fallbackUrl);
+      final failedKey = _serverIdentity(server);
+      if (failedKey.isNotEmpty) _failedServerKeys.add(failedKey);
     }
     return ok;
   }
@@ -1700,6 +1712,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     _cancelBufferingWatchdog();
     final url = _currentStreamUrl;
     if (url == null || _recoveringPlayback) return;
+    _failedMediaUrls.add(url);
     _recoveringPlayback = true;
     _playbackRetryCount++;
     if (mounted) {
@@ -1725,7 +1738,9 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
             .where(
               (s) =>
                   (s['url']?.toString() ?? '').isNotEmpty &&
-                  _serverIdentity(s) != currentKey,
+                  !_failedMediaUrls.contains(s['url']?.toString() ?? '') &&
+                  _serverIdentity(s) != currentKey &&
+                  !_failedServerKeys.contains(_serverIdentity(s)),
             )
             .toList();
         // Try next servers immediately without sequential HEAD validation - was
