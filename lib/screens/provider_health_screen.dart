@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
+import '../models/source_health_state.dart';
 import '../services/native_stream_extractor.dart';
 import '../services/direct_m3u8_service.dart';
 
@@ -10,7 +11,7 @@ class ProviderStatus {
   final String name;
   final String domain;
   final String type; // 'server', 'extractor-api', 'extractor-webview', 'extractor-native'
-  final bool? healthy;
+  final SourceHealthState state;
   final String? error;
   final int? responseMs;
 
@@ -18,17 +19,17 @@ class ProviderStatus {
     required this.name,
     required this.domain,
     required this.type,
-    this.healthy,
+    this.state = SourceHealthState.notTested,
     this.error,
     this.responseMs,
   });
 
-  ProviderStatus copyWith({bool? healthy, String? error, int? responseMs}) {
+  ProviderStatus copyWith({SourceHealthState? state, String? error, int? responseMs}) {
     return ProviderStatus(
       name: name,
       domain: domain,
       type: type,
-      healthy: healthy,
+      state: state ?? this.state,
       error: error,
       responseMs: responseMs,
     );
@@ -210,7 +211,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
                 stream['playbackStarted'] == true &&
                 (stream['url']?.toString().isNotEmpty ?? false));
             _serverResults[i] = provider.copyWith(
-              healthy: success,
+              state: success ? SourceHealthState.playbackStarted : SourceHealthState.failed,
               error: success ? null : 'لم ينتج بثًا صالحًا في اختبار التشغيل',
             );
           }
@@ -228,7 +229,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
             });
             if (success) {
               _extractorResults[i] = provider.copyWith(
-                healthy: true,
+                state: SourceHealthState.playbackStarted,
                 error: null,
               );
             }
@@ -261,8 +262,10 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
         setState(() {
           final list = isServer ? _serverResults : _extractorResults;
           list[index] = provider.copyWith(
-            healthy: null,
-            error: 'لا يوجد نطاق مباشر للاختبار',
+            state: provider.type == 'extractor-webview'
+                ? SourceHealthState.webViewRequired
+                : SourceHealthState.unsupported,
+            error: null,
           );
         });
       }
@@ -290,10 +293,12 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           final list = isServer ? _serverResults : _extractorResults;
           list[index] = provider.copyWith(
             // Reachability alone is intentionally "unknown", not green.
-            healthy: reachable ? null : false,
-            error: reachable
-                ? 'النطاق متاح؛ لم يُثبت بث فعلي بعد'
-                : 'تعذر الوصول إلى النطاق',
+            state: reachable
+                ? (provider.type == 'extractor-webview'
+                    ? SourceHealthState.webViewRequired
+                    : SourceHealthState.notTested)
+                : SourceHealthState.failed,
+            error: reachable ? null : 'تعذر الوصول إلى النطاق',
             responseMs: sw.elapsedMilliseconds,
           );
         });
@@ -304,7 +309,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
         setState(() {
           final list = isServer ? _serverResults : _extractorResults;
           list[index] = provider.copyWith(
-            healthy: false,
+            state: SourceHealthState.failed,
             error: 'تعذر الوصول إلى النطاق',
             responseMs: sw.elapsedMilliseconds,
           );
@@ -371,9 +376,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
   // ── Servers tab ──
 
   Widget _buildServersTab() {
-    final healthyCount = _serverResults.where((s) => s.healthy == true).length;
-    final unhealthyCount = _serverResults.where((s) => s.healthy == false).length;
-    final pendingCount = _serverResults.where((s) => s.healthy == null).length;
+    final healthyCount = _serverResults.where((s) => s.state.isPlaybackConfirmed).length;
+    final unhealthyCount = _serverResults.where((s) => s.state.isFailure).length;
+    final pendingCount = _serverResults.length - healthyCount - unhealthyCount;
 
     return Column(
       children: [
@@ -394,9 +399,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
   // ── Extractors tab ──
 
   Widget _buildExtractorsTab() {
-    final healthyCount = _extractorResults.where((s) => s.healthy == true).length;
-    final unhealthyCount = _extractorResults.where((s) => s.healthy == false).length;
-    final pendingCount = _extractorResults.where((s) => s.healthy == null).length;
+    final healthyCount = _extractorResults.where((s) => s.state.isPlaybackConfirmed).length;
+    final unhealthyCount = _extractorResults.where((s) => s.state.isFailure).length;
+    final pendingCount = _extractorResults.length - healthyCount - unhealthyCount;
 
     // Group by type
     final webviewExtractors = _extractorResults.where((e) => e.type == 'extractor-webview').toList();
@@ -474,8 +479,8 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
   }
 
   Widget _buildSectionHeader(String title, IconData icon, List<ProviderStatus> items) {
-    final started = items.where((s) => s.healthy == true).length;
-    final failed = items.where((s) => s.healthy == false).length;
+    final started = items.where((s) => s.state.isPlaybackConfirmed).length;
+    final failed = items.where((s) => s.state.isFailure).length;
     final uncertain = items.length - started - failed;
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
@@ -502,24 +507,24 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
   }
 
   Widget _buildProviderCard(ProviderStatus provider) {
-    Color statusColor;
-    IconData statusIcon;
-    String statusText;
-
-    if (provider.healthy == true) {
-      statusColor = Colors.green;
-      statusIcon = Icons.check_circle;
-      statusText = 'بدأ فعليًا';
-    } else if (provider.healthy == false) {
-      statusColor = Colors.red;
-      statusIcon = Icons.error;
-      statusText = provider.error ?? 'فشل';
-    } else {
-      statusColor = Colors.grey;
-      statusIcon = Icons.help_outline;
-      statusText = provider.error ??
-          (provider.domain == '-' ? 'لا يوجد نطاق' : 'لم يُختبر');
-    }
+    final state = provider.state;
+    final statusColor = switch (state) {
+      SourceHealthState.playbackStarted => Colors.green,
+      SourceHealthState.failed => Colors.red,
+      SourceHealthState.urlExtracted => Colors.amber,
+      SourceHealthState.webViewRequired => Colors.orange,
+      SourceHealthState.unsupported => Colors.blueGrey,
+      SourceHealthState.notTested => Colors.grey,
+    };
+    final statusIcon = switch (state) {
+      SourceHealthState.playbackStarted => Icons.check_circle,
+      SourceHealthState.failed => Icons.error,
+      SourceHealthState.urlExtracted => Icons.link,
+      SourceHealthState.webViewRequired => Icons.web,
+      SourceHealthState.unsupported => Icons.block,
+      SourceHealthState.notTested => Icons.help_outline,
+    };
+    final statusText = provider.error ?? state.arabicLabel;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -529,6 +534,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(statusIcon, color: statusColor, size: 22),
           const SizedBox(width: 12),
@@ -549,18 +555,17 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
                   provider.domain == '-' ? 'لا يوجد نطاق' : provider.domain,
                   style: TextStyle(color: Colors.grey[500], fontSize: 12),
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  statusText,
+                  softWrap: true,
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
-            ),
-          ),
-          Flexible(
-            child: Text(
-              statusText,
-              style: TextStyle(
-                color: statusColor,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
