@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/maxstream_about_screen.dart';
-import '../screens/provider_health_screen.dart';
+import '../screens/provider_health_overview_screen.dart';
 import '../screens/streaming_provider_settings_screen.dart';
 import '../screens/updates_screen.dart';
 
@@ -36,7 +36,7 @@ class MaxStreamMoreScreen extends StatelessWidget {
               context,
               icon: Icons.health_and_safety,
               title: 'حالة المصادر',
-              page: const ProviderHealthScreen(),
+              page: const ProviderHealthOverviewScreen(),
             ),
             _buildMenuItem(
               context,
