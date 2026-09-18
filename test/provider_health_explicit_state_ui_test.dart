@@ -32,6 +32,25 @@ void main() {
     expect(source, isNot(contains('TextOverflow.ellipsis')));
   });
 
+  test('runtime extracted URLs stay extracted rather than failed or green', () {
+    final source =
+        File('lib/screens/provider_health_screen.dart').readAsStringSync();
+
+    expect(source, contains('sourceHealthStateFromRuntime('));
+    expect(
+      source,
+      contains('states.contains(SourceHealthState.urlExtracted)'),
+    );
+    expect(
+      source,
+      contains('? SourceHealthState.urlExtracted'),
+    );
+    expect(
+      source,
+      contains("stream['playbackStarted'] == true"),
+    );
+  });
+
   test('WebView reachability stays unverified rather than green', () {
     final source =
         File('lib/screens/provider_health_screen.dart').readAsStringSync();
