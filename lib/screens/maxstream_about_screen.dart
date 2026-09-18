@@ -12,8 +12,8 @@ class MaxStreamAboutScreen extends StatefulWidget {
 }
 
 class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
-  String _version = 'v1.6.0';
-  String _variant = '...';
+  String _version = 'جارٍ التحميل...';
+  String _variant = 'جارٍ التحقق...';
 
   @override
   void initState() {
@@ -24,7 +24,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
   Future<void> _loadVersion() async {
     try {
       final info = await PackageInfo.fromPlatform();
-      String variant = 'unknown';
+      String variant = 'غير معروف';
       try {
         if (Platform.isAndroid) {
           variant = await const MethodChannel('com.maxstream.app/install')
@@ -39,7 +39,14 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
           _variant = variant;
         });
       }
-    } catch (_) {}
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _version = 'غير متاح';
+          _variant = Platform.isAndroid ? _getArchFromAbi() : 'غير معروف';
+        });
+      }
+    }
   }
 
   String _getArchFromAbi() {
@@ -49,7 +56,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
       if (abi.contains('arm')) return 'armeabi-v7a';
       if (abi.contains('x86_64') || abi.contains('amd64')) return 'x86_64';
     } catch (_) {}
-    return 'unknown';
+    return 'غير معروف';
   }
 
   @override
@@ -131,7 +138,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
                   _buildActionCard(
                     icon: Icons.code,
                     title: 'مستودع GitHub',
-                    subtitle: 'https://github.com/theeb1230-dot/theeb_stream',
+                    subtitle: 'github.com/theeb1230-dot/theeb_stream',
                     onTap: () => _launchUrl('https://github.com/theeb1230-dot/theeb_stream'),
                   ),
                   const SizedBox(height: 32),
@@ -169,9 +176,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.red.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
       ),
       child: Column(
         children: [
@@ -205,20 +210,11 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
             ),
           ),
           const SizedBox(height: 4),
-          Text(
-            _version,
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 14,
-            ),
-          ),
+          Text(_version, style: TextStyle(color: Colors.grey[500], fontSize: 14)),
           const SizedBox(height: 12),
           Text(
             'اكتشف. شاهد. استمتع.',
-            style: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.grey[400], fontSize: 14),
           ),
         ],
       ),
@@ -269,11 +265,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
                 const SizedBox(height: 4),
                 Text(
                   content,
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
+                  style: TextStyle(color: Colors.grey[400], fontSize: 13, height: 1.4),
                 ),
               ],
             ),
@@ -297,9 +289,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
         decoration: BoxDecoration(
           color: const Color(0xFF1A1A1A),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.08),
-          ),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Row(
           children: [
@@ -326,21 +316,11 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 13,
-                    ),
-                  ),
+                  Text(subtitle, style: TextStyle(color: Colors.grey[500], fontSize: 13)),
                 ],
               ),
             ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey[600],
-              size: 14,
-            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.grey[600], size: 14),
           ],
         ),
       ),
@@ -353,10 +333,7 @@ class _MaxStreamAboutScreenState extends State<MaxStreamAboutScreen> {
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E1E1E),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'المساعدة والدعم',
-          style: TextStyle(color: Colors.white),
-        ),
+        title: const Text('المساعدة والدعم', style: TextStyle(color: Colors.white)),
         content: const Text(
           'للمساعدة والدعم، راجع مستودع ذيب ستريم على GitHub.',
           style: TextStyle(color: Colors.white70),
