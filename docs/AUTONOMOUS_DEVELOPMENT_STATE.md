@@ -1,5 +1,25 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-18 — إصلاح Branch CI على PR #55
+
+- exact main عند بداية الجولة بقي `fac694aad540dbb231455a7fff851b05e2178271` وPR #55 هو المفتوح الوحيد.
+- exact head السابق `95b23f6c4b9e21c6191055c7740e33723954d537`: Branch CI run #228 فشل في Flutter analyze بسبب test contract جديد كان يحتوي Dart interpolation غير مقصود في literal matcher؛ ليست مشكلة infra ولذلك لم يُستخدم rerun.
+- أُصلح السبب الجذري على نفس branch بتحويل expected matcher literals إلى raw strings. exact head بعد إصلاح الكود: `0407c2b215dd44aa4abc5374ae4b18c76671508f` قبل commit هذا التوثيقي.
+- Build Mobile+TV run #227 للـhead السابق كان ما يزال in-progress عند الفحص، لكنه لا يورث للـhead الجديد.
+- source truth baseline يبقى 0 Server / 0 Extractor مثبت player-start ميدانيًا. 27 total / 5 runtime overlaps / 22 net-new pending. لا provider جديد يُرفع إلى working من URL/reachability فقط.
+- لا merge ولا Release حتى Branch CI + analyze/tests + Mobile/TV + iOS UNSIGNED تكون خضراء على exact head واحد.
+
+### أهداف التشغيل التالي
+
+1. فحص exact head الناتج عن هذا التوثيق واعتماد runs الخاصة به فقط.
+2. معالجة أي CODE_DEFECT/TEST_DEFECT من logs على #55 دون rerun أعمى.
+3. دمج #55 فور اكتمال exact-head gates والـmergeability بلا blocker.
+4. بعد merge إعادة فحص main ثم استكمال نموذج حالات source-health الصريح وBack/TV runtime coverage.
+5. إبقاء 22 net-new pending حتى دليل resolver/template مسموح + playback-start فعلي.
+
+---
+
+
 ## تشغيل 2026-09-18 — متابعة P0 source-health على PR #55
 
 - exact main عند بداية الجولة: `fac694aad540dbb231455a7fff851b05e2178271`. PR #55 بقي المفتوح الوحيد وكل التغييرات على branch نفسه.
