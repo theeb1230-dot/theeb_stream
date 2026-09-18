@@ -207,6 +207,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
             if (attempts.isEmpty) continue;
             final success = attempts.any((stream) =>
                 stream['available'] == true &&
+                stream['playbackStarted'] == true &&
                 (stream['url']?.toString().isNotEmpty ?? false));
             _serverResults[i] = provider.copyWith(
               healthy: success,
@@ -218,6 +219,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
             final provider = _extractorResults[i];
             final success = streams.any((stream) {
               if (stream['available'] != true ||
+                  stream['playbackStarted'] != true ||
                   !(stream['url']?.toString().isNotEmpty ?? false)) {
                 return false;
               }
@@ -472,7 +474,9 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
   }
 
   Widget _buildSectionHeader(String title, IconData icon, List<ProviderStatus> items) {
-    final healthy = items.where((s) => s.healthy == true).length;
+    final started = items.where((s) => s.healthy == true).length;
+    final failed = items.where((s) => s.healthy == false).length;
+    final uncertain = items.length - started - failed;
     return Padding(
       padding: const EdgeInsets.only(top: 16, bottom: 8),
       child: Row(
@@ -489,7 +493,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
           ),
           const Spacer(),
           Text(
-            '$healthy/${items.length}',
+            'بدأ $started · فشل $failed · غير مؤكد $uncertain · المجموع ${items.length}',
             style: TextStyle(color: Colors.grey[500], fontSize: 12),
           ),
         ],
@@ -505,9 +509,7 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
     if (provider.healthy == true) {
       statusColor = Colors.green;
       statusIcon = Icons.check_circle;
-      statusText = provider.responseMs != null
-          ? 'بث صالح • ${provider.responseMs}ms'
-          : 'بث صالح';
+      statusText = 'بدأ فعليًا';
     } else if (provider.healthy == false) {
       statusColor = Colors.red;
       statusIcon = Icons.error;
