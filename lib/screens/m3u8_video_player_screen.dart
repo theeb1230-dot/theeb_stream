@@ -3085,9 +3085,15 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      // Do not trap Android system/TV Back or the iOS back gesture. Cleanup is
+      // already idempotent in dispose(), while explicit player exit still
+      // awaits progress persistence through _exitPlayer().
+      canPop: true,
       onPopInvoked: (didPop) {
-        if (!didPop) _exitPlayer();
+        if (didPop) {
+          _cancelBufferingWatchdog();
+          unawaited(_saveProgress());
+        }
       },
       child: Scaffold(
         backgroundColor: Colors.black,
