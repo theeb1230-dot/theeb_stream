@@ -1,5 +1,29 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-18 — متابعة P0 source-health على PR #55
+
+- exact main عند بداية الجولة: `fac694aad540dbb231455a7fff851b05e2178271`. PR #55 بقي المفتوح الوحيد وكل التغييرات على branch نفسه.
+- اكتُشف false-positive إضافي في `ProviderHealthScreen`: كان نجاح resolver مع `available=true` + URL غير فارغ كافيًا لرفع Server/Extractor إلى healthy. أصبح النجاح يتطلب أيضًا `playbackStarted == true`، لذلك استخراج URL وحده لا يرفع العداد الأخضر.
+- نص النجاح في بطاقة المصدر أصبح `بدأ فعليًا` بدل `بث صالح` العام. رؤوس مجموعات المستخرجات لم تعد تعرض صيغة `healthy/total` المضللة؛ أصبحت تعرض started/failed/uncertain/total بحيث يطابق المجموع العناصر المعروضة.
+- أضيف regression test `test/provider_health_playback_truth_contract_test.dart` لقفل playback-start proof والعدادات الصادقة.
+- head تغيّر بعد هذه الإصلاحات، لذلك كل نتائج CI/build للـheads السابقة غير قابلة للتوريث. يجب اعتماد exact head النهائي فقط.
+- baseline الميداني من صور المستخدم يبقى: 0 Server و0 Extractor مثبتان كـplayer-start فعلي. Registry يبقى 27 total / 5 runtime overlaps / 22 net-new pending؛ لا working جديد مثبت.
+- direct search: TMDB contract ثابت؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- navigation/back: PR #55 أزال player `PopScope(canPop:false)` وأضاف contract للـplatform Back؛ device/TV runtime evidence ما زال blocker خارجي.
+- buffering: ~12s watchdog + stable position + server/media URL loop guards على main.
+- version `2.1.3+19`، tag/release الحالي `v2.1.3`; لا Release جديد قبل exact-head gates.
+
+### أهداف التشغيل التالي
+
+1. فحص exact head النهائي لـ#55 وBranch CI + Mobile/TV/iOS؛ إصلاح أي failure من logs على نفس الفرع.
+2. دمج #55 فور خضرة exact-head والـmergeability بلا blocker باستخدام expected head SHA.
+3. بعد إعادة قراءة main، مراجعة الحالات المطلوبة `رابط مستخرج` / `غير مؤكد/يتطلب WebView` / `غير مدعوم` في شاشة health وإضافة model صريح بدل bool الثلاثي إذا لزم.
+4. تقوية runtime/widget Back للـloading/error/dialogs/fullscreen وTV focus restoration.
+5. مواصلة 27-server adapters فقط عند resolver/template موثق ومسموح، دون ترقية registration إلى working.
+
+---
+
+
 ## تشغيل 2026-09-18 — متابعة PR #55: Back trap + source truth
 
 - exact main ما زال `fac694aad540dbb231455a7fff851b05e2178271`; PR #55 هو المفتوح الوحيد، لذلك كل العمل بقي على `p0/player-server-truth-back-2.1.3`.
