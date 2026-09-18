@@ -1,5 +1,30 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #56: حفظ حالة «رابط مستخرج» من runtime
+
+- exact main المعاد التحقق منه: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 ما زال المفتوح الوحيد ضمن 75 branch ظاهرة.
+- exact head عند بداية العمل: `f65dc0ff56b3018222f9fc133fc431ca968dfb02`. Actions الخاصة به بدأت: Branch CI #237 queued وBuild #237 pending وقت الفحص، ولذلك لم تُورث أي خضرة سابقة ولم يتم الدمج.
+- أصلح runtime mapping في `ProviderHealthScreen`: المحاولة التي ترجع URL مع `available=true` لكن بلا `playbackStarted` أصبحت تبقى `رابط مستخرج` بدل أن تُختزل إلى `فشل`، مع أولوية fail-closed: بدأ فعليًا > رابط مستخرج > WebView > غير مدعوم > فشل.
+- نفس التصنيف الصريح طُبق على Servers وExtractors عبر `sourceHealthStateFromRuntime`. لا يزال النجاح الأخضر مستحيلًا بلا player-start + available + URL.
+- أضيف regression contract يثبت أن runtime URL المستخرج لا يصبح أخضر ولا يضيع كفشل عام.
+- baseline صور المستخدم لم يتغير: 8 Servers و41 Extractors مسجلون في شاشة diagnostics، لكن player-start المثبت ميدانيًا = 0 Server / 0 Extractor.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending؛ لا net-new runtime-working مثبت.
+- direct-search: TMDB `/search/multi`, `include_adult=false`, `language=ar-SA`; Theeb Engine غير مربوط دون production HTTPS مثبت ومصرح.
+- navigation/back: إصلاحات #55 موجودة؛ device/TV runtime evidence ما زال blocker خارجيًا.
+- buffering fallback: watchdog ~12s + stable-position resume + failed server/media URL loop guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد، ولا ادعاء Android release-key signing أو iOS signed installability.
+
+### أهداف التشغيل التالي
+
+1. فحص exact-head CI/Build الناتج بعد commits هذه الجولة فقط وإصلاح أي CODE/TEST defect من logs.
+2. عند خضرة Branch CI + Mobile/TV/iOS على exact head والتحقق من mergeability، دمج #56 بـexpected head SHA ثم إعادة قراءة main.
+3. بعد الدمج، تقوية Back/TV focus للحالات loading/error/dialog/server picker/fullscreen مع اختبارات سلوكية.
+4. مراجعة Developer Mode حتى لا تظهر diagnostics التفصيلية للمستخدم العادي.
+5. إبقاء 22 net-new غير عاملة حتى وجود resolver/template مسموح وplayer-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #56: ربط الحالات الصريحة بالواجهة
 
 - exact main عند بداية الجولة: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`. PR #56 هو المفتوح الوحيد، وكل العمل بقي على `p0/source-health-explicit-states-2.1.3`.
