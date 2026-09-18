@@ -143,10 +143,17 @@ class TmdbApiService {
     String query, {
     int page = 1,
   }) => results('/search/person', {'query': query, 'page': page});
+  /// Direct cinema search contract shared with Theeb Arab.
+  /// Results are restricted to non-adult content and Arabic/Saudi metadata.
   static Future<List<Map<String, dynamic>>> searchAll(
     String query, {
     int page = 1,
-  }) => results('/search/multi', {'query': query, 'page': page});
+  }) => results('/search/multi', {
+    'query': query,
+    'page': page,
+    'include_adult': false,
+    'language': 'ar-SA',
+  });
 
   static Future<Map<String, dynamic>?> getMovieDetails(int movieId) =>
       _getJson('/movie/$movieId', {
