@@ -5,6 +5,8 @@ import 'dart:async';
 ///
 /// The caller supplies tiny read-only callbacks so this guard stays independent
 /// of any concrete player plugin and remains straightforward to unit test.
+/// Success requires both an active playing state and measurable position
+/// progress, preventing initialized-but-stalled streams from passing.
 class PlaybackStartGuard {
   const PlaybackStartGuard({
     this.timeout = const Duration(seconds: 12),
