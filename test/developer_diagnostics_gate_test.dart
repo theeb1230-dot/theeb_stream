@@ -13,6 +13,8 @@ void main() {
     expect(source, contains("title: const Text(\n                'وضع المطور'"));
     expect(source, contains('if (_developerMode)'));
     expect(source, contains("title: 'تشخيص المصادر'"));
+    expect(source, contains('Focus(\n              child: SwitchListTile('));
+    expect(source, contains('autofocus: false'));
   });
 
   test('ordinary settings no longer expose detailed diagnostics unconditionally', () {
