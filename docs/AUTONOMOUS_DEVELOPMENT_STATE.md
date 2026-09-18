@@ -1,5 +1,28 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #56: إصلاح ثاني regression contract على exact head
+
+- exact main: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 هو المفتوح الوحيد، behind=0 ولا reviews/threads حاجبة.
+- exact head السابق `02048f85f93f28abd2d55a1e40ed661505e12944`: Branch CI #242 نجح في identity audit وanalyze ثم فشل tests: 46 passed / 1 failed. Build #242 ظل in-progress عند الفحص، ولا يُورث بعد تغيير head.
+- root cause من logs: regression test قديم آخر كان يطلب literal `statusText = 'بدأ فعليًا';`، بينما UI الجديد يستمد النص من `state.arabicLabel`. هذا TEST_DEFECT لا production defect.
+- تم تحديث العقد ليختبر `state.arabicLabel` وأن اللون الأخضر مرتبط فقط بـ`SourceHealthState.playbackStarted` مع وجود النص العربي «بدأ فعليًا». لا تخفيف لمعيار player-start.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت فعليًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB contract ثابت؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- Back/player وwatchdog ~12s قائم؛ runtime device/TV evidence وsigning secrets blockers خارجية.
+- version/tag: `2.1.3+19` / `v2.1.3`; لا Release جديد.
+
+### أهداف التشغيل التالي
+
+1. فحص exact head الناتج بعد التوثيق وCI/Build الجديدة فقط.
+2. إن كانت كل البوابات خضراء على SHA واحد، دمج #56 بـexpected head SHA وإعادة قراءة main.
+3. بعد الدمج بدء Developer Mode gating للـdiagnostics التفصيلية.
+4. تقوية Back/TV focus loading/error/dialog/server picker/fullscreen باختبارات سلوكية.
+5. عدم ترقية 22 net-new دون resolver مسموح + player-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #56: إصلاح exact-head test بعد explicit mapper
 
 - exact main: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 ما زال المفتوح الوحيد.
