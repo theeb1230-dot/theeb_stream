@@ -1,5 +1,28 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-18 — متابعة PR #55: Back trap + source truth
+
+- exact main ما زال `fac694aad540dbb231455a7fff851b05e2178271`; PR #55 هو المفتوح الوحيد، لذلك كل العمل بقي على `p0/player-server-truth-back-2.1.3`.
+- أثناء انتظار بوابات head السابق ظهر route trap فعلي في player: `PopScope(canPop: false)` كان يعترض platform Back ويستدعي pop يدويًا، وهو غير مناسب لمطلب Android system Back / Android TV remote Back / iOS gesture. تم تحويله إلى `canPop: true` مع cleanup idempotent بعد pop، بينما `_exitPlayer()` المرئي ما زال يحفظ progress قبل الخروج.
+- أضيف `test/player_back_navigation_contract_test.dart` لقفل platform Back وعدم رجوع `canPop:false`، وللتأكد أن modal server/quality/subtitle routes تغلق أولًا وأن explicit exit يبقى idempotent.
+- أي خضرة للـhead السابق `45bc27c...` أصبحت غير قابلة للتوريث بعد تغيير head؛ يجب انتظار Branch CI + Mobile + TV + iOS على exact head الجديد فقط.
+- صور المستخدم ما زالت baseline: 0 Server و0 Extractor مثبتان player-start فعليًا. Registry: 27 total / 5 runtime overlaps / 22 net-new pending.
+- source picker في #55 يفصل `بدأ فعليًا` عن `رابط مستخرج`، وresolver retry يبقى fail-closed.
+- direct search لم يتغير: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS مثبت.
+- buffering watchdog على main: ~12s + last stable position + failed server + failed media URL session guard.
+- version/tag: `2.1.3+19` / `v2.1.3`; لا Release جديد قبل دمج دفعة مثبتة.
+
+### أهداف التشغيل التالي
+
+1. افحص exact head لـ#55 بعد تحديث السجل، ثم Branch CI وMobile/TV/iOS لهذا الـSHA وحده؛ أصلح failures من logs دون rerun أعمى.
+2. إذا خضر exact head وأصبح PR mergeable بلا blocker، ادمج expected-head فورًا وأعد قراءة main.
+3. بعد الدمج دقق source-health screen counters/groups والنصوص الخمس: بدأ فعليًا/رابط مستخرج/فشل/غير مؤكد-WebView/غير مدعوم.
+4. وسع widget/runtime Back evidence للـloading/error/server picker/quality/subtitle وTV focus restoration.
+5. لا ترق أيًا من 22 net-new إلى working دون resolver مسموح + player-start progress evidence.
+
+---
+
+
 ## تشغيل 2026-09-18 — دمج PR #54 وبدء PR #55
 
 - exact main بعد دمج #54: `fac694aad540dbb231455a7fff851b05e2178271`. تم دمج #54 باستخدام expected head `d67d4b8def4829a3c74619c72d2d33409c9f5650` بعد نجاح Branch CI #220 وBuild #218 على exact head نفسه؛ Mobile APK وTV APK وiOS UNSIGNED/no-codesign كلها success. Android signing steps بقيت skipped.
