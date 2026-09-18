@@ -22,8 +22,8 @@ android {
         applicationId = "com.theebstream.tv"
         minSdk = 23
         targetSdk = 34
-        versionCode = 18
-        versionName = "2.1.2"
+        versionCode = 19
+        versionName = "2.1.3"
         vectorDrawables.useSupportLibrary = true
     }
 

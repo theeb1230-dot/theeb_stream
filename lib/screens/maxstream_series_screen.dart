@@ -421,8 +421,8 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         title: Text('تنزيل الموسم $season؟'),
         content: Text(
           'سيتم تنزيل ${releasedEpisodes.length} حلقة متاحة واحدة تلو الأخرى.'
-          '${unreleasedCount > 0 ? '\n\n$unreleasedCount unreleased episodes will be skipped.' : ''}'
-          '\n\nQuality: the lowest available on the chosen server, and every episode continues using that same server.',
+          '${unreleasedCount > 0 ? '\n\nسيتم تخطي $unreleasedCount حلقة لم تُعرض بعد.' : ''}'
+          '\n\nالجودة: أقل جودة متاحة على الخادم المختار، وستستمر حلقات الموسم على الخادم نفسه.',
         ),
         actions: [
           TextButton(
@@ -685,6 +685,13 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
       child: CustomScrollView(
         slivers: [
           SliverAppBar(
+            leading: BackButton(
+              color: Colors.white,
+              onPressed: () {
+                _youtubeController?.pause();
+                Navigator.of(context).maybePop();
+              },
+            ),
             expandedHeight: 350,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(color: Colors.grey[800]),
@@ -785,6 +792,13 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
         seriesDetails?['poster_path'] ?? widget.seriesItem.posterPath;
 
     return SliverAppBar(
+      leading: BackButton(
+        color: Colors.white,
+        onPressed: () {
+          _youtubeController?.pause();
+          Navigator.of(context).maybePop();
+        },
+      ),
       expandedHeight: 350,
       pinned: true,
       backgroundColor: const Color(0xFF1A1A1A),
@@ -877,7 +891,7 @@ class _MaxStreamSeriesScreenState extends State<MaxStreamSeriesScreen> {
                             const SizedBox(width: 16),
                             if (seriesDetails?['number_of_seasons'] != null)
                               Text(
-                                '${seriesDetails!['number_of_seasons']} Seasons',
+                                '${seriesDetails!['number_of_seasons']} موسم',
                                 style: const TextStyle(color: Colors.grey),
                               ),
                             const SizedBox(width: 16),

@@ -387,6 +387,13 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
       child: CustomScrollView(
         slivers: [
           SliverAppBar(
+            leading: BackButton(
+              color: Colors.white,
+              onPressed: () {
+                _youtubeController?.pause();
+                Navigator.of(context).maybePop();
+              },
+            ),
             expandedHeight: 300,
             flexibleSpace: Container(color: Colors.grey[800]),
           ),
@@ -425,6 +432,13 @@ class _MaxStreamDetailsScreenState extends State<MaxStreamDetailsScreen> {
     final isCurrentlyDownloading = activeTask != null;
 
     return SliverAppBar(
+      leading: BackButton(
+        color: Colors.white,
+        onPressed: () {
+          _youtubeController?.pause();
+          Navigator.of(context).maybePop();
+        },
+      ),
       expandedHeight: 350,
       pinned: true,
       backgroundColor: const Color(0xFF1A1A1A),
