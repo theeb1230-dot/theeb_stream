@@ -26,9 +26,9 @@ void main() {
     expect(
       source,
       contains(
-        "'بدأ $started · فشل $failed · غير مؤكد $uncertain · المجموع ${items.length}'",
+        r"'بدأ $started · فشل $failed · غير مؤكد $uncertain · المجموع ${items.length}'",
       ),
     );
-    expect(source, isNot(contains("'$healthy/${items.length}'")));
+    expect(source, isNot(contains(r"'$healthy/${items.length}'")));
   });
 }
