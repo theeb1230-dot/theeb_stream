@@ -1,5 +1,27 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #56: إصلاح exact-head test بعد explicit mapper
+
+- exact main: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 ما زال المفتوح الوحيد.
+- exact head السابق `384f88bab48d4614d2b01d27ea097a868d20e16c`: Branch CI #240 فشل بعد نجاح analyze بسبب test واحد قديم، 46 passed / 1 failed. Build #240 كان in-progress عند الفحص.
+- root cause: `provider_health_playback_truth_contract_test.dart` كان يطلب implementation literal قديم `stream['playbackStarted'] != true` بعد نقل التصنيف إلى `sourceHealthStateFromRuntime`. السلوك لم يُخفف: mapper ما زال يستقبل `playbackStarted: stream['playbackStarted'] == true` ولا يعتبر URL نجاحًا.
+- تم تحديث regression contract ليثبت boundary الجديد بدل implementation المنسوخ، على نفس PR ومن دون rerun أعمى.
+- baseline صور المستخدم: 8 Servers و41 Extractors مسجلون؛ صالح player-start مثبت ميدانيًا 0/0.
+- 27 registry: 27 total / 5 runtime overlaps / 22 net-new pending؛ net-new runtime-working = 0.
+- direct search ثابت؛ Back/player وwatchdog قائم؛ device/TV runtime evidence وsigning secrets ما زالت blockers خارجية.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد.
+
+### أهداف التشغيل التالي
+
+1. اعتماد exact head الناتج عن هذا التوثيق فقط وفحص Branch CI + Mobile/TV/iOS.
+2. إصلاح أي failure جديد من logs على #56؛ لا rerun إلا infra transient مثبت.
+3. دمج #56 فور خضرة exact-head والـmergeability باستخدام expected head SHA، ثم إعادة قراءة main.
+4. بدء P0 التالي: Developer Mode gating للـdiagnostics ثم Back/TV focus السلوكي.
+5. عدم ترقية أي من 22 net-new إلى working بلا player-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #56: حفظ حالة «رابط مستخرج» من runtime
 
 - exact main المعاد التحقق منه: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 ما زال المفتوح الوحيد ضمن 75 branch ظاهرة.
