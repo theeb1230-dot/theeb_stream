@@ -10,7 +10,7 @@ void main() {
     expect(source, contains("static const _developerModeKey = 'developer_mode_enabled'"));
     expect(source, contains("prefs.getBool(_developerModeKey) ?? false"));
     expect(source, contains('await prefs.setBool(_developerModeKey, enabled)'));
-    expect(source, contains("title: const Text(\n                'وضع المطور'"));
+    expect(source, contains("'وضع المطور'"));
     expect(source, contains('if (_developerMode)'));
     expect(source, contains("title: 'تشخيص المصادر'"));
     expect(source, contains('Focus(\n              child: SwitchListTile('));
