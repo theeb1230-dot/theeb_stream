@@ -582,6 +582,8 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   double _subtitleOffsetMs = 0; // Subtitle timing offset in milliseconds
   String _statusMessage = 'جارٍ التهيئة...';
   Timer? _progressTimer;
+  Timer? _bufferingWatchdog;
+  Duration _bufferingWatchdogPosition = Duration.zero;
   bool _isLeaving = false;
   bool _isMinimizing = false;
   late int _currentSeason;
@@ -1622,6 +1624,11 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     }
     final isBuffering = value.isBuffering;
     var shouldRebuild = isBuffering != _isBuffering;
+    if (isBuffering && !_isBuffering) {
+      _startBufferingWatchdog(controller);
+    } else if (!isBuffering && _isBuffering) {
+      _cancelBufferingWatchdog();
+    }
     _isBuffering = isBuffering;
 
     if (!widget.isMovie &&
@@ -1642,6 +1649,30 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
       }
     }
     if (shouldRebuild) setState(() {});
+  }
+
+  void _cancelBufferingWatchdog() {
+    _bufferingWatchdog?.cancel();
+    _bufferingWatchdog = null;
+  }
+
+  void _startBufferingWatchdog(VideoPlayerController controller) {
+    if (_offlinePath != null || _recoveringPlayback || _isLeaving) return;
+    _cancelBufferingWatchdog();
+    _bufferingWatchdogPosition = controller.value.position;
+    _bufferingWatchdog = Timer(const Duration(seconds: 12), () {
+      if (!mounted || _isLeaving || _recoveringPlayback) return;
+      if (!identical(controller, _videoPlayerController)) return;
+      final value = controller.value;
+      final advanced =
+          value.position - _bufferingWatchdogPosition >= const Duration(seconds: 1);
+      if (value.isBuffering && !value.hasError && !advanced) {
+        final currentKey = _selectedServerKey;
+        if (currentKey != null) _failedServerKeys.add(currentKey);
+        _showStatus('الخادم عالق في التحميل، جارٍ تجربة خادم آخر...');
+        unawaited(_recoverPlayback());
+      }
+    });
   }
 
   Map<String, dynamic>? _nextServerAfter(String currentUrl) {
@@ -1666,6 +1697,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   }
 
   Future<void> _recoverPlayback() async {
+    _cancelBufferingWatchdog();
     final url = _currentStreamUrl;
     if (url == null || _recoveringPlayback) return;
     _recoveringPlayback = true;
@@ -1820,6 +1852,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
   Future<void> _exitPlayer() async {
     if (_isLeaving) return;
     _isLeaving = true;
+    _cancelBufferingWatchdog();
     await _saveProgress();
     _videoPlayerController?.dispose();
     if (mounted) Navigator.of(context).pop(true);
@@ -3000,6 +3033,7 @@ class _M3U8VideoPlayerScreenState extends State<M3U8VideoPlayerScreen> {
     _selectedSubtitle.dispose();
     _activeSubtitles.dispose();
     _progressTimer?.cancel();
+    _cancelBufferingWatchdog();
     unawaited(_saveProgress());
     _videoPlayerController?.removeListener(_handlePlaybackChanged);
     // Don't dispose controller if minimizing — it's now owned by MiniplayerService
