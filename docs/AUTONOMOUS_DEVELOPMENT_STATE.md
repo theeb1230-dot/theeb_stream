@@ -1,5 +1,29 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-18 — دمج PR #54 وبدء PR #55
+
+- exact main بعد دمج #54: `fac694aad540dbb231455a7fff851b05e2178271`. تم دمج #54 باستخدام expected head `d67d4b8def4829a3c74619c72d2d33409c9f5650` بعد نجاح Branch CI #220 وBuild #218 على exact head نفسه؛ Mobile APK وTV APK وiOS UNSIGNED/no-codesign كلها success. Android signing steps بقيت skipped.
+- PR الحالي الوحيد: #55 `fix: make player server status fail-closed` على `p0/player-server-truth-back-2.1.3`. head قبل تحديث هذا السجل: `8bcca9a4026245deccdc1030b19ee2d4ef40fc7d`.
+- P0 جديد مقفل برمجيًا في player server picker: non-empty URL لم يعد يعني نجاحًا. الحالة `بدأ فعليًا` تتطلب selected player initialized مع position > 0؛ الرابط غير المشغل يظهر `رابط مستخرج · لم يبدأ التشغيل بعد`، والفشل/عدم التأكد يبقى واضحًا.
+- retry resolver يبقى fail-closed: `available=false` و`playbackStatus=url_extracted` حتى إثبات player start، مع regression test `player_server_truthfulness_contract_test.dart`.
+- صور المستخدم ما زالت الدليل الميداني: 0 Server و0 Extractor مثبتان كبث بدأ فعليًا. Canonical inventory: 27 total / 5 runtime overlaps / 22 net-new pending، ولا ترقية إلى working من URL/HTTP/resolver فقط.
+- direct search: TMDB `/search/multi`, `include_adult=false`, `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS endpoint مثبت ومصرح.
+- navigation/back: Movie/Series/Player coverage البرمجية موجودة؛ device E2E وTV remote focus restoration ما زالا مطلوبين.
+- buffering fallback: ~12s watchdog + last stable position + failed server identity + session failed-media-URL blacklist موجودة الآن على main عبر #54.
+- version يبقى `2.1.3+19`; لا Release جديد لهذه الدفعة حتى اكتمال بوابات PR #55 وتحديد release-worthiness.
+
+### أهداف التشغيل التالي
+
+1. فحص exact head الجديد لـ#55 وقراءة Branch CI + Mobile/TV/iOS؛ إصلاح أي failure من logs على نفس الفرع فقط.
+2. دمج #55 فقط عند خضرة exact-head الكاملة والـmergeability باستخدام expected head SHA، ثم إعادة قراءة main.
+3. توسيع Back regression للـserver picker/quality/subtitle dialogs/fullscreen/loading/error وTV remote Back/focus restoration.
+4. مراجعة شاشة حالة المصادر والعدادات لضمان أن displayed groups/counts تطابق العناصر ولا يوجد `0/35` أو نجاح مبني على URL فقط.
+5. إبقاء 22 net-new pending حتى contract/resolver مسموح + player-start progress evidence.
+6. الاستمرار في RTL/Arabic/dead-code/security cleanup بعد P0 دون تغيير package/bundle IDs تجميليًا.
+
+---
+
+
 ## تشغيل 2026-09-18 — PR #54 / session media URL loop guard
 
 - exact main عند بداية التشغيل: `35d54fa09a49d6ddbb5ad8077866e778eaabe288`.
