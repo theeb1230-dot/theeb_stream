@@ -1,5 +1,28 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #57: Developer Mode + TV focus
+
+- exact main المعاد التحقق منه: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، base متزامن (behind=0).
+- exact head عند بداية الجولة `11428780eae87b835a559eb94a5b416e1943b146`: Branch CI #247 نجح بالكامل (identity/login audit + analyze + tests). Build #248 كان in-progress؛ TV APK اكتمل بنجاح، بينما Mobile APK وiOS unsigned ما زالا يبنيان عند الفحص. لا تُورث هذه الخضرة بعد تغييرات هذه الجولة.
+- تم تقوية Developer Mode للـAndroid TV: مفتاح `SwitchListTile` أصبح داخل focus node صريح ليبقى قابلًا للوصول بلوحة المفاتيح/D-Pad، مع regression contract يثبت وجود focusable control وعدم autofocus المزعج.
+- detailed source diagnostics تبقى مخفية افتراضيًا ولا تظهر إلا عند تفعيل «وضع المطور».
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ runtime player-start المثبت = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct-search TMDB contract ثابت؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- Back للفيلم/المسلسل/player وإصلاح PopScope قائم؛ watchdog ~12s + stable position + failed server/media URL guards قائم. physical device/TV runtime proof ما زال blocker.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد. Android signing secrets غير متوفرة وiOS no-codesign فقط.
+
+### أهداف التشغيل التالي
+
+1. اعتماد exact head الناتج بعد هذا التوثيق وفحص Branch CI + Mobile/TV/iOS الجديدة فقط.
+2. إصلاح أي CODE/TEST failure من logs على #57؛ لا rerun أعمى.
+3. دمج #57 فور خضرة exact-head والـmergeability بلا blocker باستخدام expected head SHA.
+4. بعد الدمج بدء Back/TV focus regression للحالات loading/error/dialog/server picker/fullscreen.
+5. عدم ترقية 22 net-new إلى working دون resolver مسموح + player-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — دمج #56 وبدء #57 Developer Mode gating
 
 - exact main بعد إعادة التحقق والدمج: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`.
