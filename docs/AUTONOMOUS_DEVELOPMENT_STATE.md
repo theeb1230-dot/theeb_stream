@@ -1,5 +1,33 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-18 — PR #54 / session media URL loop guard
+
+- exact main عند بداية التشغيل: `35d54fa09a49d6ddbb5ad8077866e778eaabe288`.
+- PR المفتوح الوحيد: `#54 fix: fail closed unresolved web and iOS stream health` على `reliability/session-media-url-loop-guard`.
+- exact head بعد إصلاحات هذا التشغيل: `b820c3a7f55f6dbf20fdffc7df2bb0945b163529`.
+- commits الجديدة: `0e9e91bb3ba1a872bcce964a85d167e216b94ab9` لمنع إعادة media URL الفاشل داخل الجلسة، ثم `b820c3a7f55f6dbf20fdffc7df2bb0945b163529` لاختبار regression.
+- Branch CI على head السابق `70702ba409dee864288fd9963edd86b8bb41849d`: run `35389158807` success. Build run `35389158880`: TV APK success عند الفحص، Mobile APK وiOS UNSIGNED كانا ما زالا in-progress. لا تورث هذه الخضرة إلى head الجديد.
+- صور اختبار المستخدم السابقة ما زالت الدليل الحاكم: 0 بث صالح فعليًا مثبت في Servers و0 في Extractors؛ لا يعتبر reachability/HTTP 200/extracted URL نجاح تشغيل.
+- source-health يبقى fail-closed. PR #54 يمنع web/embed inventory من الظهور كـ playback-confirmed ويعقم Worker/iOS resolver results قبل runtime.
+- Canonical registry: 27 total / 5 runtime overlaps (Videasy, VidFast, 2Embed, Frembed, VidLink) / 22 net-new pending. runtime-working المؤكد للـ22 الجديدة = 0 حتى resolver + URL + player-start progress evidence.
+- direct search: TMDB `/search/multi` مع `include_adult=false` و`language=ar-SA`. Theeb Engine `/api/search` غير مربوط لعدم وجود production HTTPS base URL مثبت ومصرح.
+- navigation/back: إصلاحات Movie Details وSeries Details وPlayer موجودة واختبارات regression البرمجية قائمة؛ device E2E على iPhone/Android/Android TV ما زال غير مثبت.
+- buffering fallback: watchdog bounded قرابة 12 ثانية، يحفظ `_lastStablePosition` ويستبعد server identity الفاشلة. أضيف الآن session-scoped `_failedMediaUrls` حتى لا يعود نفس media URL عبر provider identity أخرى؛ URL والخادم الفاشلان يوسمان عند فشل fallback، والقائمة تصفى قبل المحاولة.
+- version parity يبقى Flutter `2.1.3+19` ومرشح Android TV `2.1.3/19`. لا Release جديد في هذا التشغيل.
+- signing blockers: Android release-key signing غير مثبت عند غياب secrets؛ iOS يبقى UNSIGNED/no-codesign ولا يدعى installable مباشرة.
+
+### أهداف التشغيل التالي
+
+1. فحص exact head `b820c3a7f55f6dbf20fdffc7df2bb0945b163529` وانتظار/قراءة Branch CI + Mobile/TV/iOS gates الجديدة؛ إصلاح أي CODE_DEFECT/TEST_DEFECT على نفس PR #54 فقط.
+2. عدم الدمج إلا إذا كانت كل required checks خضراء على exact head نفسه والـPR mergeable بلا blocker، ثم الدمج باستخدام expected head SHA وإعادة قراءة main.
+3. بعد الدمج، إن كانت الدفعة release-worthy، رفع version/build التالي بصورة متسقة وبناء Mobile APK + TV APK + iOS UNSIGNED من exact main نفسه ثم التحقق fail-closed من provenance/checksums/manifest/signing.
+4. توسيع back regression للحالات loading/error/dialog/server-picker/fullscreen وTV remote focus restoration حيث يمكن اختباره آليًا.
+5. إبقاء 22 net-new servers pending حتى يوجد contract موثق ومسموح لكل adapter؛ لا تحويل التسجيل أو URL template إلى working.
+6. ربط Theeb Engine search فقط عند production HTTPS endpoint مثبت ومصرح.
+7. متابعة تنظيف التعريب/RTL/dead code بعد إغلاق P0، دون تغيير package/bundle identifiers تجميليًا.
+
+---
+
 ## الحالة الحالية — 2026-09-18 / v2.1.3
 
 - exact release/main commit: `b701654db98c6990b2c42713a6c1eb3f16ca3e13`.
