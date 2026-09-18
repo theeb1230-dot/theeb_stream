@@ -6,10 +6,12 @@ void main() {
   test('source health requires explicit playback-start proof', () {
     final source =
         File('lib/screens/provider_health_screen.dart').readAsStringSync();
+    final stateModel =
+        File('lib/models/source_health_state.dart').readAsStringSync();
 
-    // Both server and extractor success paths must depend on playbackStarted.
-    // The server path uses an expression; the extractor path uses an explicit
-    // fail-closed guard, so do not couple this contract to identical syntax.
+    // Both server and extractor runtime paths feed the explicit state mapper.
+    // Keep this contract focused on the behavior boundary instead of copying
+    // a particular UI implementation literal.
     expect(
       RegExp(r"stream\['playbackStarted'\]").allMatches(source).length,
       greaterThanOrEqualTo(2),
@@ -20,9 +22,17 @@ void main() {
     );
     expect(
       source,
-      contains("stream['playbackStarted'] != true"),
+      contains("playbackStarted: stream['playbackStarted'] == true"),
     );
-    expect(source, contains("statusText = 'بدأ فعليًا';"));
+    expect(source, contains('state.arabicLabel'));
+    expect(
+      source,
+      contains('SourceHealthState.playbackStarted => Colors.green'),
+    );
+    expect(
+      stateModel,
+      contains("SourceHealthState.playbackStarted => 'بدأ فعليًا'"),
+    );
   });
 
   test('extractor group counters describe every displayed item', () {
