@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../services/direct_m3u8_service.dart';
 import '../services/native_stream_extractor.dart';
+import '../services/theeb_arab_server_registry.dart';
 
 enum SourceProbeState { unknown, reachable, resolved, failed, unsupported }
 
@@ -329,6 +330,7 @@ class _ProviderHealthOverviewScreenState
     return Column(
       children: [
         _summary(confirmed: 0, resolved: confirmed, failed: failed, uncertain: uncertain),
+        if (!showGroups) _theebArabInventoryCard(),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
@@ -355,6 +357,59 @@ class _ProviderHealthOverviewScreenState
             ),
           ),
       ],
+    );
+  }
+
+  Widget _theebArabInventoryCard() {
+    final integrated = TheebArabServerRegistry.integrated.length;
+    final pending = TheebArabServerRegistry.pending.length;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161616),
+        border: Border.all(color: Colors.white12),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ExpansionTile(
+        tilePadding: EdgeInsets.zero,
+        childrenPadding: EdgeInsets.zero,
+        collapsedIconColor: Colors.grey,
+        iconColor: Colors.white,
+        title: const Text(
+          'مخزون ذيب العرب: 27 خادمًا',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        subtitle: Text(
+          '$integrated موجودة أصلًا في Runtime • $pending بانتظار Adapter موثّق',
+          style: const TextStyle(color: Colors.grey, fontSize: 12),
+        ),
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(bottom: 10),
+            child: Text(
+              'الأسماء المسجلة ليست دليل تشغيل. الخادم لا يدخل ترتيب fallback إلا بعد وجود عقد Resolver واختبار Player-Start ناجح.',
+              style: TextStyle(color: Colors.grey, fontSize: 12, height: 1.4),
+            ),
+          ),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: TheebArabServerRegistry.all.map((server) {
+              final active = server.alreadyInRuntime;
+              return Chip(
+                visualDensity: VisualDensity.compact,
+                backgroundColor: active ? Colors.amber.withValues(alpha: 0.15) : Colors.white10,
+                side: BorderSide(color: active ? Colors.amber.shade700 : Colors.white12),
+                label: Text(
+                  server.name,
+                  style: TextStyle(color: active ? Colors.amber : Colors.grey.shade400, fontSize: 11),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 
