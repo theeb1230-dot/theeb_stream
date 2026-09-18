@@ -7,11 +7,20 @@ void main() {
     final source =
         File('lib/screens/provider_health_screen.dart').readAsStringSync();
 
+    // Both server and extractor success paths must depend on playbackStarted.
+    // The server path uses an expression; the extractor path uses an explicit
+    // fail-closed guard, so do not couple this contract to identical syntax.
     expect(
-      RegExp(r"stream\['playbackStarted'\]\s*==\s*true")
-          .allMatches(source)
-          .length,
+      RegExp(r"stream\['playbackStarted'\]").allMatches(source).length,
       greaterThanOrEqualTo(2),
+    );
+    expect(
+      source,
+      contains("stream['playbackStarted'] == true"),
+    );
+    expect(
+      source,
+      contains("stream['playbackStarted'] != true"),
     );
     expect(source, contains("statusText = 'بدأ فعليًا';"));
   });
