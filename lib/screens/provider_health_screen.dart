@@ -206,33 +206,61 @@ class _ProviderHealthScreenState extends State<ProviderHealthScreen>
                   _matchesName(provider.name, source);
             }).toList();
             if (attempts.isEmpty) continue;
-            final success = attempts.any((stream) =>
-                stream['available'] == true &&
-                stream['playbackStarted'] == true &&
-                (stream['url']?.toString().isNotEmpty ?? false));
+            final states = attempts.map((stream) => sourceHealthStateFromRuntime(
+                  available: stream['available'] == true,
+                  playbackStarted: stream['playbackStarted'] == true,
+                  url: stream['url']?.toString(),
+                  requiresWebView: stream['requiresWebView'] == true ||
+                      stream['webViewRequired'] == true,
+                  supported: stream['supported'] != false,
+                ));
+            final state = states.contains(SourceHealthState.playbackStarted)
+                ? SourceHealthState.playbackStarted
+                : states.contains(SourceHealthState.urlExtracted)
+                    ? SourceHealthState.urlExtracted
+                    : states.contains(SourceHealthState.webViewRequired)
+                        ? SourceHealthState.webViewRequired
+                        : states.contains(SourceHealthState.unsupported)
+                            ? SourceHealthState.unsupported
+                            : SourceHealthState.failed;
             _serverResults[i] = provider.copyWith(
-              state: success ? SourceHealthState.playbackStarted : SourceHealthState.failed,
-              error: success ? null : 'لم ينتج بثًا صالحًا في اختبار التشغيل',
+              state: state,
+              error: state == SourceHealthState.failed
+                  ? 'لم ينتج بثًا صالحًا في اختبار التشغيل'
+                  : null,
             );
           }
 
           for (int i = 0; i < _extractorResults.length; i++) {
             final provider = _extractorResults[i];
-            final success = streams.any((stream) {
-              if (stream['available'] != true ||
-                  stream['playbackStarted'] != true ||
-                  !(stream['url']?.toString().isNotEmpty ?? false)) {
-                return false;
-              }
+            final attempts = streams.where((stream) {
               final source = stream['source']?.toString() ?? '';
               return _matchesName(provider.name, source);
-            });
-            if (success) {
-              _extractorResults[i] = provider.copyWith(
-                state: SourceHealthState.playbackStarted,
-                error: null,
-              );
-            }
+            }).toList();
+            if (attempts.isEmpty) continue;
+            final states = attempts.map((stream) => sourceHealthStateFromRuntime(
+                  available: stream['available'] == true,
+                  playbackStarted: stream['playbackStarted'] == true,
+                  url: stream['url']?.toString(),
+                  requiresWebView: stream['requiresWebView'] == true ||
+                      stream['webViewRequired'] == true,
+                  supported: stream['supported'] != false,
+                ));
+            final state = states.contains(SourceHealthState.playbackStarted)
+                ? SourceHealthState.playbackStarted
+                : states.contains(SourceHealthState.urlExtracted)
+                    ? SourceHealthState.urlExtracted
+                    : states.contains(SourceHealthState.webViewRequired)
+                        ? SourceHealthState.webViewRequired
+                        : states.contains(SourceHealthState.unsupported)
+                            ? SourceHealthState.unsupported
+                            : SourceHealthState.failed;
+            _extractorResults[i] = provider.copyWith(
+              state: state,
+              error: state == SourceHealthState.failed
+                  ? 'لم ينتج رابطًا صالحًا في اختبار التشغيل'
+                  : null,
+            );
           }
         });
       }
