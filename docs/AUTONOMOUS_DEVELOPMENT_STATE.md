@@ -1,5 +1,57 @@
 # Autonomous Development State — Theeb Stream
 
+## الحالة الحالية — 2026-09-18 / v2.1.3
+
+- exact release/main commit: `b701654db98c6990b2c42713a6c1eb3f16ca3e13`.
+- PR المدمج: `#51 fix: P0 source truth, navigation, direct search and 2.1.3 reliability`.
+- exact PR head قبل الدمج: `d13ba5dbedb62fe459d67ab5781734f15fc8348d`.
+- النسخة الموحدة: Flutter `2.1.3+19` وAndroid TV `2.1.3 / 19`.
+- Branch CI على exact PR head: run `35354104347` — success.
+- Build على exact PR head: run `35354104500` — success.
+- main release build: run `35358156473` — Mobile APK + TV APK + iOS UNSIGNED/no-codesign IPA + Publish GitHub Release كلها success.
+- GitHub Release: `v2.1.3`، target `b701654db98c6990b2c42713a6c1eb3f16ca3e13`، والأصول الخمسة موجودة non-zero: Mobile APK + TV APK + iOS UNSIGNED IPA + SHA256SUMS.txt + BUILD_PROVENANCE.txt.
+- Android signing: خطوات keystore/signing كانت skipped لغياب secrets؛ لا يوجد دليل release-key signing ولا تصنيف Golden/Stable.
+- iOS: `UNSIGNED/no-codesign` وغير قابلة للتثبيت مباشرة بلا signing/provisioning خارجي صالح.
+
+### P0 من اختبار المستخدم
+
+- صور المستخدم أظهرت قبل الإصلاح 0 بث صالح فعليًا في الخوادم و0 في المستخرجات. لذلك health diagnostics أصبحت fail-closed: domain reachability أو HTTP أو مجرد extracted URL لا يساوي تشغيلًا ناجحًا.
+- الحالات أصبحت تميز بين player-start confirmed / resolved URL / failed / uncertain، مع نصوص كاملة بدل ellipsis وعدادات مجموعات غير مضللة.
+- أضيف Canonical Theeb Arab migration registry من 27 هوية فريدة. الحقيقة الحالية: 5 overlaps موجودة أصلًا في runtime (`Videasy`, `VidFast`, `2Embed`, `Frembed`, `VidLink`) و22 net-new pending حتى يوجد Adapter/URL contract موثّق ومسموح لكل منها. التسجيل ليس دليل تشغيل.
+- direct search الحالي يظل TMDB `/search/multi` بعقد `include_adult=false` و`language=ar-SA` مع regression test. Theeb Engine `/api/search` غير مربوط حتى يتوفر production HTTPS base URL مثبت ومصرح.
+- أضيف زر رجوع صريح لتفاصيل الفيلم والمسلسل بما في ذلك loading state، مع pause للـtrailer و`Navigator.maybePop()`.
+- أضيف runtime buffering watchdog: buffering لمدة نحو 12 ثانية بلا تقدم position ولا `hasError` يوسم الخادم failed للجلسة ويبدأ fallback بدل التعليق، مع cancellation على recovery/exit/dispose.
+
+### Release Readiness الحالية
+
+**Developer/Beta-candidate متقدم، وليست Golden/Stable مثبتة.**
+
+مثبت آليًا:
+- analyze/tests خضراء على PR exact head.
+- Mobile APK + TV APK + iOS no-codesign builds ناجحة.
+- version/build parity ناجحة.
+- release `v2.1.3` منشور من exact main/release commit نفسه مع checksums/provenance.
+
+غير مثبت بعد:
+- Android release-key signature عبر `apksigner` أو مكافئ.
+- iOS signed/provisioned installable IPA.
+- device E2E بعد v2.1.3 لمسارات Back/focus/playback على iPhone/Android/Android TV.
+- أي من الـ22 net-new server adapters كـworking-confirmed حتى يمر resolver + URL validation + player-start progress فعليًا.
+- production HTTPS endpoint مصرح لـTheeb Engine direct-search provider.
+
+### أهداف التشغيل التالي
+
+1. إعادة اختبار الجهاز على v2.1.3 لمسار `Home/Search → Details → Player → Back → Details → Back` على iPhone وAndroid وAndroid TV، مع focus/scroll restoration.
+2. تشغيل Health diagnostics على نفس المحتوى الذي كان يفشل وتسجيل عدد `player-start confirmed` الحقيقي؛ أي source غير مثبت يبقى resolved/uncertain لا أخضر.
+3. تحويل الـ22 net-new server identities تدريجيًا إلى adapters حقيقية فقط عند توفر contract موثّق ومسموح، مع capability/timeouts/cancellation/tests لكل adapter ومنع duplicate runtime identities.
+4. إضافة Theeb Engine direct-search provider فقط بعد إثبات production HTTPS base URL المصرح، مع dedup/error/loading/retry واختبار Search → Details → Episodes → Watch/Download.
+5. توسيع regression tests للـBack أثناء loading/error/dialog/server-picker/fullscreen ولـAndroid TV remote Back + focus restoration.
+6. تقوية buffering watchdog ضد loop على نفس server/media URL وحفظ/استعادة آخر stable position بعد fallback.
+7. مراجعة Android release signing؛ لا ترقية readiness قبل `apksigner` evidence فعلي.
+8. مواصلة التعريب/RTL وتنظيف أي نصوص إنجليزية مرئية أو dead code مثبتة دون تغيير identifiers بلا سبب توافق.
+
+---
+
 آخر تحديث: 2026-09-07
 المستودع: `theeb1230-dot/theeb_stream`
 
