@@ -1,5 +1,28 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — دمج #62 وبدء runtime source-proof hardening
+
+- exact main بعد الدمج: `831a165b93017d67a36dd20677140efeed8b5a74`.
+- PR #62 exact head `b13b1b6ba7038440892e8a8ade59d2fa74a95245`: Branch CI #267 success (identity audit + flutter analyze + tests)، وBuild #273 success على نفس SHA: Mobile APKs الثلاثة + TV APK + iOS UNSIGNED/no-codesign IPA، وكل artifacts non-zero ومرتبطة بنفس head SHA. Android signing steps كانت skipped لغياب secrets. لا reviews/threads حاجبة وmergeable=true؛ دُمج بـexpected head SHA.
+- صور اختبار المستخدم تبقى الدليل الميداني: 8 Servers / 41 Extractors مسجلون؛ player-start المثبت فعليًا = 0 / 0. لا تُرقّى domain reachability أو HTTP 200 أو URL مستخرج إلى نجاح.
+- Canonical 27: 27 total / 5 runtime overlaps (Videasy/VidFast/2Embed/Frembed/VidLink) / 22 net-new pending-unverified / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi` مع `include_adult=false` و`language=ar-SA`; Theeb Engine `/api/search` غير مربوط بلا production HTTPS مثبت ومصرح.
+- navigation/back: إصلاحات Details/Player loading-error/server picker/fullscreen وTV D-Pad/focus restoration مدمجة؛ physical iOS/Android/TV runtime proof ما زال مطلوبًا.
+- playback: PlaybackStartGuard الآن يتطلب تقدمًا مستمرًا لا قفزة position وحيدة؛ watchdog ~12s + stable position + failed server/media URL loop guards قائم.
+- بعد إعادة قراءة main بدأ branch `p0/source-health-runtime-proof-2.1.3`: تم جعل `playbackStarted + URL` هو إثبات runtime authoritative حتى لو كان `available` stale=false، مع إبقاء URL+available فقط في `رابط مستخرج` وعدم قبول playback flag بلا URL. أضيف `test/source_health_runtime_proof_test.dart` لتثبيت هذه الحدود fail-closed.
+- version parity: pubspec `2.1.3+19` وAndroid TV `2.1.3/19`. manifest TV يحتوي LEANBACK_LAUNCHER + leanback required + touchscreen false + landscape.
+- tag/release: `v2.1.3` هو الإصدار الحالي؛ لا Release جديد لهذه الدفعة. iOS no-codesign فقط، وAndroid release-key signing غير مثبت لغياب secrets.
+
+### أهداف التشغيل التالي
+
+1. فتح PR واحد فقط لفرع runtime source-proof واعتماد exact-head Branch CI + Build، وإصلاح أي failure من logs دون rerun أعمى.
+2. تتبع كل استخدامات `available`/URL في diagnostics والـplayer ومنع أي مسار آخر من عرض «بدأ فعليًا» دون PlaybackStartGuard progress proof.
+3. التحقق من العدادات والمجموعات في شاشة الحالة وأنها تطابق العناصر المرئية ولا تعيد 0/35 المضللة.
+4. مواصلة widget/runtime contracts للرجوع واستعادة focus/state، مع إبقاء physical-device proof blocker صريحًا.
+5. عدم ترقية أي من 22 net-new إلى working بلا resolver/template موثّق ومسموح + player-start progress فعلي.
+
+---
+
 ## تشغيل 2026-09-19 — PR #58: TV player control contract
 
 - exact main: `6102f028d9f972b2a8eda140051a6c7068463f38`; #58 هو PR المفتوح الوحيد، mergeable=true وبلا reviews/threads حاجبة.
