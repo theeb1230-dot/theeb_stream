@@ -15,10 +15,19 @@ void main() {
 
     final detailsRoute = source.substring(detailsRouteStart, playerRouteStart);
     expect(detailsRoute, contains('deepNavController.popBackStack()'));
-    expect(detailsRoute, isNot(contains('appState.updateFocusOnSidebar(true)')),
-        reason: 'Details -> list must restore the originating card/row via deepNavReturnTick, not steal focus into the sidebar.');
+    expect(
+      detailsRoute,
+      isNot(contains('appState.updateFocusOnSidebar(true)')),
+      reason:
+          'Details -> list must restore the originating card/row via deepNavReturnTick, not steal focus into the sidebar.',
+    );
 
     expect(source, contains('deepNavReturnTick++'));
-    expect(source, contains('restoreFocusKey    = deepNavReturnTick'));
+    expect(
+      RegExp(r'restoreFocusKey\s*=\s*deepNavReturnTick').allMatches(source).length,
+      greaterThanOrEqualTo(5),
+      reason:
+          'All content tabs that launch deep navigation must observe the shared restore tick.',
+    );
   });
 }
