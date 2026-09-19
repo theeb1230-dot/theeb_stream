@@ -1,5 +1,29 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #58: إصلاح TEST_DEFECT وتقوية صدق Server Picker
+
+- exact main المعاد التحقق منه: `6102f028d9f972b2a8eda140051a6c7068463f38`; PR #58 هو المفتوح الوحيد على `p0/back-loading-error-contract-2.1.3`، بلا reviews/threads حاجبة.
+- exact head السابق `74dfb6f5c0fcbedc85ef933fca9babfdcb267939`: Build #257 نجح، لكن Branch CI #255 نجح identity audit وflutter analyze ثم فشل Flutter tests بنتيجة 53 passed / 1 failed.
+- root cause من logs: الاختبار الجديد افترض literal `Navigator.pop(context` بينما server picker الفعلي يغلق الـmodal الصحيح عبر `Navigator.of(sheetContext).pop()`. هذا TEST_DEFECT؛ لم يُستخدم rerun أعمى.
+- تم إصلاح العقد على نفس PR، ثم تقويته ليثبت أن Server Picker لا يعرض الأخضر إلا عند `playbackStarted` مع تقدم position فعلي، وأن URL فقط يظهر «رابط مستخرج · لم يبدأ التشغيل بعد»، والفشل/عدم التأكد لا يتحول إلى نجاح.
+- exact head بعد دفعة الاختبارات: `fcde0b35be5ffa14601041da277167cf1765a661`. أي خضرة من SHA أقدم غير موروثة، وتنتظر هذه الدفعة CI/Build الخاصة بها.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ runtime player-start المثبت ميدانيًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- navigation/back: Details أثناء loading وPlayer أثناء loading/error وserver picker modal مغطاة بعقود regression؛ physical iOS gesture/Android TV remote/focus/fullscreen proof ما زال مطلوبًا.
+- buffering fallback: watchdog ~12s + stable position + failed server/media URL session guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد. Android release-key signing secrets غير مثبتة، وiOS no-codesign فقط.
+
+### أهداف التشغيل التالي
+
+1. اعتماد Branch CI + Build الخاصة بالـexact head `fcde0b35...` فقط وإصلاح أي failure من logs.
+2. دمج #58 فور خضرة analyze/tests + Mobile/TV/iOS على exact head والـmergeability بلا blocker.
+3. بعد الدمج إعادة قراءة main وتوسيع runtime/widget coverage للfullscreen وTV D-Pad/focus/restoration.
+4. مراجعة التعريب المرئي المتبقي في player/services دون خلط أسماء العلامات التقنية.
+5. إبقاء 22 net-new pending حتى resolver/template مسموح + player-start progress فعلي.
+
+---
+
 ## تشغيل 2026-09-19 — PR #58: Back أثناء loading/error/server picker
 
 - exact main عند بداية الجولة: `6102f028d9f972b2a8eda140051a6c7068463f38`; لا PR مفتوح عند الفحص لأن #57 دُمج بالفعل إلى main.
