@@ -1,5 +1,28 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #58: CI أخضر وتقوية Fullscreen Back
+
+- exact main: `6102f028d9f972b2a8eda140051a6c7068463f38`; PR #58 ما زال المفتوح الوحيد، mergeable=true وبلا reviews/threads حاجبة.
+- exact head عند بداية الجولة `5b8752817ae5450efad40ed8450a7793a4a89f12`: Branch CI #257 نجح بالكامل. Build #259 بدأ على نفس SHA؛ Mobile/TV/iOS كانت in-progress عند الفحص، لذلك لم يتم الدمج.
+- تم تقوية regression contract للـfullscreen player: وضع `immersiveSticky` يجب أن يحتفظ بزر «رجوع» المرئي المرتبط بـ`widget.onBack`، إضافة إلى platform PopScope الموجود، لمنع fullscreen من التحول إلى route trap.
+- exact head بعد التغيير: `c0a4e65af1410777af6b4492c25a68742589bb53`; خضرة `5b875...` لا تُورث، ويجب اعتماد CI/Build لهذا SHA فقط.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت فعليًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi`, `include_adult=false`, `language=ar-SA`; Theeb Engine غير مربوط دون production HTTPS مثبت ومصرح.
+- back: Details loading + Player loading/error + server picker + fullscreen visible Back أصبحت تحت regression contracts؛ physical iOS/Android/TV runtime proof وTV focus restoration ما زالا مطلوبين.
+- buffering fallback: watchdog ~12s + stable position + failed server/media URL loop guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد. Android signing secrets غائبة، وiOS no-codesign.
+
+### أهداف التشغيل التالي
+
+1. اعتماد CI/Build للـexact head `c0a4e65...` فقط وإصلاح أي failure من logs.
+2. إذا نجحت analyze/tests + Mobile/TV/iOS والـPR mergeable بلا blocker، دمج #58 بـexpected head SHA.
+3. إعادة قراءة main ثم بدء TV D-Pad/focus restoration وdialog/back runtime contracts.
+4. مراجعة التعريب المرئي المتبقي في player/services.
+5. عدم ترقية 22 net-new إلى working بلا resolver مسموح + player-start progress فعلي.
+
+---
+
 ## تشغيل 2026-09-19 — PR #58: إصلاح TEST_DEFECT وتقوية صدق Server Picker
 
 - exact main المعاد التحقق منه: `6102f028d9f972b2a8eda140051a6c7068463f38`; PR #58 هو المفتوح الوحيد على `p0/back-loading-error-contract-2.1.3`، بلا reviews/threads حاجبة.
