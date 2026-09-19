@@ -1,5 +1,28 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #58: TV player control contract
+
+- exact main: `6102f028d9f972b2a8eda140051a6c7068463f38`; #58 هو PR المفتوح الوحيد، mergeable=true وبلا reviews/threads حاجبة.
+- exact head عند بداية الجولة `3e4549ce2667114910cec445e9370e62e9ed567c`: Branch CI #259 كان pending وBuild #261 in-progress، لذلك لم يُدمج ولم تُورث نتائج SHA أقدم.
+- أضيف regression contract لعناصر تحكم المشغل القابلة للتركيز على TV/keyboard: رجوع 10 ثوانٍ، تقديم 10 ثوانٍ، وكتم/تشغيل الصوت بعناوين عربية، مع استمرار عقد fullscreen Back. الهدف منع regressions التي تجعل المشغل مرئيًا لكن غير قابل للتنقل بالريموت.
+- exact head بعد التغيير: `809357a16c3dac33562437fc389aa1d7f65d6412`; يجب إعادة exact-head gates عليه.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start المثبت فعليًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- back: Details loading، Player loading/error، server picker، fullscreen visible Back تحت regression contracts. physical runtime proof وfocus restoration بعد الرجوع ما زالا مطلوبين.
+- buffering fallback: watchdog ~12s + stable position + failed server/media URL guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد، Android release signing secrets غائبة وiOS no-codesign.
+
+### أهداف التشغيل التالي
+
+1. اعتماد Branch CI + Build للـexact head `809357a...` فقط وإصلاح أي failure من logs.
+2. دمج #58 فور خضرة analyze/tests + Mobile/TV/iOS على نفس SHA والـmergeability بلا blocker.
+3. بعد الدمج إعادة قراءة main وبدء focus restoration بعد Player→Details→list والحوارات.
+4. تدقيق التعريب المرئي المتبقي وTV focus traversal الفعلي.
+5. إبقاء 22 net-new pending حتى resolver مسموح + player-start progress فعلي.
+
+---
+
 ## تشغيل 2026-09-19 — PR #58: CI أخضر وتقوية Fullscreen Back
 
 - exact main: `6102f028d9f972b2a8eda140051a6c7068463f38`; PR #58 ما زال المفتوح الوحيد، mergeable=true وبلا reviews/threads حاجبة.
