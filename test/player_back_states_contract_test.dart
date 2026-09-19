@@ -28,6 +28,9 @@ void main() {
     expect(source, contains("tooltip: 'رجوع'"));
     expect(source, contains('onPressed: widget.onBack'));
     expect(source, contains('SystemUiMode.immersiveSticky'));
+    expect(source, contains("tooltip: 'رجوع 10 ثوانٍ'"));
+    expect(source, contains("tooltip: 'تقديم 10 ثوانٍ'"));
+    expect(source, contains("tooltip: value.volume == 0 ? 'تشغيل الصوت' : 'كتم الصوت'"));
   });
 
   test('player pop cancels watchdog and persists progress', () {
