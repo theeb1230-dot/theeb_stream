@@ -1,12 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../screens/maxstream_about_screen.dart';
 import '../screens/provider_health_overview_screen.dart';
 import '../screens/streaming_provider_settings_screen.dart';
 import '../screens/updates_screen.dart';
 
-class MaxStreamMoreScreen extends StatelessWidget {
+class MaxStreamMoreScreen extends StatefulWidget {
   const MaxStreamMoreScreen({super.key});
+
+  @override
+  State<MaxStreamMoreScreen> createState() => _MaxStreamMoreScreenState();
+}
+
+class _MaxStreamMoreScreenState extends State<MaxStreamMoreScreen> {
+  static const _developerModeKey = 'developer_mode_enabled';
+  bool _developerMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDeveloperMode();
+  }
+
+  Future<void> _loadDeveloperMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
+    setState(() => _developerMode = prefs.getBool(_developerModeKey) ?? false);
+  }
+
+  Future<void> _setDeveloperMode(bool enabled) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_developerModeKey, enabled);
+    if (!mounted) return;
+    setState(() => _developerMode = enabled);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +60,32 @@ class MaxStreamMoreScreen extends StatelessWidget {
               title: 'خدمات البث',
               page: const StreamingProviderSettingsScreen(),
             ),
-            _buildMenuItem(
-              context,
-              icon: Icons.health_and_safety,
-              title: 'حالة المصادر',
-              page: const ProviderHealthOverviewScreen(),
+            Focus(
+              child: SwitchListTile(
+                autofocus: false,
+                secondary: const Icon(Icons.developer_mode, color: Colors.white),
+                title: const Text(
+                  'وضع المطور',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                subtitle: const Text(
+                  'يعرض أدوات التشخيص التقنية المتقدمة',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                value: _developerMode,
+                onChanged: _setDeveloperMode,
+              ),
             ),
+            if (_developerMode)
+              _buildMenuItem(
+                context,
+                icon: Icons.health_and_safety,
+                title: 'تشخيص المصادر',
+                page: const ProviderHealthOverviewScreen(),
+              ),
             _buildMenuItem(
               context,
               icon: Icons.system_update,

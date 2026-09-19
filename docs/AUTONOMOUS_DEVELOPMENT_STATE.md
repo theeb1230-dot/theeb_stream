@@ -1,5 +1,77 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #57: إصلاح TEST_DEFECT على Developer Mode gate
+
+- exact main: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، branch `p0/developer-diagnostics-gate-2.1.3`.
+- exact head المفحوص `68173165f565bdc99cfc61bd35908de203d4c189`: Branch CI #250 نجح identity audit وflutter analyze ثم فشل Flutter tests بنتيجة 48 passed / 1 failed. Build #251 كان ما يزال in-progress وقت الفحص ولا يُورث بعد تغيير head.
+- root cause من logs: `developer_diagnostics_gate_test.dart` ربط وجود النص «وضع المطور» بمسافات indentation قديمة قبل إضافة Focus لـTV. السلوك الإنتاجي صحيح؛ هذا TEST_DEFECT هش.
+- تم إصلاح الاختبار ليقفل وجود النص والعقد السلوكي `if (_developerMode)` وroute التشخيص وFocus دون الاعتماد على whitespace. لا تخفيف للـDeveloper Mode gate.
+- TV focus: مفتاح وضع المطور ملفوف بـFocus ويبقى SwitchListTile قابلًا للـkeyboard/D-Pad؛ أضيف contract test لذلك، لكن device runtime proof ما زال مطلوبًا.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت ميدانيًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB ثابت؛ Theeb Engine غير مربوط دون production HTTPS مثبت ومصرح.
+- Back/player وwatchdog ~12s قائم؛ runtime TV/device evidence وAndroid signing secrets blockers.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد.
+
+### أهداف التشغيل التالي
+
+1. اعتماد CI/Build الخاصة بالـexact head الجديد فقط وإصلاح أي failure من logs.
+2. دمج #57 فور خضرة analyze/tests + Mobile/TV/iOS على SHA واحد والـmergeability بلا blocker.
+3. بعد الدمج إعادة قراءة main وبدء Back/TV focus للحالات loading/error/dialog/server picker/fullscreen.
+4. مراجعة التعريب المرئي المتبقي، خصوصًا رسائل خدمات البث.
+5. إبقاء 22 net-new pending بلا ادعاء تشغيل حتى resolver مسموح + player-start progress فعلي.
+
+---
+
+
+## تشغيل 2026-09-19 — PR #57: Developer Mode + TV focus
+
+- exact main المعاد التحقق منه: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، base متزامن (behind=0).
+- exact head عند بداية الجولة `11428780eae87b835a559eb94a5b416e1943b146`: Branch CI #247 نجح بالكامل (identity/login audit + analyze + tests). Build #248 كان in-progress؛ TV APK اكتمل بنجاح، بينما Mobile APK وiOS unsigned ما زالا يبنيان عند الفحص. لا تُورث هذه الخضرة بعد تغييرات هذه الجولة.
+- تم تقوية Developer Mode للـAndroid TV: مفتاح `SwitchListTile` أصبح داخل focus node صريح ليبقى قابلًا للوصول بلوحة المفاتيح/D-Pad، مع regression contract يثبت وجود focusable control وعدم autofocus المزعج.
+- detailed source diagnostics تبقى مخفية افتراضيًا ولا تظهر إلا عند تفعيل «وضع المطور».
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ runtime player-start المثبت = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct-search TMDB contract ثابت؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- Back للفيلم/المسلسل/player وإصلاح PopScope قائم؛ watchdog ~12s + stable position + failed server/media URL guards قائم. physical device/TV runtime proof ما زال blocker.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد. Android signing secrets غير متوفرة وiOS no-codesign فقط.
+
+### أهداف التشغيل التالي
+
+1. اعتماد exact head الناتج بعد هذا التوثيق وفحص Branch CI + Mobile/TV/iOS الجديدة فقط.
+2. إصلاح أي CODE/TEST failure من logs على #57؛ لا rerun أعمى.
+3. دمج #57 فور خضرة exact-head والـmergeability بلا blocker باستخدام expected head SHA.
+4. بعد الدمج بدء Back/TV focus regression للحالات loading/error/dialog/server picker/fullscreen.
+5. عدم ترقية 22 net-new إلى working دون resolver مسموح + player-start progress حقيقي.
+
+---
+
+
+## تشغيل 2026-09-19 — دمج #56 وبدء #57 Developer Mode gating
+
+- exact main بعد إعادة التحقق والدمج: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`.
+- PR #56 exact head `fd233c321d396283555615c8557db035db3abf9b`: Branch CI #245 success (identity audit + analyze + tests) وBuild #245 success على نفس SHA: Mobile APKs arm64/armeabi-v7a/x86_64، TV APK، iOS unsigned IPA. artifacts non-zero وبـhead SHA نفسه. Android keystore/signing steps skipped لغياب secrets؛ iOS no-codesign.
+- لا reviews/threads حاجبة و#56 كان ahead 14 / behind 0، فتم squash merge باستخدام expected head SHA.
+- بعد إعادة قراءة main بدأ PR #57 فقط على `p0/developer-diagnostics-gate-2.1.3`.
+- #57 يجعل شاشة diagnostics التفصيلية مخفية افتراضيًا خلف `وضع المطور`، مع حفظ الاختيار عبر shared_preferences الموجودة أصلًا. المستخدم العادي لا يرى route «تشخيص المصادر» إلا بعد تفعيل الوضع.
+- أضيف `test/developer_diagnostics_gate_test.dart` لمنع رجوع exposure غير المشروط.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت ميدانيًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB contract ثابت؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- Back/player وwatchdog ~12s قائم؛ device/TV runtime evidence ما زال مطلوبًا.
+- version/tag/release: `2.1.3+19` / `v2.1.3`. لا Release جديد لهذه الدفعة حتى exact-head #57 gates.
+
+### أهداف التشغيل التالي
+
+1. فحص exact-head Branch CI + Mobile/TV/iOS لـ#57 وإصلاح أي failure من logs.
+2. تدقيق UX وضع المطور على TV D-Pad/focus وعدم جعل SwitchListTile trap.
+3. دمج #57 فور خضرة exact-head والـmergeability بلا blocker، ثم إعادة قراءة main.
+4. تقوية Back/TV focus للحالات loading/error/dialog/server picker/fullscreen.
+5. إبقاء 22 net-new pending حتى resolver/template مسموح + player-start progress حقيقي.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #56: إصلاح ثاني regression contract على exact head
 
 - exact main: `a9888a3d5a1692dd518a2309bb1aa49b6faecee0`; PR #56 هو المفتوح الوحيد، behind=0 ولا reviews/threads حاجبة.
