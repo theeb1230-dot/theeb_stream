@@ -36,7 +36,11 @@ SourceHealthState sourceHealthStateFromRuntime({
   bool supported = true,
 }) {
   if (!supported) return SourceHealthState.unsupported;
-  if (playbackStarted && available && (url?.isNotEmpty ?? false)) {
+  // Fail closed: a playback-start proof is authoritative only when the
+  // runtime also confirms a usable extracted URL. Conversely, a stale
+  // `available` flag must never downgrade a genuine start proof or promote
+  // a URL-only result to green.
+  if (playbackStarted && (url?.isNotEmpty ?? false)) {
     return SourceHealthState.playbackStarted;
   }
   if (available && (url?.isNotEmpty ?? false)) {
