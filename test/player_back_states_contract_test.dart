@@ -20,7 +20,7 @@ void main() {
         File('lib/screens/m3u8_video_player_screen.dart').readAsStringSync();
 
     expect(source, contains('showModalBottomSheet'));
-    expect(source, contains('Navigator.pop(context'));
+    expect(source, contains('Navigator.of(sheetContext).pop()'));
   });
 
   test('player pop cancels watchdog and persists progress', () {
