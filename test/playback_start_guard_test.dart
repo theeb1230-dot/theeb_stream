@@ -9,7 +9,7 @@ void main() {
       minimumProgress: Duration(milliseconds: 20),
     );
 
-    test('confirms only after playback position advances', () async {
+    test('confirms only after sustained playback position advances', () async {
       var reads = 0;
       final confirmed = await guard.confirm(
         position: () {
@@ -21,11 +21,27 @@ void main() {
       );
 
       expect(confirmed, isTrue);
+      expect(reads, greaterThanOrEqualTo(4));
     });
 
     test('rejects initialized player that remains stalled', () async {
       final confirmed = await guard.confirm(
         position: () => Duration.zero,
+        hasError: () => false,
+        isPlaying: () => true,
+      );
+
+      expect(confirmed, isFalse);
+    });
+
+    test('rejects a one-off position jump followed by a stall', () async {
+      var reads = 0;
+      final confirmed = await guard.confirm(
+        position: () {
+          reads++;
+          if (reads == 1) return Duration.zero;
+          return const Duration(milliseconds: 600);
+        },
         hasError: () => false,
         isPlaying: () => true,
       );
