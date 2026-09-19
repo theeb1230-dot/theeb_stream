@@ -360,6 +360,10 @@ private fun ExitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
             TextButton(
                 modifier = Modifier
                     .focusRequester(cancelFocus)
+                    .focusProperties {
+                        left = confirmFocus
+                        right = confirmFocus
+                    }
                     .onFocusChanged { cancelFocused = it.isFocused }
                     .background(
                         if (cancelFocused) Color.White else Color.Transparent,
@@ -386,6 +390,10 @@ private fun ExitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
             TextButton(
                 modifier = Modifier
                     .focusRequester(confirmFocus)
+                    .focusProperties {
+                        left = cancelFocus
+                        right = cancelFocus
+                    }
                     .onFocusChanged { confirmFocused = it.isFocused }
                     .background(
                         if (confirmFocused) Color.White else Color(0xFFE50914),
