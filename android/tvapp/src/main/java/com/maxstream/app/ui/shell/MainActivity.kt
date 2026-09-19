@@ -333,8 +333,8 @@ private fun SeriesListTab(
 
 @Composable
 private fun ExitDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-    val cancelFocus = FocusRequester()
-    val confirmFocus = FocusRequester()
+    val cancelFocus = remember { FocusRequester() }
+    val confirmFocus = remember { FocusRequester() }
     var cancelFocused by remember { mutableStateOf(false) }
     var confirmFocused by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { cancelFocus.requestFocus() }
