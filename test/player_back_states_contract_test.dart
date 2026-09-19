@@ -25,6 +25,9 @@ void main() {
     expect(source, contains("'رابط مستخرج · لم يبدأ التشغيل بعد'"));
     expect(source, contains("'فشل/غير مؤكد · اضغط لإعادة المحاولة'"));
     expect(source, contains('playbackStarted'));
+    expect(source, contains("tooltip: 'رجوع'"));
+    expect(source, contains('onPressed: widget.onBack'));
+    expect(source, contains('SystemUiMode.immersiveSticky'));
   });
 
   test('player pop cancels watchdog and persists progress', () {
