@@ -418,6 +418,7 @@ class _ProviderHealthOverviewScreenState
     if (items.isEmpty) return const [];
     final resolved = items.where((e) => e.state == SourceProbeState.resolved).length;
     final failed = items.where((e) => e.state == SourceProbeState.failed).length;
+    final uncertain = items.length - resolved - failed;
     return [
       Padding(
         padding: const EdgeInsets.only(top: 18, bottom: 8),
@@ -434,7 +435,7 @@ class _ProviderHealthOverviewScreenState
               ),
             ),
             Text(
-              'مستخرج $resolved • فشل $failed • الإجمالي ${items.length}',
+              'رابط مستخرج $resolved • فشل $failed • غير مؤكد $uncertain • المجموع ${items.length}',
               style: const TextStyle(color: Colors.grey, fontSize: 12),
             ),
           ],

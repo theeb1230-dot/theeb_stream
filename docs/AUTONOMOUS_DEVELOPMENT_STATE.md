@@ -1,5 +1,27 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — دمج #63 وتدقيق عدادات شاشة حالة المصادر
+
+- exact main بعد دمج #63: `78f4dccb861449112260d052da57615fc127b1b6`.
+- PR #63 exact head `70b6aca4b5cc8a1fc1d67ab4d42963711b277466`: Branch CI #268 success بما فيه identity/login audit + flutter analyze + tests، وBuild #275 success على نفس SHA للهاتف وTV وiOS unsigned. artifacts non-zero ومربوطة بنفس SHA؛ Android signing skipped لغياب secrets. PR كان mergeable=true وبلا reviews/threads حاجبة، ودُمج بـexpected head.
+- صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start المثبت ميدانيًا = 0 / 0. HTTP/domain/URL لا تساوي نجاحًا.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 pending net-new / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط دون production HTTPS مثبت ومصرح.
+- navigation/back: عقود Details/Player loading/error/server picker/fullscreen وTV focus/back مدمجة؛ physical device proof ما زال blocker.
+- playback: playback-start يتطلب URL + sustained position progress؛ watchdog ~12s + stable position + failed server/media URL guards قائم.
+- بعد إعادة قراءة main بدأ branch `p0/source-health-overview-counts-2.1.3`. وُجدت شاشة overview ثانية تستخدم عداد مجموعات غير شامل: تعرض extracted/failed/total فقط ولا تذكر uncertain رغم عرض عناصر reachable/unknown/unsupported. تم إصلاح المجموعة لتعرض `رابط مستخرج / فشل / غير مؤكد / المجموع` بحيث المجموع = الحالات الثلاث، مع regression test يمنع رجوع اللون الأخضر لـresolved/reachable.
+- version: `2.1.3+19` وTV `2.1.3/19`. tag الحالي `v2.1.3`; لا Release جديد. iOS no-codesign، وAndroid release-key signing غير مثبت.
+
+### أهداف التشغيل التالي
+
+1. اعتماد exact-head CI/Build للـPR الجديد فقط وإصلاح أي failure من logs دون rerun أعمى.
+2. توحيد نموذج الحالة بين ProviderHealthScreen وProviderHealthOverviewScreen لمنع semantic drift بين شاشتين متشابهتين.
+3. التأكد أن كل group counter يساوي عدد العناصر المعروضة وأن «بدأ فعليًا» لا يأتي إلا من player-start progress proof.
+4. متابعة Search→Details→Episodes→Player وback/focus runtime contracts.
+5. إبقاء 22 net-new pending حتى resolver/template مسموح + player-start progress مثبت.
+
+---
+
 ## تشغيل 2026-09-19 — دمج #62 وبدء runtime source-proof hardening
 
 - exact main بعد الدمج: `831a165b93017d67a36dd20677140efeed8b5a74`.
