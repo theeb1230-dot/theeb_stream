@@ -1,5 +1,29 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #58: Back أثناء loading/error/server picker
+
+- exact main عند بداية الجولة: `6102f028d9f972b2a8eda140051a6c7068463f38`; لا PR مفتوح عند الفحص لأن #57 دُمج بالفعل إلى main.
+- PR #58 على `p0/back-loading-error-contract-2.1.3` هو مسار P0 الحالي، بدأ من main الحالي دون behind.
+- أضيف regression contract لتفاصيل الفيلم/المسلسل يثبت أن route يبقى `canPop: true` أثناء loading وأن BackButton المرئي يستخدم `maybePop`، مع إيقاف trailer بعد system/platform pop.
+- أضيف regression contract للـplayer يغطي loading/error والزر المرئي «رجوع» وserver picker كـmodal قابل للإغلاق، ويثبت أن platform pop يلغي buffering watchdog ويحفظ progress.
+- لا يوجد ادعاء runtime device proof؛ المطلوب لاحقًا Android/iOS/TV physical runtime للحركات وD-Pad/fullscreen.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون، runtime player-start المثبت = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB ثابت على /search/multi + include_adult=false + language=ar-SA؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- watchdog ~12s + failed server/media URL session guards + stable position ما زالت قائمة.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; آخر Release يستهدف `b701654...` وليس main الحالي، لذلك لا Release جديد بعد.
+
+### أهداف التشغيل التالي
+
+1. اعتماد exact-head CI/Build لـ#58 وإصلاح failures من logs دون rerun أعمى.
+2. توسيع back/focus contract للfullscreen والحوارات حيث يكشف الكود فجوة حقيقية.
+3. دمج #58 فقط بعد analyze/tests + Mobile/TV/iOS exact-head خضراء.
+4. بعدها مراجعة التعريب المرئي وبقايا diagnostics خارج Developer Mode.
+5. إبقاء 22 net-new pending حتى resolver مسموح + player-start progress مثبت.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #57: إصلاح TEST_DEFECT على Developer Mode gate
 
 - exact main: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، branch `p0/developer-diagnostics-gate-2.1.3`.
