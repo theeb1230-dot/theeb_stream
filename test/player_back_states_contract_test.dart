@@ -21,6 +21,10 @@ void main() {
 
     expect(source, contains('showModalBottomSheet'));
     expect(source, contains('Navigator.of(sheetContext).pop()'));
+    expect(source, contains("? 'بدأ فعليًا · الخادم"));
+    expect(source, contains("'رابط مستخرج · لم يبدأ التشغيل بعد'"));
+    expect(source, contains("'فشل/غير مؤكد · اضغط لإعادة المحاولة'"));
+    expect(source, contains('playbackStarted'));
   });
 
   test('player pop cancels watchdog and persists progress', () {
