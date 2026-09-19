@@ -1,5 +1,99 @@
 # Autonomous Development State — Theeb Stream
 
+## تشغيل 2026-09-19 — PR #58: TV player control contract
+
+- exact main: `6102f028d9f972b2a8eda140051a6c7068463f38`; #58 هو PR المفتوح الوحيد، mergeable=true وبلا reviews/threads حاجبة.
+- exact head عند بداية الجولة `3e4549ce2667114910cec445e9370e62e9ed567c`: Branch CI #259 كان pending وBuild #261 in-progress، لذلك لم يُدمج ولم تُورث نتائج SHA أقدم.
+- أضيف regression contract لعناصر تحكم المشغل القابلة للتركيز على TV/keyboard: رجوع 10 ثوانٍ، تقديم 10 ثوانٍ، وكتم/تشغيل الصوت بعناوين عربية، مع استمرار عقد fullscreen Back. الهدف منع regressions التي تجعل المشغل مرئيًا لكن غير قابل للتنقل بالريموت.
+- exact head بعد التغيير: `809357a16c3dac33562437fc389aa1d7f65d6412`; يجب إعادة exact-head gates عليه.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start المثبت فعليًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- back: Details loading، Player loading/error، server picker، fullscreen visible Back تحت regression contracts. physical runtime proof وfocus restoration بعد الرجوع ما زالا مطلوبين.
+- buffering fallback: watchdog ~12s + stable position + failed server/media URL guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد، Android release signing secrets غائبة وiOS no-codesign.
+
+### أهداف التشغيل التالي
+
+1. اعتماد Branch CI + Build للـexact head `809357a...` فقط وإصلاح أي failure من logs.
+2. دمج #58 فور خضرة analyze/tests + Mobile/TV/iOS على نفس SHA والـmergeability بلا blocker.
+3. بعد الدمج إعادة قراءة main وبدء focus restoration بعد Player→Details→list والحوارات.
+4. تدقيق التعريب المرئي المتبقي وTV focus traversal الفعلي.
+5. إبقاء 22 net-new pending حتى resolver مسموح + player-start progress فعلي.
+
+---
+
+## تشغيل 2026-09-19 — PR #58: CI أخضر وتقوية Fullscreen Back
+
+- exact main: `6102f028d9f972b2a8eda140051a6c7068463f38`; PR #58 ما زال المفتوح الوحيد، mergeable=true وبلا reviews/threads حاجبة.
+- exact head عند بداية الجولة `5b8752817ae5450efad40ed8450a7793a4a89f12`: Branch CI #257 نجح بالكامل. Build #259 بدأ على نفس SHA؛ Mobile/TV/iOS كانت in-progress عند الفحص، لذلك لم يتم الدمج.
+- تم تقوية regression contract للـfullscreen player: وضع `immersiveSticky` يجب أن يحتفظ بزر «رجوع» المرئي المرتبط بـ`widget.onBack`، إضافة إلى platform PopScope الموجود، لمنع fullscreen من التحول إلى route trap.
+- exact head بعد التغيير: `c0a4e65af1410777af6b4492c25a68742589bb53`; خضرة `5b875...` لا تُورث، ويجب اعتماد CI/Build لهذا SHA فقط.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ player-start مثبت فعليًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi`, `include_adult=false`, `language=ar-SA`; Theeb Engine غير مربوط دون production HTTPS مثبت ومصرح.
+- back: Details loading + Player loading/error + server picker + fullscreen visible Back أصبحت تحت regression contracts؛ physical iOS/Android/TV runtime proof وTV focus restoration ما زالا مطلوبين.
+- buffering fallback: watchdog ~12s + stable position + failed server/media URL loop guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد. Android signing secrets غائبة، وiOS no-codesign.
+
+### أهداف التشغيل التالي
+
+1. اعتماد CI/Build للـexact head `c0a4e65...` فقط وإصلاح أي failure من logs.
+2. إذا نجحت analyze/tests + Mobile/TV/iOS والـPR mergeable بلا blocker، دمج #58 بـexpected head SHA.
+3. إعادة قراءة main ثم بدء TV D-Pad/focus restoration وdialog/back runtime contracts.
+4. مراجعة التعريب المرئي المتبقي في player/services.
+5. عدم ترقية 22 net-new إلى working بلا resolver مسموح + player-start progress فعلي.
+
+---
+
+## تشغيل 2026-09-19 — PR #58: إصلاح TEST_DEFECT وتقوية صدق Server Picker
+
+- exact main المعاد التحقق منه: `6102f028d9f972b2a8eda140051a6c7068463f38`; PR #58 هو المفتوح الوحيد على `p0/back-loading-error-contract-2.1.3`، بلا reviews/threads حاجبة.
+- exact head السابق `74dfb6f5c0fcbedc85ef933fca9babfdcb267939`: Build #257 نجح، لكن Branch CI #255 نجح identity audit وflutter analyze ثم فشل Flutter tests بنتيجة 53 passed / 1 failed.
+- root cause من logs: الاختبار الجديد افترض literal `Navigator.pop(context` بينما server picker الفعلي يغلق الـmodal الصحيح عبر `Navigator.of(sheetContext).pop()`. هذا TEST_DEFECT؛ لم يُستخدم rerun أعمى.
+- تم إصلاح العقد على نفس PR، ثم تقويته ليثبت أن Server Picker لا يعرض الأخضر إلا عند `playbackStarted` مع تقدم position فعلي، وأن URL فقط يظهر «رابط مستخرج · لم يبدأ التشغيل بعد»، والفشل/عدم التأكد لا يتحول إلى نجاح.
+- exact head بعد دفعة الاختبارات: `fcde0b35be5ffa14601041da277167cf1765a661`. أي خضرة من SHA أقدم غير موروثة، وتنتظر هذه الدفعة CI/Build الخاصة بها.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون؛ runtime player-start المثبت ميدانيًا = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search: TMDB `/search/multi` + `include_adult=false` + `language=ar-SA`; Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- navigation/back: Details أثناء loading وPlayer أثناء loading/error وserver picker modal مغطاة بعقود regression؛ physical iOS gesture/Android TV remote/focus/fullscreen proof ما زال مطلوبًا.
+- buffering fallback: watchdog ~12s + stable position + failed server/media URL session guards قائم.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; لا Release جديد. Android release-key signing secrets غير مثبتة، وiOS no-codesign فقط.
+
+### أهداف التشغيل التالي
+
+1. اعتماد Branch CI + Build الخاصة بالـexact head `fcde0b35...` فقط وإصلاح أي failure من logs.
+2. دمج #58 فور خضرة analyze/tests + Mobile/TV/iOS على exact head والـmergeability بلا blocker.
+3. بعد الدمج إعادة قراءة main وتوسيع runtime/widget coverage للfullscreen وTV D-Pad/focus/restoration.
+4. مراجعة التعريب المرئي المتبقي في player/services دون خلط أسماء العلامات التقنية.
+5. إبقاء 22 net-new pending حتى resolver/template مسموح + player-start progress فعلي.
+
+---
+
+## تشغيل 2026-09-19 — PR #58: Back أثناء loading/error/server picker
+
+- exact main عند بداية الجولة: `6102f028d9f972b2a8eda140051a6c7068463f38`; لا PR مفتوح عند الفحص لأن #57 دُمج بالفعل إلى main.
+- PR #58 على `p0/back-loading-error-contract-2.1.3` هو مسار P0 الحالي، بدأ من main الحالي دون behind.
+- أضيف regression contract لتفاصيل الفيلم/المسلسل يثبت أن route يبقى `canPop: true` أثناء loading وأن BackButton المرئي يستخدم `maybePop`، مع إيقاف trailer بعد system/platform pop.
+- أضيف regression contract للـplayer يغطي loading/error والزر المرئي «رجوع» وserver picker كـmodal قابل للإغلاق، ويثبت أن platform pop يلغي buffering watchdog ويحفظ progress.
+- لا يوجد ادعاء runtime device proof؛ المطلوب لاحقًا Android/iOS/TV physical runtime للحركات وD-Pad/fullscreen.
+- baseline صور المستخدم: 8 Servers / 41 Extractors مسجلون، runtime player-start المثبت = 0 / 0.
+- Canonical 27: 27 total / 5 runtime overlaps / 22 net-new pending / 0 net-new runtime-working مثبت.
+- direct search TMDB ثابت على /search/multi + include_adult=false + language=ar-SA؛ Theeb Engine غير مربوط بلا production HTTPS مثبت ومصرح.
+- watchdog ~12s + failed server/media URL session guards + stable position ما زالت قائمة.
+- version/tag/release: `2.1.3+19` / `v2.1.3`; آخر Release يستهدف `b701654...` وليس main الحالي، لذلك لا Release جديد بعد.
+
+### أهداف التشغيل التالي
+
+1. اعتماد exact-head CI/Build لـ#58 وإصلاح failures من logs دون rerun أعمى.
+2. توسيع back/focus contract للfullscreen والحوارات حيث يكشف الكود فجوة حقيقية.
+3. دمج #58 فقط بعد analyze/tests + Mobile/TV/iOS exact-head خضراء.
+4. بعدها مراجعة التعريب المرئي وبقايا diagnostics خارج Developer Mode.
+5. إبقاء 22 net-new pending حتى resolver مسموح + player-start progress مثبت.
+
+---
+
+
 ## تشغيل 2026-09-19 — PR #57: إصلاح TEST_DEFECT على Developer Mode gate
 
 - exact main: `61dd792a3dea63e10aaa338ac6412b1fcb27d7f2`; PR #57 هو المفتوح الوحيد، branch `p0/developer-diagnostics-gate-2.1.3`.
